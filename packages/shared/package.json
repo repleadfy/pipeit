@@ -1,0 +1,25 @@
+{
+  "name": "@mpipe/shared",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./db": "./dist/db/index.js",
+    "./db/schema": "./dist/db/schema.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.0",
+    "postgres": "^3.4.7",
+    "nanoid": "^5.1.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "typescript": "^5.9.3"
+  }
+}
