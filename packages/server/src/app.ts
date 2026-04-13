@@ -10,6 +10,7 @@ import { github } from "./auth/github.js";
 import { email } from "./auth/email.js";
 import { verifyJwt } from "./auth/jwt.js";
 import { authMiddleware } from "./auth/middleware.js";
+import { authRateLimit, apiRateLimit } from "./middleware/rate-limit.js";
 import { docsRouter } from "./routes/docs.js";
 import { positionRouter } from "./routes/position.js";
 import { pushRouter } from "./routes/push.js";
@@ -22,6 +23,8 @@ app.use("*", cors({
 }));
 
 app.get("/health", (c) => c.json({ status: "ok" }));
+
+app.use("/auth/*", authRateLimit);
 
 app.route("/auth", google);
 app.route("/auth", github);
@@ -46,6 +49,7 @@ app.post("/auth/logout", (c) => {
 });
 
 app.use("/api/*", authMiddleware);
+app.use("/api/*", apiRateLimit);
 
 app.route("/api/docs", docsRouter);
 app.route("/api/docs", positionRouter);
