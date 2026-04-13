@@ -7,6 +7,8 @@ import { ReadingProgress } from "../components/ReadingProgress.js";
 import { TOCSidebar } from "../components/TOCSidebar.js";
 import { SearchPanel } from "../components/SearchPanel.js";
 import { useKeyboard } from "../hooks/useKeyboard.js";
+import { useReadingPosition } from "../hooks/useReadingPosition.js";
+import { useTheme } from "../hooks/useTheme.js";
 import type { DocResponse } from "@mpipe/shared";
 
 export function DocPage() {
@@ -17,6 +19,8 @@ export function DocPage() {
   const [searchOpen, setSearchOpen] = useState(false);
   const toggleSearch = useCallback(() => setSearchOpen((v) => !v), []);
   useKeyboard("k", true, toggleSearch);
+  useReadingPosition(slug);
+  const { theme, toggle: toggleTheme } = useTheme();
 
   useEffect(() => {
     if (!slug) return;
@@ -39,7 +43,7 @@ export function DocPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
-      <Header onToggleTOC={() => setTocOpen(!tocOpen)} onToggleSearch={() => setSearchOpen(!searchOpen)} />
+      <Header onToggleTOC={() => setTocOpen(!tocOpen)} onToggleSearch={() => setSearchOpen(!searchOpen)} theme={theme} onToggleTheme={toggleTheme} />
       <TOCSidebar open={tocOpen} onClose={() => setTocOpen(false)} />
       <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} />
       <main className="max-w-3xl mx-auto px-4 py-8">

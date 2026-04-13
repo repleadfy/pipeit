@@ -4,9 +4,11 @@ import { useState } from "react";
 interface HeaderProps {
   onToggleTOC: () => void;
   onToggleSearch: () => void;
+  theme: "light" | "dark";
+  onToggleTheme: () => void;
 }
 
-export function Header({ onToggleTOC, onToggleSearch }: HeaderProps) {
+export function Header({ onToggleTOC, onToggleSearch, theme, onToggleTheme }: HeaderProps) {
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -28,6 +30,9 @@ export function Header({ onToggleTOC, onToggleSearch }: HeaderProps) {
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-gray-900 border border-gray-800 rounded-lg shadow-xl py-1 z-50">
                 <div className="px-3 py-2 text-sm text-gray-400 border-b border-gray-800">{user.email}</div>
+                <button onClick={onToggleTheme} className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 transition">
+                  {theme === "dark" ? "Light mode" : "Dark mode"}
+                </button>
                 <button onClick={logout} className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 transition">
                   Sign out
                 </button>
