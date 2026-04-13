@@ -7,6 +7,7 @@ export interface JwtPayload {
   sub: string;
   email: string;
   name?: string;
+  [key: string]: unknown;
 }
 
 export async function signJwt(payload: JwtPayload): Promise<string> {
