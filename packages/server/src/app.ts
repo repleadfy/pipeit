@@ -10,6 +10,7 @@ import { github } from "./auth/github.js";
 import { email } from "./auth/email.js";
 import { verifyJwt } from "./auth/jwt.js";
 import { authMiddleware } from "./auth/middleware.js";
+import { docsRouter } from "./routes/docs.js";
 
 const app = new Hono();
 
@@ -43,5 +44,7 @@ app.post("/auth/logout", (c) => {
 });
 
 app.use("/api/*", authMiddleware);
+
+app.route("/api/docs", docsRouter);
 
 export { app };
