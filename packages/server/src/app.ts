@@ -1,7 +1,14 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { getCookie, deleteCookie } from "hono/cookie";
+import { eq } from "drizzle-orm";
+import { db } from "@mpipe/shared/db";
+import { users } from "@mpipe/shared/db/schema";
 import { env } from "./env.js";
 import { google } from "./auth/google.js";
+import { github } from "./auth/github.js";
+import { email } from "./auth/email.js";
+import { verifyJwt } from "./auth/jwt.js";
 import { authMiddleware } from "./auth/middleware.js";
 
 const app = new Hono();
@@ -14,6 +21,26 @@ app.use("*", cors({
 app.get("/health", (c) => c.json({ status: "ok" }));
 
 app.route("/auth", google);
+app.route("/auth", github);
+app.route("/auth", email);
+
+app.get("/auth/me", async (c) => {
+  const token = getCookie(c, "token");
+  if (!token) return c.json({ user: null });
+  try {
+    const payload = await verifyJwt(token);
+    const user = (await db.select().from(users).where(eq(users.id, payload.sub)).limit(1))[0];
+    if (!user) return c.json({ user: null });
+    return c.json({ user: { id: user.id, name: user.name, email: user.email, avatar_url: user.avatarUrl } });
+  } catch {
+    return c.json({ user: null });
+  }
+});
+
+app.post("/auth/logout", (c) => {
+  deleteCookie(c, "token", { path: "/" });
+  return c.json({ ok: true });
+});
 
 app.use("/api/*", authMiddleware);
 
