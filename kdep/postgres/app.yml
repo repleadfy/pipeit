@@ -1,0 +1,26 @@
+preset: stateful
+namespace: mpipe
+name: mpipe-postgres
+image: postgres
+registry: docker.io/library
+tag: "17"
+port: 5432
+replicas: 1
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+env_from:
+  - secret/secret-mpipe-postgres
+env:
+  POSTGRES_DB: mpipe
+  POSTGRES_USER: mpipe
+  POSTGRES_PASSWORD: ""
+volumes:
+  - name: pgdata
+    mountPath: /var/lib/postgresql/data
+    size: 10Gi
+    storageClass: managed-premium
