@@ -1,3 +1,4 @@
+import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { getCookie, deleteCookie } from "hono/cookie";
@@ -54,5 +55,12 @@ app.use("/api/*", apiRateLimit);
 app.route("/api/docs", docsRouter);
 app.route("/api/docs", positionRouter);
 app.route("/api/push", pushRouter);
+
+// Serve built web assets (production only)
+if (process.env.NODE_ENV === "production") {
+  app.use("/*", serveStatic({ root: "./public" }));
+  // SPA fallback — serve index.html for all non-API routes
+  app.get("*", serveStatic({ root: "./public", path: "index.html" }));
+}
 
 export { app };
