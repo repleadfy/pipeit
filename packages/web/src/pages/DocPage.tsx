@@ -1,9 +1,12 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api } from "../lib/api.js";
 import { Header } from "../components/Header.js";
 import { MarkdownRenderer } from "../components/MarkdownRenderer.js";
 import { ReadingProgress } from "../components/ReadingProgress.js";
+import { TOCSidebar } from "../components/TOCSidebar.js";
+import { SearchPanel } from "../components/SearchPanel.js";
+import { useKeyboard } from "../hooks/useKeyboard.js";
 import type { DocResponse } from "@mpipe/shared";
 
 export function DocPage() {
@@ -12,6 +15,8 @@ export function DocPage() {
   const [error, setError] = useState<string | null>(null);
   const [tocOpen, setTocOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const toggleSearch = useCallback(() => setSearchOpen((v) => !v), []);
+  useKeyboard("k", true, toggleSearch);
 
   useEffect(() => {
     if (!slug) return;
@@ -35,6 +40,8 @@ export function DocPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
       <Header onToggleTOC={() => setTocOpen(!tocOpen)} onToggleSearch={() => setSearchOpen(!searchOpen)} />
+      <TOCSidebar open={tocOpen} onClose={() => setTocOpen(false)} />
+      <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} />
       <main className="max-w-3xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-2">{doc.title}</h1>
         <p className="text-sm text-gray-500 mb-8">v{doc.version} &middot; {new Date(doc.updated_at).toLocaleDateString()}</p>
