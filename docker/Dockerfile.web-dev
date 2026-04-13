@@ -1,0 +1,12 @@
+FROM node:22-slim
+WORKDIR /app
+COPY package.json yarn.lock .yarnrc ./
+COPY packages/shared/package.json packages/shared/
+COPY packages/web/package.json packages/web/
+RUN yarn install
+COPY packages/shared packages/shared
+COPY packages/web packages/web
+COPY tsconfig.base.json ./
+RUN yarn workspace @mpipe/shared run build
+WORKDIR /app/packages/web
+CMD ["yarn", "dev", "--host", "0.0.0.0"]
