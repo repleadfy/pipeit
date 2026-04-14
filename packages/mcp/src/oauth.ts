@@ -26,11 +26,35 @@ oauthApp.get("/metadata", (c) => {
     issuer: base,
     authorization_endpoint: `${base}/mcp/authorize`,
     token_endpoint: `${base}/mcp/token`,
+    registration_endpoint: `${base}/mcp/register`,
     response_types_supported: ["code"],
     grant_types_supported: ["authorization_code"],
     code_challenge_methods_supported: ["S256"],
     token_endpoint_auth_methods_supported: ["none"],
   });
+});
+
+// Dynamic client registration (RFC 7591) — required by MCP SDK
+// Accepts any client and returns a client_id. We don't enforce client secrets
+// since we rely on PKCE for security (public clients).
+oauthApp.post("/register", async (c) => {
+  const body = await c.req.json<{
+    client_name?: string;
+    redirect_uris?: string[];
+    grant_types?: string[];
+    response_types?: string[];
+    token_endpoint_auth_method?: string;
+  }>();
+
+  const clientId = nanoid(21);
+  return c.json({
+    client_id: clientId,
+    client_name: body.client_name ?? "MCP Client",
+    redirect_uris: body.redirect_uris ?? [],
+    grant_types: body.grant_types ?? ["authorization_code"],
+    response_types: body.response_types ?? ["code"],
+    token_endpoint_auth_method: body.token_endpoint_auth_method ?? "none",
+  }, 201);
 });
 
 // Authorization endpoint — shows login options
