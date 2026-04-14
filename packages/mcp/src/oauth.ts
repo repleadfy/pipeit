@@ -21,7 +21,7 @@ const oauthApp = new Hono();
 
 // OAuth metadata — mounted at /.well-known/oauth-authorization-server by the main app
 oauthApp.get("/metadata", (c) => {
-  const base = new URL(c.req.url).origin;
+  const base = process.env.PUBLIC_URL || new URL(c.req.url).origin;
   return c.json({
     issuer: base,
     authorization_endpoint: `${base}/mcp/authorize`,
@@ -57,7 +57,7 @@ oauthApp.get("/authorize", (c) => {
   });
 
   // Render a simple login page with Google/GitHub buttons
-  const base = new URL(c.req.url).origin;
+  const base = process.env.PUBLIC_URL || new URL(c.req.url).origin;
   const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>mpipe — Sign In</title>
 <style>

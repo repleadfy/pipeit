@@ -15,7 +15,7 @@ mcpApp.route("/", oauthApp);
 // MCP Streamable HTTP endpoint — requires Bearer auth
 mcpApp.all("/", mcpAuthMiddleware, async (c) => {
   const user = c.get("mcpUser");
-  const baseUrl = new URL(c.req.url).origin;
+  const baseUrl = process.env.PUBLIC_URL || new URL(c.req.url).origin;
 
   // Create per-request server with user context
   const server = new McpServer({

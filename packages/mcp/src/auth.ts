@@ -20,7 +20,7 @@ export async function mcpAuthMiddleware(c: Context, next: Next) {
   const token = authHeader?.replace("Bearer ", "");
 
   if (!token) {
-    const base = new URL(c.req.url).origin;
+    const base = process.env.PUBLIC_URL || new URL(c.req.url).origin;
     c.header("WWW-Authenticate", `Bearer resource_metadata="${base}/.well-known/oauth-authorization-server"`);
     return c.json({ error: "unauthorized" }, 401);
   }

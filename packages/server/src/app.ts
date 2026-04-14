@@ -62,7 +62,7 @@ app.route("/mcp", mcpApp);
 
 // OAuth metadata discovery
 app.get("/.well-known/oauth-authorization-server", (c) => {
-  const base = new URL(c.req.url).origin;
+  const base = env.PUBLIC_URL || new URL(c.req.url).origin;
   return c.json({
     issuer: base,
     authorization_endpoint: `${base}/mcp/authorize`,
