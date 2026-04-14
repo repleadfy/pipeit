@@ -103,9 +103,31 @@ docsRouter.get("/", async (c) => {
   })));
 });
 
-// GET /api/docs/:slug — get single doc
+// GET /api/docs/:slug — get single doc (slug "latest" returns most recent)
 docsRouter.get("/:slug", async (c) => {
   const slug = c.req.param("slug");
+
+  // "latest" → resolve to user's most recently updated doc
+  if (slug === "latest") {
+    const user = c.get("user");
+    if (!user) return c.json({ error: "not found" }, 404);
+    const latest = await db.select().from(docs)
+      .where(eq(docs.userId, user.sub))
+      .orderBy(sql`${docs.updatedAt} DESC`)
+      .limit(1);
+    if (latest.length === 0) return c.json({ error: "no_docs" }, 404);
+    const d = latest[0];
+    return c.json({
+      slug: d.slug,
+      title: d.title,
+      content: d.content,
+      version: d.version,
+      is_public: d.isPublic,
+      created_at: d.createdAt.toISOString(),
+      updated_at: d.updatedAt.toISOString(),
+    });
+  }
+
   const doc = await db.select().from(docs).where(eq(docs.slug, slug)).limit(1);
 
   if (doc.length === 0) return c.json({ error: "not found" }, 404);

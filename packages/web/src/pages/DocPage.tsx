@@ -29,11 +29,22 @@ export function DocPage() {
       .catch((e) => setError(e.message));
   }, [slug]);
 
-  if (error) return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950 text-gray-100">
-      <p className="text-gray-400">{error === "not found" ? "Document not found" : error}</p>
-    </div>
-  );
+  if (error) {
+    if (error === "no_docs") return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-gray-100">
+        <div className="text-center space-y-4 max-w-md">
+          <h1 className="text-2xl font-bold">Welcome to mpipe</h1>
+          <p className="text-gray-400">You don't have any documents yet. Push your first markdown file to get started:</p>
+          <pre className="text-left bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-gray-300 overflow-x-auto">npx mpipe push README.md</pre>
+        </div>
+      </div>
+    );
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-gray-100">
+        <p className="text-gray-400">{error === "not found" ? "Document not found" : error}</p>
+      </div>
+    );
+  }
 
   if (!doc) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-950 text-gray-100">
