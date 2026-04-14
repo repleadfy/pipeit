@@ -4,3 +4,6 @@ dist/
 .env.*
 .DS_Store
 .superpowers/
+kdep/*/secrets.yml
+kdep/*/.rendered
+

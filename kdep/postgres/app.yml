@@ -1,0 +1,34 @@
+preset: statefulset_svc
+namespace: mpipe
+name: mpipe-postgres
+image: postgres
+tag: "17"
+port: 5432
+replicas: 1
+
+image_pull_policy: IfNotPresent
+
+cluster_ip: None
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+configmap:
+  POSTGRES_DB: mpipe
+  POSTGRES_USER: mpipe
+
+volume_mounts:
+  - name: pgdata
+    mountPath: /var/lib/postgresql/data
+    subPath: pgdata
+
+storage:
+  pgdata:
+    size: 3Gi
+    class: managed-csi
+    access_mode: ReadWriteOnce

@@ -1,0 +1,40 @@
+preset: web
+namespace: mpipe
+name: mpipe-web
+image: mpipe-web
+registry: leadfycr.azurecr.io
+dockerfile: docker/Dockerfile.server
+port: 3001
+replicas: 1
+image_pull_secrets: ns-mpipe-azcr-secret
+ingress_class_field: nginx
+probe:
+  path: /health
+  port: 3001
+  initial_delay: 10
+  period: 15
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+lifecycle:
+  preStop:
+    exec:
+      command: ["sh", "-c", "sleep 5"]
+env_from:
+  - configmap/config-mpipe-web
+  - secret/secret-mpipe-web
+env:
+  PORT: "3001"
+  PUBLIC_URL: "https://mpipe.dev"
+  WEB_URL: "https://mpipe.dev"
+  VAPID_EMAIL: "mailto:admin@mpipe.dev"
+  NODE_ENV: "production"
+domains:
+  - mpipe.dev
+ingress_annotations:
+  cert-manager.io/cluster-issuer: letsencrypt
+  nginx.ingress.kubernetes.io/proxy-body-size: "2m"

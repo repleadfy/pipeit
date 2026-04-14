@@ -1,0 +1,28 @@
+{
+  "name": "@mpipe/server",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "node --import tsx --test src/*.test.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.11",
+    "@mpipe/mcp": "*",
+    "@mpipe/shared": "*",
+    "hono": "^4.12.8",
+    "jose": "^6.2.2",
+    "nanoid": "^5.1.7",
+    "bcrypt": "^5.1.1",
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/web-push": "^3.6.4",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
