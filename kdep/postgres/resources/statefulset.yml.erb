@@ -1,0 +1,128 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: <%= @config["statefulset_name"] || @config["deployment_name"] || name %>
+  namespace: <%= namespace %>
+  labels:
+    app: <%= name %>
+spec:
+  replicas: <%= replicas %>
+  serviceName: <%= @config["service_name"] || name %>
+  selector:
+    matchLabels:
+      app: <%= name %>
+  template:
+    metadata:
+      labels:
+        app: <%= name %>
+<% if @config["pod_labels"] -%>
+<% @config["pod_labels"].each do |k, v| -%>
+        <%= k %>: "<%= v %>"
+<% end -%>
+<% end -%>
+    spec:
+<% if @config["termination_grace_period"] -%>
+      terminationGracePeriodSeconds: <%= @config["termination_grace_period"] %>
+<% end -%>
+<% if @config["image_pull_secrets"] -%>
+      imagePullSecrets:
+        - name: <%= @config["image_pull_secrets"] %>
+<% end -%>
+      containers:
+        - name: <%= @config["container_name"] || name %>
+          image: <%= @config["registry"] ? "#{@config["registry"]}/#{image}" : image %>:<%= @config["tag"] || "latest" %>
+<% if @config["image_pull_policy"] -%>
+          imagePullPolicy: <%= @config["image_pull_policy"] %>
+<% end -%>
+<% if @config["command"] -%>
+          command: <%= @config["command"].is_a?(Array) ? @config["command"].inspect : "[\"#{@config["command"]}\"]" %>
+<% end -%>
+<% if @config["args"] -%>
+          args: <%= @config["args"].is_a?(Array) ? @config["args"].inspect : "[\"#{@config["args"]}\"]" %>
+<% end -%>
+<% if @config["port"] -%>
+          ports:
+            - containerPort: <%= port %>
+<% if @config["container_port_protocol"] -%>
+              protocol: <%= @config["container_port_protocol"] %>
+<% end -%>
+<% end -%>
+<% if @config["security_context"] -%>
+          securityContext:
+<%= @config["security_context"].to_yaml.sub("---\n", "").gsub(/^/, "            ").rstrip %>
+<% end -%>
+<% if @config["resources"] -%>
+          resources:
+<% if @config["resources"]["requests"] -%>
+            requests:
+<% @config["resources"]["requests"].each do |k, v| -%>
+              <%= k %>: <%= v.is_a?(Numeric) ? v : "\"#{v}\"" %>
+<% end -%>
+<% end -%>
+<% if @config["resources"]["limits"] -%>
+            limits:
+<% @config["resources"]["limits"].each do |k, v| -%>
+              <%= k %>: <%= v.is_a?(Numeric) ? v : "\"#{v}\"" %>
+<% end -%>
+<% end -%>
+<% end -%>
+<% if @config["probe"] -%>
+          livenessProbe:
+            httpGet:
+              path: <%= @config["probe"]["path"] || "/healthz" %>
+              port: <%= @config["probe"]["port"] || port %>
+            initialDelaySeconds: <%= @config["probe"]["initial_delay"] || 15 %>
+            periodSeconds: <%= @config["probe"]["period"] || 10 %>
+            failureThreshold: <%= @config["probe"]["failure_threshold"] || 3 %>
+            timeoutSeconds: <%= @config["probe"]["timeout"] || 3 %>
+          readinessProbe:
+            httpGet:
+              path: <%= @config["probe"]["readiness_path"] || @config["probe"]["path"] || "/healthz" %>
+              port: <%= @config["probe"]["readiness_port"] || @config["probe"]["port"] || port %>
+            initialDelaySeconds: <%= @config["probe"]["readiness_initial_delay"] || @config["probe"]["initial_delay"] || 3 %>
+            periodSeconds: <%= @config["probe"]["readiness_period"] || @config["probe"]["period"] || 10 %>
+            failureThreshold: <%= @config["probe"]["readiness_failure_threshold"] || @config["probe"]["failure_threshold"] || 3 %>
+            timeoutSeconds: <%= @config["probe"]["readiness_timeout"] || @config["probe"]["timeout"] || 3 %>
+<% end -%>
+<% if @config["volume_mounts"] -%>
+          volumeMounts:
+<% @config["volume_mounts"].each do |vm| -%>
+            - name: <%= vm["name"] %>
+              mountPath: <%= vm["mountPath"] %>
+<% if vm["readOnly"] -%>
+              readOnly: <%= vm["readOnly"] %>
+<% end -%>
+<% if vm["subPath"] -%>
+              subPath: <%= vm["subPath"] %>
+<% end -%>
+<% end -%>
+<% end -%>
+          envFrom:
+<% env_from_list = @config["env_from"] || ["configmap/config-#{name}", "secret/secret-#{name}"] -%>
+<% env_from_list.each do |ref| -%>
+<%   type, ref_name = ref.split("/", 2) -%>
+<% if type == "configmap" -%>
+            - configMapRef:
+                name: <%= ref_name %>
+<% elsif type == "secret" -%>
+            - secretRef:
+                name: <%= ref_name %>
+<% end -%>
+<% end -%>
+<% if @config["volumes"] -%>
+      volumes:
+<%= @config["volumes"].to_yaml.sub("---\n", "").gsub(/^/, "        ").rstrip %>
+<% end -%>
+<% if @config["storage"] -%>
+  volumeClaimTemplates:
+<% @config["storage"].each do |vol_name, vol_config| -%>
+    - metadata:
+        name: <%= vol_name %>
+      spec:
+        accessModes: ["<%= vol_config["access_mode"] || "ReadWriteOnce" %>"]
+        storageClassName: <%= vol_config["class"] || "managed-csi" %>
+        resources:
+          requests:
+            storage: <%= vol_config["size"] %>
+<% end -%>
+<% end -%>

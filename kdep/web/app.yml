@@ -3,7 +3,6 @@ namespace: mpipe
 name: mpipe-web
 image: mpipe-web
 registry: leadfycr.azurecr.io
-tag: "0.1"
 dockerfile: docker/Dockerfile.server
 port: 3001
 replicas: 1
@@ -30,17 +29,10 @@ env_from:
   - secret/secret-mpipe-web
 env:
   PORT: "3001"
-  DATABASE_URL: ""
-  JWT_SECRET: ""
-  GOOGLE_CLIENT_ID: ""
-  GOOGLE_CLIENT_SECRET: ""
-  GITHUB_CLIENT_ID: ""
-  GITHUB_CLIENT_SECRET: ""
   PUBLIC_URL: "https://mpipe.dev"
   WEB_URL: "https://mpipe.dev"
-  VAPID_PUBLIC_KEY: ""
-  VAPID_PRIVATE_KEY: ""
   VAPID_EMAIL: "mailto:admin@mpipe.dev"
+  NODE_ENV: "production"
 domains:
   - mpipe.dev
 ingress_annotations:
