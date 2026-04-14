@@ -12,6 +12,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
+    "@cfworker/json-schema": "^4.1.1",
     "@modelcontextprotocol/server": "2.0.0-alpha.2",
     "@modelcontextprotocol/hono": "2.0.0-alpha.2",
     "@mpipe/shared": "*",
