@@ -15,6 +15,7 @@ import { authRateLimit, apiRateLimit } from "./middleware/rate-limit.js";
 import { docsRouter } from "./routes/docs.js";
 import { positionRouter } from "./routes/position.js";
 import { pushRouter } from "./routes/push.js";
+import { mcpApp } from "@mpipe/mcp";
 
 const app = new Hono();
 
@@ -55,6 +56,23 @@ app.use("/api/*", apiRateLimit);
 app.route("/api/docs", docsRouter);
 app.route("/api/docs", positionRouter);
 app.route("/api/push", pushRouter);
+
+// MCP remote server
+app.route("/mcp", mcpApp);
+
+// OAuth metadata discovery
+app.get("/.well-known/oauth-authorization-server", (c) => {
+  const base = new URL(c.req.url).origin;
+  return c.json({
+    issuer: base,
+    authorization_endpoint: `${base}/mcp/authorize`,
+    token_endpoint: `${base}/mcp/token`,
+    response_types_supported: ["code"],
+    grant_types_supported: ["authorization_code"],
+    code_challenge_methods_supported: ["S256"],
+    token_endpoint_auth_methods_supported: ["none"],
+  });
+});
 
 // Serve built web assets (production only)
 if (process.env.NODE_ENV === "production") {

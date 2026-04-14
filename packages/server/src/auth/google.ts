@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { setCookie } from "hono/cookie";
+import { setCookie, getCookie } from "hono/cookie";
 import { eq } from "drizzle-orm";
 import { db } from "@mpipe/shared/db";
 import { users, authIdentities } from "@mpipe/shared/db/schema";
@@ -79,6 +79,12 @@ google.get("/google/callback", async (c) => {
     maxAge: 60 * 60 * 24 * 30,
     path: "/",
   });
+
+  // Check if this is an MCP OAuth flow
+  const mcpOauthState = getCookie(c, "mcp_oauth_state");
+  if (mcpOauthState) {
+    return c.redirect(`${env.PUBLIC_URL}/mcp/callback?user_id=${userId}`);
+  }
 
   return c.redirect(env.WEB_URL);
 });
