@@ -18,7 +18,7 @@
     "hono": "^4.12.8",
     "jose": "^6.2.2",
     "nanoid": "^5.1.7",
-    "zod": "^3.25.0"
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.3",
