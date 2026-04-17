@@ -78,8 +78,12 @@ app.get("/.well-known/oauth-authorization-server", (c) => {
 // Serve built web assets (production only)
 if (process.env.NODE_ENV === "production") {
   app.use("/*", serveStatic({ root: "./public" }));
-  // SPA fallback — serve index.html for all non-API routes
-  app.get("*", serveStatic({ root: "./public", path: "index.html" }));
+  // SPA fallback — serve index.html only for non-file paths (no extension)
+  app.get("*", (c, next) => {
+    const path = new URL(c.req.url).pathname;
+    if (path.includes(".")) return c.notFound();
+    return serveStatic({ root: "./public", path: "index.html" })(c, next);
+  });
 }
 
 export { app };
