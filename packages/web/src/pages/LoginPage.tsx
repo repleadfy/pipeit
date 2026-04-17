@@ -25,7 +25,7 @@ export function LoginPage() {
         <div className="flex items-center gap-3 text-gray-500 text-sm">
           <div className="flex-1 h-px bg-gray-800" /><span>or</span><div className="flex-1 h-px bg-gray-800" />
         </div>
-        <form className="space-y-3" onSubmit={async (e) => {
+        <form key={isSignUp ? "signup" : "signin"} className="space-y-3" onSubmit={async (e) => {
           e.preventDefault();
           setError("");
           const form = new FormData(e.currentTarget);
