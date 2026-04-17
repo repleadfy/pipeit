@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../lib/api.js";
 import { Header } from "../components/Header.js";
@@ -41,7 +41,10 @@ export function DocPage() {
     );
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-        <p className="text-gray-400">{error === "not found" ? "Document not found" : error}</p>
+        <div className="text-center">
+          <p className="text-gray-400 mb-4">{error === "not found" ? "Document not found" : error}</p>
+          <Link to="/" className="text-indigo-400 hover:text-indigo-300 text-sm">Back to home</Link>
+        </div>
       </div>
     );
   }
