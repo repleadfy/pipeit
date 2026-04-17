@@ -13,7 +13,7 @@ export function Header({ onToggleTOC, onToggleSearch, theme, onToggleTheme }: He
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between px-4 py-2 bg-gray-950/80 backdrop-blur border-b border-gray-800">
+    <header className="sticky top-0 z-40 flex items-center justify-between px-4 py-2 bg-white/80 dark:bg-gray-950/80 backdrop-blur border-b border-gray-200 dark:border-gray-800">
       <button onClick={onToggleTOC} className="px-2 py-1 rounded text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800 transition">
         &#9776; TOC
       </button>
@@ -28,7 +28,7 @@ export function Header({ onToggleTOC, onToggleSearch, theme, onToggleTheme }: He
               {user.avatar_url ? <img src={user.avatar_url} className="w-7 h-7 rounded-full" /> : user.name[0].toUpperCase()}
             </button>
             {menuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-gray-900 border border-gray-800 rounded-lg shadow-xl py-1 z-50">
+              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-xl py-1 z-50">
                 <div className="px-3 py-2 text-sm text-gray-400 border-b border-gray-800">{user.email}</div>
                 <button onClick={onToggleTheme} className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 transition">
                   {theme === "dark" ? "Light mode" : "Dark mode"}

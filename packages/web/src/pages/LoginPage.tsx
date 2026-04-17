@@ -11,7 +11,7 @@ export function LoginPage() {
   if (user) return <Navigate to="/" replace />;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950 text-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       <div className="w-full max-w-sm space-y-6 p-8">
         <h1 className="text-2xl font-bold text-center">{isSignUp ? "Create an account" : "Sign in to mpipe"}</h1>
         <div className="space-y-3">

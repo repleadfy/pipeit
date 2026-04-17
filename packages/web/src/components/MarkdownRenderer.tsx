@@ -26,7 +26,7 @@ function MermaidBlock({ code }: { code: string }) {
 
 export function MarkdownRenderer({ content }: { content: string }) {
   return (
-    <article className="prose prose-invert prose-gray max-w-none">
+    <article className="prose dark:prose-invert prose-gray max-w-none">
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeHighlight, rehypeKatex, rehypeSlug, rehypeAutolinkHeadings]}
