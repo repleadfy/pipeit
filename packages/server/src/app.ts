@@ -79,10 +79,11 @@ app.get("/.well-known/oauth-authorization-server", (c) => {
 if (process.env.NODE_ENV === "production") {
   app.use("/*", serveStatic({ root: "./public" }));
   // SPA fallback — serve index.html only for non-file paths (no extension)
-  app.get("*", (c, next) => {
+  const spaFallback = serveStatic({ root: "./public", path: "index.html" });
+  app.get("*", async (c, next) => {
     const path = new URL(c.req.url).pathname;
     if (path.includes(".")) return c.notFound();
-    return serveStatic({ root: "./public", path: "index.html" })(c, next);
+    return spaFallback(c, next);
   });
 }
 
