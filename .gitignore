@@ -7,3 +7,4 @@ dist/
 kdep/*/secrets.yml
 kdep/*/.rendered
 .prod_test_creds
+.gstack/
