@@ -1,6 +1,7 @@
 import { execSync as realExec, spawnSync as realSpawn } from "node:child_process";
 
-export const MARKETPLACE = "repleadfy/pipeit";
+export const MARKETPLACE_SOURCE = "repleadfy/pipeit";
+export const MARKETPLACE_NAME = "repleadfy";
 export const PLUGIN = "pipeit";
 
 type SpawnFn = (cmd: string, args: string[]) => { status: number | null };
@@ -14,8 +15,8 @@ export function hasClaudeCli(spawn: SpawnFn = (c, a) => realSpawn(c, a, { stdio:
 
 export function tryInstallViaCli(exec: ExecFn = (c) => { realExec(c, { stdio: "inherit" }); }): boolean {
   try {
-    exec(`claude plugin marketplace add ${MARKETPLACE}`);
-    exec(`claude plugin install ${PLUGIN}@${MARKETPLACE}`);
+    exec(`claude plugin marketplace add ${MARKETPLACE_SOURCE}`);
+    exec(`claude plugin install ${PLUGIN}@${MARKETPLACE_NAME}`);
     return true;
   } catch {
     return false;
@@ -26,8 +27,8 @@ export function printManualInstructions(log: LogFn = console.log): void {
   log("");
   log("Run these two commands inside Claude Code:");
   log("");
-  log(`  /plugin marketplace add ${MARKETPLACE}`);
-  log(`  /plugin install ${PLUGIN}`);
+  log(`  /plugin marketplace add ${MARKETPLACE_SOURCE}`);
+  log(`  /plugin install ${PLUGIN}@${MARKETPLACE_NAME}`);
   log("");
 }
 

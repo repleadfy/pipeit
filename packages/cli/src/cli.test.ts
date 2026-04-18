@@ -18,7 +18,7 @@ test("tryInstallViaCli returns true when both exec calls succeed", () => {
   assert.equal(tryInstallViaCli(exec), true);
   assert.deepEqual(calls, [
     "claude plugin marketplace add repleadfy/pipeit",
-    "claude plugin install pipeit@repleadfy/pipeit",
+    "claude plugin install pipeit@repleadfy",
   ]);
 });
 
@@ -31,7 +31,7 @@ test("printManualInstructions writes the two /plugin lines", () => {
   const lines: string[] = [];
   printManualInstructions((s) => lines.push(s));
   assert.ok(lines.some((l) => l.includes("/plugin marketplace add repleadfy/pipeit")));
-  assert.ok(lines.some((l) => l.includes("/plugin install pipeit")));
+  assert.ok(lines.some((l) => l.includes("/plugin install pipeit@repleadfy")));
 });
 
 test("printNextStep mentions /pipeit and browser sign-in", () => {

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { CopyButton } from "../components/CopyButton.js";
 
 const PLUGIN_COMMANDS = `/plugin marketplace add repleadfy/pipeit
-/plugin install pipeit`;
+/plugin install pipeit@repleadfy`;
 
 function Block({ label, code, recommended }: { label: string; code: string; recommended?: boolean }) {
   return (

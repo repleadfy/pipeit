@@ -7,7 +7,7 @@ Three paths, same end state: the pipeit Claude Code plugin is registered with it
 Inside Claude Code:
 
     /plugin marketplace add repleadfy/pipeit
-    /plugin install pipeit
+    /plugin install pipeit@repleadfy
 
 ## 2. npm
 

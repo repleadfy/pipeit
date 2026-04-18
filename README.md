@@ -7,7 +7,7 @@ Share markdown from AI conversations. Read on any device.
 The fastest path is the Claude Code plugin:
 
     /plugin marketplace add repleadfy/pipeit
-    /plugin install pipeit
+    /plugin install pipeit@repleadfy
 
 Or from a terminal:
 

@@ -7,7 +7,7 @@ describe("InstallPage", () => {
   test("renders all three install commands", () => {
     render(<MemoryRouter><InstallPage /></MemoryRouter>);
     expect(screen.getByText(/plugin marketplace add repleadfy\/pipeit/)).toBeInTheDocument();
-    expect(screen.getByText(/plugin install pipeit/)).toBeInTheDocument();
+    expect(screen.getByText(/plugin install pipeit@repleadfy/)).toBeInTheDocument();
     expect(screen.getByText(/npx pipeit\.live/)).toBeInTheDocument();
     expect(screen.getByText(/bunx pipeit\.live/)).toBeInTheDocument();
   });
