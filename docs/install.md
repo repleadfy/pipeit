@@ -11,11 +11,11 @@ Inside Claude Code:
 
 ## 2. npm
 
-    npx pipeit
+    npx pipeit.live
 
 ## 3. Bun
 
-    bunx pipeit
+    bunx pipeit.live
 
 Both `npx` and `bunx` variants either shell out to the `claude` CLI (if present) or print the two `/plugin` lines for you to paste.
 

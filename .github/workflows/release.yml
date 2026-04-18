@@ -39,7 +39,7 @@ jobs:
       - run: yarn build
 
       - name: Publish CLI to npm
-        run: yarn workspace pipeit publish --new-version ${GITHUB_REF_NAME#v} --no-git-tag-version --non-interactive
+        run: yarn workspace pipeit.live publish --new-version ${GITHUB_REF_NAME#v} --no-git-tag-version --non-interactive
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

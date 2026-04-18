@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship pipeit as a Claude Code plugin installable via three channels (`/plugin marketplace add`, `npx pipeit`, `bunx pipeit`), with a public `/install` landing page and a React-based OAuth consent screen.
+**Goal:** Ship pipeit as a Claude Code plugin installable via three channels (`/plugin marketplace add`, `npx pipeit.live`, `bunx pipeit.live`), with a public `/install` landing page and a React-based OAuth consent screen.
 
 **Architecture:** Single monorepo (`repleadfy/pipeit`) hosts a root marketplace manifest, a `plugins/pipeit/` plugin package, a new `packages/cli/` bootstrap that shells out to the `claude` CLI when available, and two new SPA routes (`/install`, `/mcp/consent`). Install writes config only; OAuth happens lazily on the first MCP tool call.
 
@@ -165,12 +165,12 @@ git commit -m "feat: relocate SKILL.md into plugins/pipeit and add marketplace m
 
 ```json
 {
-  "name": "pipeit",
+  "name": "pipeit.live",
   "version": "0.1.0",
   "type": "module",
   "description": "One-shot installer for the pipeit Claude Code plugin.",
   "bin": {
-    "pipeit": "./dist/index.js"
+    "pipeit.live": "./dist/index.js"
   },
   "files": ["dist"],
   "scripts": {
@@ -277,7 +277,7 @@ test("printNextStep mentions /pipeit and browser sign-in", () => {
 
 - [ ] **Step 2: Run the test to confirm it fails**
 
-Run: `yarn workspace pipeit test`
+Run: `yarn workspace pipeit.live test`
 Expected: FAIL — "Cannot find module './cli.js'" or the helpers don't exist.
 
 - [ ] **Step 3: Write `packages/cli/src/cli.ts` with injected dependencies**
@@ -328,7 +328,7 @@ export function printNextStep(log: LogFn = console.log): void {
 
 - [ ] **Step 4: Re-run tests**
 
-Run: `yarn workspace pipeit test`
+Run: `yarn workspace pipeit.live test`
 Expected: PASS — all six tests green.
 
 - [ ] **Step 5: Commit**
@@ -361,7 +361,7 @@ if (hasClaudeCli() && tryInstallViaCli()) {
 
 - [ ] **Step 2: Build the CLI**
 
-Run: `yarn workspace pipeit build`
+Run: `yarn workspace pipeit.live build`
 Expected: produces `packages/cli/dist/index.js` with a leading `#!/usr/bin/env node` line.
 
 - [ ] **Step 3: Smoke-test the manual path by forcing `claude` absent**
@@ -417,7 +417,7 @@ Append one of these lines at the bottom of this plan under a `## Verification no
 
 - [ ] **Step 3: If you made code changes, rerun the CLI tests**
 
-Run: `yarn workspace pipeit test`
+Run: `yarn workspace pipeit.live test`
 Expected: PASS.
 
 - [ ] **Step 4: Commit (only if code changed)**
@@ -675,8 +675,8 @@ describe("InstallPage", () => {
     render(<MemoryRouter><InstallPage /></MemoryRouter>);
     expect(screen.getByText(/plugin marketplace add repleadfy\/pipeit/)).toBeInTheDocument();
     expect(screen.getByText(/plugin install pipeit/)).toBeInTheDocument();
-    expect(screen.getByText(/npx pipeit/)).toBeInTheDocument();
-    expect(screen.getByText(/bunx pipeit/)).toBeInTheDocument();
+    expect(screen.getByText(/npx pipeit\.live/)).toBeInTheDocument();
+    expect(screen.getByText(/bunx pipeit\.live/)).toBeInTheDocument();
   });
 
   test("shows the post-install hint mentioning /pipeit and browser sign-in", () => {
@@ -747,8 +747,8 @@ export function InstallPage() {
         </header>
 
         <Block label="Claude Code plugin" code={PLUGIN_COMMANDS} recommended />
-        <Block label="npm" code="npx pipeit" />
-        <Block label="Bun" code="bunx pipeit" />
+        <Block label="npm" code="npx pipeit.live" />
+        <Block label="Bun" code="bunx pipeit.live" />
 
         <p className="text-sm text-gray-600 dark:text-gray-400">
           After install: run <code className="text-gray-900 dark:text-gray-100">/pipeit</code> in Claude Code. Your browser opens once to sign in.
@@ -1362,9 +1362,9 @@ In root `package.json`, update `scripts`:
   "scripts": {
     "dev:server": "yarn workspace @pipeit/server run dev",
     "dev:web": "yarn workspace web run dev",
-    "build": "yarn workspace @pipeit/shared run build && yarn workspace @pipeit/mcp run build && yarn workspace @pipeit/server run build && yarn workspace web run build && yarn workspace pipeit run build",
+    "build": "yarn workspace @pipeit/shared run build && yarn workspace @pipeit/mcp run build && yarn workspace @pipeit/server run build && yarn workspace web run build && yarn workspace pipeit.live run build",
     "build:server": "yarn workspace @pipeit/shared run build && yarn workspace @pipeit/server run build",
-    "build:cli": "yarn workspace pipeit run build"
+    "build:cli": "yarn workspace pipeit.live run build"
   }
 ```
 
@@ -1430,7 +1430,7 @@ jobs:
       - run: yarn build
 
       - name: Publish CLI to npm
-        run: yarn workspace pipeit publish --new-version ${GITHUB_REF_NAME#v} --no-git-tag-version --non-interactive
+        run: yarn workspace pipeit.live publish --new-version ${GITHUB_REF_NAME#v} --no-git-tag-version --non-interactive
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -1465,7 +1465,7 @@ git commit -m "ci: add tag-triggered release workflow for pipeit.live npm publis
 
 - [ ] **Step 1: Verify the npm name is available**
 
-Run: `npm view pipeit 2>&1`
+Run: `npm view pipeit.live 2>&1`
 
 - If output contains `404` or `Not Found` → name is available; proceed.
 - If output shows a package already exists → fall back to `@repleadfy/pipeit`:
@@ -1485,8 +1485,8 @@ Append to the `## Verification notes` section at the end of this plan:
 
 ```bash
 yarn workspace web test
-yarn workspace pipeit test
-yarn workspace pipeit build
+yarn workspace pipeit.live test
+yarn workspace pipeit.live build
 git add packages/cli packages/web/src/pages/InstallPage.tsx packages/web/src/pages/InstallPage.test.tsx .github/workflows/release.yml
 git commit -m "chore: fall back to @repleadfy/pipeit for CLI npm package"
 ```
@@ -1515,11 +1515,11 @@ Inside Claude Code:
 
 ## 2. npm
 
-    npx pipeit
+    npx pipeit.live
 
 ## 3. Bun
 
-    bunx pipeit
+    bunx pipeit.live
 
 Both `npx` and `bunx` variants either shell out to the `claude` CLI (if present) or print the two `/plugin` lines for you to paste.
 
@@ -1559,7 +1559,7 @@ The fastest path is the Claude Code plugin:
 
 Or from a terminal:
 
-    npx pipeit   # or: bunx pipeit
+    npx pipeit.live   # or: bunx pipeit.live
 
 Full install reference: [docs/install.md](docs/install.md).
 ```
@@ -1581,14 +1581,14 @@ git commit -m "docs: add install instructions for plugin, npx, and bunx paths"
 
 In a clean shell with `claude` not on PATH:
 ```bash
-bunx pipeit
+bunx pipeit.live
 ```
 Expected: prints the two `/plugin ...` lines, then the next-step hint.
 
 - [ ] **Step 2: Fresh install via `npx` with `claude` CLI present**
 
 ```bash
-npx pipeit
+npx pipeit.live
 ```
 Expected: runs `claude plugin marketplace add repleadfy/pipeit` and `claude plugin install pipeit@repleadfy/pipeit`, prints the next-step hint.
 
@@ -1632,7 +1632,7 @@ git commit -m "docs: record pre-release manual QA results"
 ## Verification notes
 
 - **Task 5 verdict (2026-04-17):** `claude plugin` subcommands confirmed as `marketplace add <source>` and `install <plugin>` (supporting the `plugin@marketplace` form). Current `tryInstallViaCli` strings (`claude plugin marketplace add repleadfy/pipeit`, `claude plugin install pipeit@repleadfy/pipeit`) match the live CLI shape — no code changes needed.
-- **Task 16 verdict (2026-04-18):** `npm view pipeit` returns 404 — name available on npm. No changes required. CLI package retains `"name": "pipeit"`.
+- **Task 16 verdict (2026-04-18):** `npm view pipeit.live` returns 404 — name available on npm. No changes required. CLI package retains `"name": "pipeit.live"`.
 
 ---
 

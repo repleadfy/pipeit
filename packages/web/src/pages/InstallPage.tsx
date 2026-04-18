@@ -39,8 +39,8 @@ export function InstallPage() {
         </header>
 
         <Block label="Claude Code plugin" code={PLUGIN_COMMANDS} recommended />
-        <Block label="npm" code="npx pipeit" />
-        <Block label="Bun" code="bunx pipeit" />
+        <Block label="npm" code="npx pipeit.live" />
+        <Block label="Bun" code="bunx pipeit.live" />
 
         <p className="text-sm text-gray-600 dark:text-gray-400">
           After install: run <code className="text-gray-900 dark:text-gray-100">/pipeit</code> in Claude Code. Your browser opens once to sign in.
