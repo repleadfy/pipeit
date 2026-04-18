@@ -5,6 +5,7 @@ import * as jose from "jose";
 import { eq } from "drizzle-orm";
 import { db } from "@mpipe/shared/db";
 import { users } from "@mpipe/shared/db/schema";
+import { verifyJwt } from "@mpipe/shared/jwt";
 
 // In-memory auth code store (short-lived, 5 min TTL)
 const authCodes = new Map<string, { userId: string; redirectUri: string; codeChallenge: string; expiresAt: number }>();
@@ -57,9 +58,9 @@ oauthApp.post("/register", async (c) => {
   }, 201);
 });
 
-// Authorization endpoint — shows login options
+// Authorization endpoint — routes the user into the SPA consent flow.
 // MCP client redirects here with: client_id, redirect_uri, state, code_challenge, code_challenge_method
-oauthApp.get("/authorize", (c) => {
+oauthApp.get("/authorize", async (c) => {
   const clientId = c.req.query("client_id") ?? "";
   const redirectUri = c.req.query("redirect_uri") ?? "";
   const state = c.req.query("state") ?? "";
@@ -70,37 +71,78 @@ oauthApp.get("/authorize", (c) => {
     return c.json({ error: "missing redirect_uri or code_challenge" }, 400);
   }
 
-  // Store OAuth params in a short-lived cookie so we can retrieve them after the user logs in
-  const oauthState = JSON.stringify({ clientId, redirectUri, state, codeChallenge, codeChallengeMethod });
+  const oauthState = JSON.stringify({ clientId, redirectUri, state, codeChallenge, codeChallengeMethod, issuedAt: Date.now() });
   setCookie(c, "mcp_oauth_state", oauthState, {
     httpOnly: true,
     secure: true,
     sameSite: "Lax",
-    maxAge: 600, // 10 minutes
+    maxAge: 600,
     path: "/",
   });
 
-  // Render a simple login page with Google/GitHub buttons
-  const base = process.env.PUBLIC_URL || new URL(c.req.url).origin;
-  const html = `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>mpipe — Sign In</title>
-<style>
-  body { font-family: system-ui; background: #0f172a; color: #e2e8f0; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-  .card { background: #1e293b; padding: 2rem; border-radius: 12px; text-align: center; max-width: 360px; }
-  h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
-  p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.5rem; }
-  a { display: block; padding: 0.75rem; margin: 0.5rem 0; border-radius: 8px; text-decoration: none; color: white; font-weight: 500; }
-  .google { background: #4285f4; }
-  .github { background: #333; }
-</style></head>
-<body><div class="card">
-  <h1>mpipe</h1>
-  <p>Sign in to connect your AI tool</p>
-  <a class="google" href="${base}/auth/google?mcp_oauth=1">Continue with Google</a>
-  <a class="github" href="${base}/auth/github?mcp_oauth=1">Continue with GitHub</a>
-</div></body></html>`;
+  // Authed users go straight to the SPA consent page. Unauthed users detour to
+  // /login?return_to=/mcp/consent — LoginPage will forward back after sign-in.
+  const sessionToken = getCookie(c, "token");
+  if (sessionToken) {
+    return c.redirect("/mcp/consent");
+  }
+  return c.redirect("/login?return_to=/mcp/consent");
+});
 
-  return c.html(html);
+// Returns the pending OAuth request metadata so the SPA can render the consent UI.
+oauthApp.get("/consent-info", (c) => {
+  const cookie = getCookie(c, "mcp_oauth_state");
+  if (!cookie) return c.json({ error: "no pending authorization" }, 404);
+  const { clientId, issuedAt } = JSON.parse(cookie) as { clientId: string; issuedAt: number };
+  return c.json({
+    client_id: clientId,
+    client_name: "Claude Code",
+    issued_at: issuedAt,
+  });
+});
+
+// The SPA consent page POSTs { action: "allow" | "deny" } with the session cookie.
+// On allow: mint a code, delete the oauth_state cookie, return { redirect: url-with-code }.
+// On deny: delete the cookie and return { redirect: url-with-error }.
+oauthApp.post("/consent", async (c) => {
+  const body = await c.req.json<{ action?: string }>();
+  const action = body?.action;
+  const oauthStateCookie = getCookie(c, "mcp_oauth_state");
+  if (!oauthStateCookie) return c.json({ error: "no pending authorization" }, 400);
+
+  const { redirectUri, state, codeChallenge } = JSON.parse(oauthStateCookie);
+
+  if (action === "deny") {
+    setCookie(c, "mcp_oauth_state", "", { maxAge: 0, path: "/" });
+    const url = new URL(redirectUri);
+    url.searchParams.set("error", "access_denied");
+    if (state) url.searchParams.set("state", state);
+    return c.json({ redirect: url.toString() });
+  }
+
+  if (action !== "allow") {
+    return c.json({ error: "invalid action" }, 400);
+  }
+
+  const sessionToken = getCookie(c, "token");
+  if (!sessionToken) return c.json({ error: "not authenticated" }, 401);
+
+  const payload = await verifyJwt(sessionToken);
+  const userId = payload.sub;
+
+  const code = nanoid(32);
+  authCodes.set(code, {
+    userId,
+    redirectUri,
+    codeChallenge,
+    expiresAt: Date.now() + 5 * 60 * 1000,
+  });
+  setCookie(c, "mcp_oauth_state", "", { maxAge: 0, path: "/" });
+
+  const url = new URL(redirectUri);
+  url.searchParams.set("code", code);
+  if (state) url.searchParams.set("state", state);
+  return c.json({ redirect: url.toString() });
 });
 
 // Called after Google/GitHub OAuth completes — generates auth code and redirects to MCP client
