@@ -36,6 +36,8 @@ email.post("/email/signup", async (c) => {
     path: "/",
   });
 
+  // MCP flow: client reads `redirect` and navigates. Non-MCP flow: client
+  // handles its own `return_to` from the URL — server never sees it here.
   const mcpOauthState = getCookie(c, "mcp_oauth_state");
   if (mcpOauthState) {
     return c.json({ redirect: "/mcp/consent" });
@@ -71,6 +73,8 @@ email.post("/email/login", async (c) => {
     path: "/",
   });
 
+  // MCP flow: client reads `redirect` and navigates. Non-MCP flow: client
+  // handles its own `return_to` from the URL — server never sees it here.
   const mcpOauthState = getCookie(c, "mcp_oauth_state");
   if (mcpOauthState) {
     return c.json({ redirect: "/mcp/consent" });

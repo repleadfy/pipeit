@@ -10,7 +10,7 @@ const google = new Hono();
 
 google.get("/google", (c) => {
   const returnTo = c.req.query("return_to");
-  if (returnTo && returnTo.startsWith("/")) {
+  if (returnTo && /^\/(?![/\\])/.test(returnTo)) {
     setCookie(c, "return_to", returnTo, {
       httpOnly: true,
       sameSite: "Lax",
@@ -18,6 +18,10 @@ google.get("/google", (c) => {
       path: "/",
       secure: env.PUBLIC_URL.startsWith("https"),
     });
+  } else {
+    // Always clear a stale cookie when no valid return_to is provided — prevents
+    // a 10-minute-old cookie from hijacking a fresh OAuth flow.
+    setCookie(c, "return_to", "", { maxAge: 0, path: "/" });
   }
   const params = new URLSearchParams({
     client_id: env.GOOGLE_CLIENT_ID,
@@ -97,11 +101,11 @@ google.get("/google/callback", async (c) => {
   }
 
   const returnToCookie = getCookie(c, "return_to");
-  if (returnToCookie && returnToCookie.startsWith("/")) {
+  if (returnToCookie && /^\/(?![/\\])/.test(returnToCookie)) {
     setCookie(c, "return_to", "", { maxAge: 0, path: "/" });
     return c.redirect(`${env.WEB_URL}${returnToCookie}`);
   }
-
+  setCookie(c, "return_to", "", { maxAge: 0, path: "/" });
   return c.redirect(env.WEB_URL);
 });
 

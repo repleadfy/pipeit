@@ -7,7 +7,8 @@ export function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState("");
   const [searchParams] = useSearchParams();
-  const returnTo = searchParams.get("return_to") || "/";
+  const rawReturnTo = searchParams.get("return_to") || "/";
+  const returnTo = /^\/(?![/\\])/.test(rawReturnTo) ? rawReturnTo : "/";
 
   if (loading) return null;
   if (user) return <Navigate to={returnTo} replace />;
