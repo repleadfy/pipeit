@@ -3,6 +3,7 @@ import { AuthProvider } from "./lib/auth.js";
 import { ProtectedRoute } from "./components/ProtectedRoute.js";
 import { LoginPage } from "./pages/LoginPage.js";
 import { DocPage } from "./pages/DocPage.js";
+import { InstallPage } from "./pages/InstallPage.js";
 import { NotFoundPage } from "./pages/NotFoundPage.js";
 
 export function App() {
@@ -11,6 +12,7 @@ export function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/install" element={<InstallPage />} />
           <Route path="/d/:slug" element={<DocPage />} />
           <Route
             path="/"
