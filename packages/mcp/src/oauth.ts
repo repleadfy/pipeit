@@ -93,11 +93,16 @@ oauthApp.get("/authorize", async (c) => {
 oauthApp.get("/consent-info", (c) => {
   const cookie = getCookie(c, "mcp_oauth_state");
   if (!cookie) return c.json({ error: "no pending authorization" }, 404);
-  const { clientId, issuedAt } = JSON.parse(cookie) as { clientId: string; issuedAt: number };
+  let parsed: { clientId: string; issuedAt: number };
+  try {
+    parsed = JSON.parse(cookie);
+  } catch {
+    return c.json({ error: "invalid state" }, 400);
+  }
   return c.json({
-    client_id: clientId,
+    client_id: parsed.clientId,
     client_name: "Claude Code",
-    issued_at: issuedAt,
+    issued_at: parsed.issuedAt,
   });
 });
 
@@ -110,7 +115,15 @@ oauthApp.post("/consent", async (c) => {
   const oauthStateCookie = getCookie(c, "mcp_oauth_state");
   if (!oauthStateCookie) return c.json({ error: "no pending authorization" }, 400);
 
-  const { redirectUri, state, codeChallenge } = JSON.parse(oauthStateCookie);
+  let redirectUri: string;
+  let state: string;
+  let codeChallenge: string;
+  try {
+    ({ redirectUri, state, codeChallenge } = JSON.parse(oauthStateCookie));
+  } catch {
+    setCookie(c, "mcp_oauth_state", "", { maxAge: 0, path: "/" });
+    return c.json({ error: "invalid state" }, 400);
+  }
 
   if (action === "deny") {
     setCookie(c, "mcp_oauth_state", "", { maxAge: 0, path: "/" });
