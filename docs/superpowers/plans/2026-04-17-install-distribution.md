@@ -1631,7 +1631,7 @@ git commit -m "docs: record pre-release manual QA results"
 
 ## Verification notes
 
-(Fill in as Tasks 5, 16, and 18 run.)
+- **Task 5 verdict (2026-04-17):** `claude plugin` subcommands confirmed as `marketplace add <source>` and `install <plugin>` (supporting the `plugin@marketplace` form). Current `tryInstallViaCli` strings (`claude plugin marketplace add repleadfy/mpipe`, `claude plugin install mpipe@repleadfy/mpipe`) match the live CLI shape — no code changes needed.
 
 ---
 
