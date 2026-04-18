@@ -1,0 +1,8 @@
+{
+  "name": "mpipe",
+  "version": "0.1.0",
+  "description": "Pipe markdown from Claude Code to mpipe.dev. Adds the /mpipe skill + MCP server connection.",
+  "homepage": "https://mpipe.dev",
+  "repository": "https://github.com/repleadfy/mpipe",
+  "license": "MIT"
+}
