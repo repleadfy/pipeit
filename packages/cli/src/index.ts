@@ -1,2 +1,9 @@
 #!/usr/bin/env node
-// Entry populated in Task 3.
+import { hasClaudeCli, tryInstallViaCli, printManualInstructions, printNextStep } from "./cli.js";
+
+if (hasClaudeCli() && tryInstallViaCli()) {
+  printNextStep();
+} else {
+  printManualInstructions();
+  printNextStep();
+}
