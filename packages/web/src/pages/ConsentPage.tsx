@@ -22,19 +22,24 @@ export function ConsentPage() {
 
   async function decide(action: "allow" | "deny") {
     setSubmitting(true);
-    const res = await fetch("/mcp/consent", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (data.redirect) {
-      window.location.href = data.redirect;
-      return;
+    try {
+      const res = await fetch("/mcp/consent", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (data.redirect) {
+        window.location.href = data.redirect;
+        return;
+      }
+      setError(data.error || "something went wrong");
+    } catch {
+      setError("network error");
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
-    setError(data.error || "something went wrong");
   }
 
   return (
