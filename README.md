@@ -11,7 +11,7 @@ The fastest path is the Claude Code plugin:
 
 Or from a terminal:
 
-    npx pipeit.live   # or: bunx pipeit.live
+    npx pipeit   # or: bunx pipeit
 
 Full install reference: [docs/install.md](docs/install.md).
 

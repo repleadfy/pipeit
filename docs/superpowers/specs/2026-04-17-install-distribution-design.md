@@ -1,12 +1,12 @@
 # pipeit — Install & Distribution Design
 
-Make pipeit installable via three channels — `npx pipeit.live`, `bunx pipeit.live`, and the Claude Code plugin marketplace (`/plugin marketplace add repleadfy/pipeit` + `/plugin install pipeit`) — with a clear separation between *install*, *auth*, and *share*.
+Make pipeit installable via three channels — `npx pipeit`, `bunx pipeit`, and the Claude Code plugin marketplace (`/plugin marketplace add repleadfy/pipeit` + `/plugin install pipeit`) — with a clear separation between *install*, *auth*, and *share*.
 
 ## Scope
 
 **In scope:**
 - Claude Code as the only supported environment for this pass.
-- Three install paths: CC plugin marketplace, `npx pipeit.live`, `bunx pipeit.live`.
+- Three install paths: CC plugin marketplace, `npx pipeit`, `bunx pipeit`.
 - Shareable install page at `pipeit.live/install`.
 
 **Out of scope (v1):**
@@ -14,7 +14,7 @@ Make pipeit installable via three channels — `npx pipeit.live`, `bunx pipeit.l
 - Invite links that pre-authenticate teammates.
 - Server-side revocation UI for MCP tokens.
 - Local credential files (`~/.pipeit/*`) — never exist. MCP client owns all tokens.
-- `npx pipeit.live uninstall` — uninstall is `/plugin uninstall pipeit`.
+- `npx pipeit uninstall` — uninstall is `/plugin uninstall pipeit`.
 
 ## Guiding Principles
 
@@ -109,11 +109,11 @@ New monorepo package `packages/cli/`, published to npm as `pipeit.live`.
 
 ```json
 {
-  "name": "pipeit.live",
+  "name": "pipeit",
   "version": "0.1.0",
   "type": "module",
   "bin": {
-    "pipeit.live": "./dist/index.js"
+    "pipeit": "./dist/index.js"
   },
   "files": ["dist"],
   "scripts": {
@@ -126,7 +126,7 @@ New monorepo package `packages/cli/`, published to npm as `pipeit.live`.
 }
 ```
 
-The `bin` mapping means `npx pipeit.live` and `bunx pipeit.live` invoke the same binary.
+The `bin` mapping means `npx pipeit` and `bunx pipeit` invoke the same binary.
 
 ### `packages/cli/src/index.ts`
 
@@ -207,8 +207,8 @@ Current state: `/` redirects authed users to `/d/latest` and unauthed users to `
      /plugin marketplace add repleadfy/pipeit
      /plugin install pipeit
      ```
-  2. **npm:** `npx pipeit.live`
-  3. **Bun:** `bunx pipeit.live`
+  2. **npm:** `npx pipeit`
+  3. **Bun:** `bunx pipeit`
 - Post-install hint: "After install: run `/pipeit` in Claude Code. Your browser opens once to sign in."
 - Link: "Already installed? [Sign in →]" → `/login`.
 
@@ -259,7 +259,7 @@ Two things need to be disentangled in the original spec:
 10. CC retries the original `pipeit_upload` call with `Authorization: Bearer <access_token>`. Server accepts, creates doc.
 11. Claude prints: `✓ Piped to https://pipeit.live/d/<slug>`
 
-### Path: `npx pipeit.live` / `bunx pipeit.live`
+### Path: `npx pipeit` / `bunx pipeit`
 
 Identical to above from step 1 onward. The CLI either shells out to `claude plugin ...` (collapsing to the same plugin install) or prints instructions for the user to run them. Credentials never pass through the CLI.
 
@@ -296,7 +296,7 @@ No new infra. The command string itself IS the share artifact.
 
 A single `git tag vX.Y.Z` triggers:
 1. GitHub release created — surfaces as latest version to `/plugin update`.
-2. `yarn workspace pipeit.live publish` to npm.
+2. `yarn workspace pipeit publish` to npm.
 3. Docker image build + push (existing kdep path).
 
 All three version strings stay in lockstep: `plugin.json.version` = `packages/cli/package.json.version` = git tag.
@@ -326,11 +326,11 @@ All three version strings stay in lockstep: `plugin.json.version` = `packages/cl
 - **Plugin**: smoke test by running `/plugin marketplace add <local-file-path>` against a local checkout and verifying plugin loads + skill appears.
 - **Install page**: RTL test for copy-button behavior + route-fallback test that unauthed `/` goes to `/install`.
 - **Consent page**: RTL test for Allow/Deny actions; integration test against a local MCP authorize flow.
-- **End-to-end**: manual QA — `bunx pipeit.live` on a fresh machine, then `/pipeit` in CC, verify browser opens, sign in, doc uploads.
+- **End-to-end**: manual QA — `bunx pipeit` on a fresh machine, then `/pipeit` in CC, verify browser opens, sign in, doc uploads.
 
 ## Risks & Open Questions
 
 1. **CC plugin CLI API shape.** Need to verify `claude plugin marketplace add` and `claude plugin install` exist as non-interactive subcommands before merge. If they don't, the shell-out branch is dead and everyone falls through to manual instructions (still fine, just less polish).
-2. **`pipeit.live` on npm availability.** Need to check `npm view pipeit.live` before publishing. If taken, fall back to `@repleadfy/pipeit` (uglier but guaranteed).
+2. **`pipeit.live` on npm availability.** Need to check `npm view pipeit` before publishing. If taken, fall back to `@repleadfy/pipeit` (uglier but guaranteed).
 3. **Consent page design.** No prior consent UI in the repo. Small scope but needs a mock — follows existing Tailwind/typography patterns.
 4. **Marketplace.json schema.** Following the CC public plugin spec as of 2026-04. Schema could evolve; pin to the latest shape and verify with a `/plugin marketplace add` dry run before release.

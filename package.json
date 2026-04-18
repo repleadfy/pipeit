@@ -5,9 +5,9 @@
   "scripts": {
     "dev:server": "yarn workspace @pipeit/server run dev",
     "dev:web": "yarn workspace web run dev",
-    "build": "yarn workspace @pipeit/shared run build && yarn workspace @pipeit/mcp run build && yarn workspace @pipeit/server run build && yarn workspace web run build && yarn workspace pipeit.live run build",
+    "build": "yarn workspace @pipeit/shared run build && yarn workspace @pipeit/mcp run build && yarn workspace @pipeit/server run build && yarn workspace web run build && yarn workspace pipeit run build",
     "build:server": "yarn workspace @pipeit/shared run build && yarn workspace @pipeit/server run build",
-    "build:cli": "yarn workspace pipeit.live run build"
+    "build:cli": "yarn workspace pipeit run build"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.10"

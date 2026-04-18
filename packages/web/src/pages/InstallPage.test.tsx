@@ -8,8 +8,8 @@ describe("InstallPage", () => {
     render(<MemoryRouter><InstallPage /></MemoryRouter>);
     expect(screen.getByText(/plugin marketplace add repleadfy\/pipeit/)).toBeInTheDocument();
     expect(screen.getByText(/plugin install pipeit/)).toBeInTheDocument();
-    expect(screen.getByText(/npx pipeit\.live/)).toBeInTheDocument();
-    expect(screen.getByText(/bunx pipeit\.live/)).toBeInTheDocument();
+    expect(screen.getByText(/npx pipeit/)).toBeInTheDocument();
+    expect(screen.getByText(/bunx pipeit/)).toBeInTheDocument();
   });
 
   test("shows the post-install hint mentioning /pipeit and browser sign-in", () => {
