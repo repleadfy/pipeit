@@ -5,8 +5,9 @@
   "scripts": {
     "dev:server": "yarn workspace @mpipe/server run dev",
     "dev:web": "yarn workspace web run dev",
-    "build": "yarn workspace @mpipe/shared run build && yarn workspace @mpipe/mcp run build && yarn workspace @mpipe/server run build && yarn workspace web run build",
-    "build:server": "yarn workspace @mpipe/shared run build && yarn workspace @mpipe/server run build"
+    "build": "yarn workspace @mpipe/shared run build && yarn workspace @mpipe/mcp run build && yarn workspace @mpipe/server run build && yarn workspace web run build && yarn workspace mpipe.dev run build",
+    "build:server": "yarn workspace @mpipe/shared run build && yarn workspace @mpipe/server run build",
+    "build:cli": "yarn workspace mpipe.dev run build"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.10"
