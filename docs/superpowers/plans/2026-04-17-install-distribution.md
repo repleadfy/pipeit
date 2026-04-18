@@ -1632,6 +1632,7 @@ git commit -m "docs: record pre-release manual QA results"
 ## Verification notes
 
 - **Task 5 verdict (2026-04-17):** `claude plugin` subcommands confirmed as `marketplace add <source>` and `install <plugin>` (supporting the `plugin@marketplace` form). Current `tryInstallViaCli` strings (`claude plugin marketplace add repleadfy/mpipe`, `claude plugin install mpipe@repleadfy/mpipe`) match the live CLI shape — no code changes needed.
+- **Task 16 verdict (2026-04-18):** `npm view mpipe.dev` returns 404 — name available on npm. No changes required. CLI package retains `"name": "mpipe.dev"`.
 
 ---
 
