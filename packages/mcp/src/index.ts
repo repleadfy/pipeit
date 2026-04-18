@@ -19,7 +19,7 @@ mcpApp.all("/", mcpAuthMiddleware, async (c) => {
 
   // Create per-request server with user context
   const server = new McpServer({
-    name: "mpipe",
+    name: "pipeit",
     version: "0.1.0",
   });
 

@@ -1,14 +1,14 @@
 import { z } from "zod";
 import { eq, and } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { docs } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { docs } from "@pipeit/shared/db/schema";
 import type { McpServer } from "@modelcontextprotocol/server";
 
 export function registerDeleteTool(server: McpServer, getUserId: () => string) {
   server.registerTool(
-    "mpipe_delete",
+    "pipeit_delete",
     {
-      description: "Delete a document from mpipe by its slug.",
+      description: "Delete a document from pipeit by its slug.",
       inputSchema: z.object({
         slug: z.string().describe("The document slug (from the URL /d/<slug>)"),
       }),

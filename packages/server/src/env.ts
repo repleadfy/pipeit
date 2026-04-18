@@ -16,5 +16,5 @@ export const env = {
   WEB_URL: process.env.WEB_URL ?? "http://localhost:5173",
   VAPID_PUBLIC_KEY: process.env.VAPID_PUBLIC_KEY ?? "",
   VAPID_PRIVATE_KEY: process.env.VAPID_PRIVATE_KEY ?? "",
-  VAPID_EMAIL: process.env.VAPID_EMAIL ?? "mailto:admin@mpipe.dev",
+  VAPID_EMAIL: process.env.VAPID_EMAIL ?? "mailto:admin@pipeit.live",
 };

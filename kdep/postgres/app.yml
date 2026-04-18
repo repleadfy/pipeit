@@ -1,6 +1,6 @@
 preset: statefulset_svc
-namespace: mpipe
-name: mpipe-postgres
+namespace: pipeit
+name: pipeit-postgres
 image: postgres
 tag: "17"
 port: 5432
@@ -19,8 +19,8 @@ resources:
     memory: 512Mi
 
 configmap:
-  POSTGRES_DB: mpipe
-  POSTGRES_USER: mpipe
+  POSTGRES_DB: pipeit
+  POSTGRES_USER: pipeit
 
 volume_mounts:
   - name: pgdata

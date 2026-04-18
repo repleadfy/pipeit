@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { setCookie, getCookie } from "hono/cookie";
 import { eq } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { users, authIdentities } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { users, authIdentities } from "@pipeit/shared/db/schema";
 import { signJwt } from "./jwt.js";
 import { env } from "../env.js";
 

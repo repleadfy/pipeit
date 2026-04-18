@@ -51,7 +51,7 @@ export function ConsentPage() {
           <>
             <p className="text-gray-700 dark:text-gray-300">
               <span className="font-medium">{info.client_name}</span> is requesting
-              permission to upload markdown to your mpipe account.
+              permission to upload markdown to your pipeit account.
             </p>
             <p className="text-xs text-gray-500">
               Request issued {new Date(info.issued_at).toLocaleString()}

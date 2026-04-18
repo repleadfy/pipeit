@@ -7,6 +7,6 @@ RUN yarn install
 COPY packages/shared packages/shared
 COPY packages/web packages/web
 COPY tsconfig.base.json ./
-RUN yarn workspace @mpipe/shared run build
+RUN yarn workspace @pipeit/shared run build
 WORKDIR /app/packages/web
 CMD ["yarn", "dev", "--host", "0.0.0.0"]

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { DocListItem as DocItem } from "@mpipe/shared";
+import type { DocListItem as DocItem } from "@pipeit/shared";
 
 function timeAgo(dateStr: string): string {
   const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);

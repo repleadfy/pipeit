@@ -1,12 +1,12 @@
-# mpipe — Design Spec
+# pipeit — Design Spec
 
 Share markdown documents from AI conversations (Claude Code, Cursor, VSCode, Codex, OpenCode) and read them on any device with a polished PWA reader.
 
 ## System Overview
 
-mpipe is three things:
+pipeit is three things:
 
-1. **CLI skills** — `/mpipe` command that uploads markdown and returns a link
+1. **CLI skills** — `/pipeit` command that uploads markdown and returns a link
 2. **API server** — receives, stores, and serves markdown documents
 3. **Web reader PWA** — responsive markdown viewer with reading-position memory and push notifications
 
@@ -18,8 +18,8 @@ packages/
   server/     ← Hono API + MCP OAuth + auth + push notifications
   web/        ← React PWA (Vite + Tailwind) — markdown reader
 
-npx mpipe   ← standalone npm CLI package for onboarding
-skills/       ← /mpipe skill for CC, Cursor, VSCode, Codex, OpenCode
+npx pipeit   ← standalone npm CLI package for onboarding
+skills/       ← /pipeit skill for CC, Cursor, VSCode, Codex, OpenCode
 kdep/         ← K8s deployment config
 ```
 
@@ -30,10 +30,10 @@ Yarn workspaces monorepo. Same structure as `nemo_meet`.
 ```
 User in CC/Cursor/Claude.ai/etc.
   │
-  │ /mpipe ./spec.md
+  │ /pipeit ./spec.md
   │
   ▼
-Skill reads file ──► MCP tool call (mpipe_upload)
+Skill reads file ──► MCP tool call (pipeit_upload)
                         │
                         ▼ (MCP OAuth token)
                   Hono API (server/)
@@ -54,10 +54,10 @@ Skill reads file ──► MCP tool call (mpipe_upload)
 
 ## Hosting & Infrastructure
 
-- **Hosted SaaS** — single hosted instance (mpipe.dev)
-- **Kubernetes** — deployed to Leadfy AKS cluster, `mpipe` namespace
+- **Hosted SaaS** — single hosted instance (pipeit.live)
+- **Kubernetes** — deployed to Leadfy AKS cluster, `pipeit` namespace
 - **Deploy tool** — kdep (same as nemo_meet)
-- **Database** — PostgreSQL 17, own instance in the `mpipe` namespace
+- **Database** — PostgreSQL 17, own instance in the `pipeit` namespace
 - **Container** — single Docker image: Hono serves both API routes (`/api/*`, `/auth/*`, `/mcp/*`) and static PWA assets (`/*`)
 
 ## Authentication
@@ -76,20 +76,20 @@ Three auth methods for web login, one for AI tool access:
 
 All AI tools (Claude Code, Cursor, VSCode, Claude.ai, ChatGPT) connect via MCP with OAuth:
 
-- MCP server exposes tools: `mpipe_upload`, `mpipe_list`, `mpipe_delete`, `mpipe_toggle`
+- MCP server exposes tools: `pipeit_upload`, `pipeit_list`, `pipeit_delete`, `pipeit_toggle`
 - First MCP tool call triggers OAuth flow → browser opens → user signs in (Google/GitHub/email) → token issued
-- No local credential files (`~/.mpipe` etc.) — MCP handles token storage and refresh
+- No local credential files (`~/.pipeit` etc.) — MCP handles token storage and refresh
 
-### Onboarding (`npx mpipe`)
+### Onboarding (`npx pipeit`)
 
 ```bash
-npx mpipe
+npx pipeit
 ```
 
 1. Detects environment (Claude Code, Cursor, VSCode, Codex, OpenCode)
 2. Adds MCP server config to the appropriate config file (`.mcp.json`, VS Code settings, etc.)
-3. Installs the `/mpipe` skill
-4. Prints instructions: "Run /mpipe to share your first doc. Browser will open once for sign-in."
+3. Installs the `/pipeit` skill
+4. Prints instructions: "Run /pipeit to share your first doc. Browser will open once for sign-in."
 
 Account creation happens on first auth, not during `npx`. Zero friction — no forms during onboarding.
 
@@ -221,27 +221,27 @@ DELETE /api/push/subscribe     → remove subscription
 Exposed via the MCP protocol for AI tool access:
 
 ```
-mpipe_upload   → { content, file_path?, is_public? } → { url, slug, is_new }
-mpipe_list     → { q?, read_state?, visibility? } → [{ slug, title, version, updated_at, is_public }]
-mpipe_delete   → { slug } → { ok }
-mpipe_toggle   → { slug, is_public } → { url }
+pipeit_upload   → { content, file_path?, is_public? } → { url, slug, is_new }
+pipeit_list     → { q?, read_state?, visibility? } → [{ slug, title, version, updated_at, is_public }]
+pipeit_delete   → { slug } → { ok }
+pipeit_toggle   → { slug, is_public } → { url }
 ```
 
-## Skill (`/mpipe`)
+## Skill (`/pipeit`)
 
 ### Usage
 
 ```
-/mpipe                        → share last markdown block from conversation
-/mpipe ./path/to/file.md      → share a specific file
-/mpipe --new ./file.md        → force new link (snapshot, no update-in-place)
-/mpipe --public ./file.md     → create/update with public shareable link
+/pipeit                        → share last markdown block from conversation
+/pipeit ./path/to/file.md      → share a specific file
+/pipeit --new ./file.md        → force new link (snapshot, no update-in-place)
+/pipeit --public ./file.md     → create/update with public shareable link
 ```
 
 ### Behavior
 
 1. Read file content (or extract markdown from conversation context)
-2. Call MCP tool `mpipe_upload` with `{ content, file_path, is_public }`
+2. Call MCP tool `pipeit_upload` with `{ content, file_path, is_public }`
 3. Receive `{ url, slug, is_new }`
 4. Print the URL to the user
 5. If Slack MCP is detected (tools matching `slack_send_message` exist), suggest: "Want to share this on Slack? Which channel?"
@@ -256,7 +256,7 @@ The skill and MCP server config must work across:
 - **Codex** — skill in Codex config, MCP in Codex settings
 - **OpenCode** — skill in OpenCode config, MCP in OpenCode settings
 
-The `npx mpipe` CLI detects the environment and writes to the correct locations.
+The `npx pipeit` CLI detects the environment and writes to the correct locations.
 
 ## Web Reader (PWA)
 
@@ -349,7 +349,7 @@ Using `react-markdown` with remark/rehype plugin ecosystem:
 - Uses Web Push API with VAPID keys
 
 **Install prompt:**
-- After first doc view, subtle non-blocking banner: "Add mpipe to home screen for notifications"
+- After first doc view, subtle non-blocking banner: "Add pipeit to home screen for notifications"
 
 ## Auth Pages
 
@@ -357,7 +357,7 @@ Using `react-markdown` with remark/rehype plugin ecosystem:
 
 ```
 ┌──────────────────────────────┐
-│        Sign in to mpipe    │
+│        Sign in to pipeit    │
 │                              │
 │  [ Continue with Google  ]   │
 │  [ Continue with GitHub  ]   │
@@ -376,12 +376,12 @@ Using `react-markdown` with remark/rehype plugin ecosystem:
 ## Deployment
 
 - **Docker image:** single container serving Hono (API + static PWA assets)
-- **Kubernetes:** `mpipe` namespace on Leadfy AKS cluster
+- **Kubernetes:** `pipeit` namespace on Leadfy AKS cluster
 - **Database:** PostgreSQL 17, own instance in namespace
 - **Deploy tool:** kdep (same patterns as nemo_meet)
 - **Registry:** `leadfycr.azurecr.io`
 - **Ingress:** nginx ingress + cert-manager for TLS
-- **Domains:** `mpipe.dev`
+- **Domains:** `pipeit.live`
 
 ### kdep Structure
 

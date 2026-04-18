@@ -1,2 +1,2 @@
-export { signJwt, verifyJwt } from "@mpipe/shared/jwt";
-export type { JwtPayload } from "@mpipe/shared/jwt";
+export { signJwt, verifyJwt } from "@pipeit/shared/jwt";
+export type { JwtPayload } from "@pipeit/shared/jwt";

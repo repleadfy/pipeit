@@ -1,8 +1,8 @@
-# mpipe Implementation Plan
+# pipeit Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build mpipe — a service that pipes markdown from AI conversations to a polished PWA reader at mpipe.dev.
+**Goal:** Build pipeit — a service that pipes markdown from AI conversations to a polished PWA reader at pipeit.live.
 
 **Architecture:** Yarn workspaces monorepo with three packages (shared, server, web). Hono API serves both REST endpoints and static PWA assets from a single container. Deployed to Leadfy K8s via kdep. Follows nemo_meet patterns exactly: ESM everywhere, `.js` import extensions, Drizzle ORM, React 19 + Vite 8 + Tailwind v4.
 
@@ -13,7 +13,7 @@
 ## File Structure
 
 ```
-mpipe/
+pipeit/
 ├── package.json                          # root workspace config
 ├── .yarnrc                               # nodeLinker: node-modules
 ├── drizzle.config.ts                     # Drizzle Kit config
@@ -88,8 +88,8 @@ mpipe/
 │           │   └── useKeyboard.ts        # Cmd+K handler
 │           └── sw.ts                     # service worker (app shell caching)
 ├── skills/
-│   └── mpipe/
-│       └── SKILL.md                      # /mpipe skill for Claude Code
+│   └── pipeit/
+│       └── SKILL.md                      # /pipeit skill for Claude Code
 ├── kdep/
 │   ├── web/
 │   │   ├── app.yml
@@ -116,14 +116,14 @@ mpipe/
 
 ```json
 {
-  "name": "mpipe",
+  "name": "pipeit",
   "private": true,
   "workspaces": ["packages/*"],
   "scripts": {
-    "dev:server": "yarn workspace @mpipe/server run dev",
+    "dev:server": "yarn workspace @pipeit/server run dev",
     "dev:web": "yarn workspace web run dev",
-    "build": "yarn workspace @mpipe/shared run build && yarn workspace @mpipe/server run build && yarn workspace web run build",
-    "build:server": "yarn workspace @mpipe/shared run build && yarn workspace @mpipe/server run build"
+    "build": "yarn workspace @pipeit/shared run build && yarn workspace @pipeit/server run build && yarn workspace web run build",
+    "build:server": "yarn workspace @pipeit/shared run build && yarn workspace @pipeit/server run build"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.10"
@@ -165,7 +165,7 @@ nodeLinker: node-modules
 
 ```json
 {
-  "name": "@mpipe/shared",
+  "name": "@pipeit/shared",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
@@ -345,12 +345,12 @@ export default defineConfig({
 
 - [ ] **Step 11: Install dependencies and build shared**
 
-Run: `yarn install && yarn workspace @mpipe/shared run build`
+Run: `yarn install && yarn workspace @pipeit/shared run build`
 Expected: clean compile, `packages/shared/dist/` created
 
 - [ ] **Step 12: Generate initial migration**
 
-Run: `DATABASE_URL=postgresql://localhost/mpipe yarn drizzle-kit generate`
+Run: `DATABASE_URL=postgresql://localhost/pipeit yarn drizzle-kit generate`
 Expected: `drizzle/0000_init.sql` created with CREATE TABLE statements
 
 - [ ] **Step 13: Commit**
@@ -372,7 +372,7 @@ git commit -m "feat: monorepo scaffold + shared package with Drizzle schema"
 
 ```json
 {
-  "name": "@mpipe/server",
+  "name": "@pipeit/server",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
@@ -383,7 +383,7 @@ git commit -m "feat: monorepo scaffold + shared package with Drizzle schema"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.11",
-    "@mpipe/shared": "*",
+    "@pipeit/shared": "*",
     "hono": "^4.12.8",
     "jose": "^6.2.2",
     "nanoid": "^5.1.7",
@@ -434,7 +434,7 @@ export const env = {
   WEB_URL: process.env.WEB_URL ?? "http://localhost:5173",
   VAPID_PUBLIC_KEY: process.env.VAPID_PUBLIC_KEY ?? "",
   VAPID_PRIVATE_KEY: process.env.VAPID_PRIVATE_KEY ?? "",
-  VAPID_EMAIL: process.env.VAPID_EMAIL ?? "mailto:admin@mpipe.dev",
+  VAPID_EMAIL: process.env.VAPID_EMAIL ?? "mailto:admin@pipeit.live",
 };
 ```
 
@@ -465,14 +465,14 @@ import { app } from "./app.js";
 import { env } from "./env.js";
 
 serve({ fetch: app.fetch, port: env.PORT }, (info) => {
-  console.log(`mpipe server listening on port ${info.port}`);
+  console.log(`pipeit server listening on port ${info.port}`);
 });
 ```
 
 - [ ] **Step 6: Install dependencies and test**
 
-Run: `yarn install && JWT_SECRET=dev DATABASE_URL=postgresql://localhost/mpipe yarn dev:server`
-Expected: `mpipe server listening on port 3001`
+Run: `yarn install && JWT_SECRET=dev DATABASE_URL=postgresql://localhost/pipeit yarn dev:server`
+Expected: `pipeit server listening on port 3001`
 
 Test in another terminal: `curl http://localhost:3001/health`
 Expected: `{"status":"ok"}`
@@ -617,8 +617,8 @@ git commit -m "feat: JWT auth middleware with sign/verify"
 import { Hono } from "hono";
 import { setCookie } from "hono/cookie";
 import { eq } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { users, authIdentities } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { users, authIdentities } from "@pipeit/shared/db/schema";
 import { signJwt } from "./jwt.js";
 import { env } from "../env.js";
 
@@ -734,8 +734,8 @@ git commit -m "feat: Google OAuth login with auto-account creation"
 import { Hono } from "hono";
 import { setCookie } from "hono/cookie";
 import { eq } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { users, authIdentities } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { users, authIdentities } from "@pipeit/shared/db/schema";
 import { signJwt } from "./jwt.js";
 import { env } from "../env.js";
 
@@ -831,8 +831,8 @@ import { Hono } from "hono";
 import { setCookie } from "hono/cookie";
 import { eq, and } from "drizzle-orm";
 import bcrypt from "bcrypt";
-import { db } from "@mpipe/shared/db";
-import { users, authIdentities } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { users, authIdentities } from "@pipeit/shared/db/schema";
 import { signJwt } from "./jwt.js";
 import { env } from "../env.js";
 
@@ -911,8 +911,8 @@ import { email } from "./auth/email.js";
 import { getCookie, deleteCookie } from "hono/cookie";
 import { verifyJwt } from "./auth/jwt.js";
 import { eq } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { users } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { users } from "@pipeit/shared/db/schema";
 
 app.route("/auth", github);
 app.route("/auth", email);
@@ -971,7 +971,7 @@ describe("Doc routes", () => {
 
 - [ ] **Step 2: Run test to verify it fails or passes baseline**
 
-Run: `cd packages/server && JWT_SECRET=test-secret DATABASE_URL=postgresql://localhost/mpipe node --import tsx --test src/docs.test.ts`
+Run: `cd packages/server && JWT_SECRET=test-secret DATABASE_URL=postgresql://localhost/pipeit node --import tsx --test src/docs.test.ts`
 Expected: PASS (401 from auth middleware — baseline test)
 
 - [ ] **Step 3: Create packages/server/src/routes/docs.ts**
@@ -980,8 +980,8 @@ Expected: PASS (401 from auth middleware — baseline test)
 import { Hono } from "hono";
 import { eq, and, ilike, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import { db } from "@mpipe/shared/db";
-import { docs, readingPositions } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { docs, readingPositions } from "@pipeit/shared/db/schema";
 import { env } from "../env.js";
 
 const docsRouter = new Hono();
@@ -1205,8 +1205,8 @@ git commit -m "feat: doc CRUD routes with upload, update-in-place, list + filter
 ```typescript
 import { Hono } from "hono";
 import { eq, and } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { docs, readingPositions } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { docs, readingPositions } from "@pipeit/shared/db/schema";
 
 const positionRouter = new Hono();
 
@@ -1264,8 +1264,8 @@ export { positionRouter };
 ```typescript
 import { Hono } from "hono";
 import { eq, and } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { pushSubscriptions } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { pushSubscriptions } from "@pipeit/shared/db/schema";
 
 const pushRouter = new Hono();
 
@@ -1308,8 +1308,8 @@ export { pushRouter };
 ```typescript
 import webpush from "web-push";
 import { eq } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { pushSubscriptions } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { pushSubscriptions } from "@pipeit/shared/db/schema";
 import { env } from "../env.js";
 
 if (env.VAPID_PUBLIC_KEY && env.VAPID_PRIVATE_KEY) {
@@ -1466,14 +1466,14 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: mpipe
-      POSTGRES_USER: mpipe
-      POSTGRES_PASSWORD: mpipe
+      POSTGRES_DB: pipeit
+      POSTGRES_USER: pipeit
+      POSTGRES_PASSWORD: pipeit
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ../drizzle:/docker-entrypoint-initdb.d:ro
     networks:
-      - mpipe
+      - pipeit
 
   server:
     build:
@@ -1483,7 +1483,7 @@ services:
       - "3001:3001"
     environment:
       PORT: "3001"
-      DATABASE_URL: "postgresql://mpipe:mpipe@postgres:5432/mpipe"
+      DATABASE_URL: "postgresql://pipeit:pipeit@postgres:5432/pipeit"
       JWT_SECRET: "dev-secret-change-in-production"
       PUBLIC_URL: "http://localhost:3001"
       WEB_URL: "http://localhost:5173"
@@ -1494,7 +1494,7 @@ services:
     depends_on:
       - postgres
     networks:
-      - mpipe
+      - pipeit
 
   web:
     build:
@@ -1512,13 +1512,13 @@ services:
     depends_on:
       - server
     networks:
-      - mpipe
+      - pipeit
 
 volumes:
   pgdata:
 
 networks:
-  mpipe:
+  pipeit:
 ```
 
 - [ ] **Step 2: Create docker/Dockerfile.server**
@@ -1533,7 +1533,7 @@ RUN yarn install --frozen-lockfile
 COPY packages/shared packages/shared
 COPY packages/server packages/server
 COPY tsconfig.base.json ./
-RUN yarn workspace @mpipe/shared run build && yarn workspace @mpipe/server run build
+RUN yarn workspace @pipeit/shared run build && yarn workspace @pipeit/server run build
 
 FROM node:22-slim
 WORKDIR /app
@@ -1557,7 +1557,7 @@ RUN yarn install
 COPY packages/shared packages/shared
 COPY packages/web packages/web
 COPY tsconfig.base.json ./
-RUN yarn workspace @mpipe/shared run build
+RUN yarn workspace @pipeit/shared run build
 WORKDIR /app/packages/web
 CMD ["yarn", "dev", "--host", "0.0.0.0"]
 ```
@@ -1664,7 +1664,7 @@ export default defineConfig({
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mpipe</title>
+    <title>pipeit</title>
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#1a1a2e" />
   </head>
@@ -1792,7 +1792,7 @@ export function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-950 text-gray-100">
       <div className="w-full max-w-sm space-y-6 p-8">
-        <h1 className="text-2xl font-bold text-center">Sign in to mpipe</h1>
+        <h1 className="text-2xl font-bold text-center">Sign in to pipeit</h1>
         <div className="space-y-3">
           <a href="/auth/google" className="block w-full text-center py-2.5 px-4 rounded-lg bg-white text-gray-900 font-medium hover:bg-gray-100 transition">
             Continue with Google
@@ -2021,7 +2021,7 @@ import { api } from "../lib/api.js";
 import { Header } from "../components/Header.js";
 import { MarkdownRenderer } from "../components/MarkdownRenderer.js";
 import { ReadingProgress } from "../components/ReadingProgress.js";
-import type { DocResponse } from "@mpipe/shared";
+import type { DocResponse } from "@pipeit/shared";
 
 export function DocPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -2163,7 +2163,7 @@ export function CycleFilter({ options, value, onChange }: CycleFilterProps) {
 
 ```typescript
 import { Link } from "react-router-dom";
-import type { DocListItem as DocItem } from "@mpipe/shared";
+import type { DocListItem as DocItem } from "@pipeit/shared";
 
 function timeAgo(dateStr: string): string {
   const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
@@ -2206,7 +2206,7 @@ import { useEffect, useState } from "react";
 import { api } from "../lib/api.js";
 import { DocListItem } from "./DocListItem.js";
 import { CycleFilter } from "./CycleFilter.js";
-import type { DocListItem as DocItem } from "@mpipe/shared";
+import type { DocListItem as DocItem } from "@pipeit/shared";
 
 const READ_STATES = ["All", "Not started", "Reading", "Finished"];
 const VISIBILITY = ["All", "Private", "Public"];
@@ -2333,7 +2333,7 @@ git commit -m "feat: TOC sidebar, search panel with filters, Cmd+K keyboard shor
 ```typescript
 import { useEffect, useRef } from "react";
 import { api } from "../lib/api.js";
-import type { PositionPayload } from "@mpipe/shared";
+import type { PositionPayload } from "@pipeit/shared";
 
 export function useReadingPosition(slug: string | undefined) {
   const restored = useRef(false);
@@ -2393,14 +2393,14 @@ import { useEffect, useState } from "react";
 
 export function useTheme() {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
-    const saved = localStorage.getItem("mpipe-theme");
+    const saved = localStorage.getItem("pipeit-theme");
     if (saved === "light" || saved === "dark") return saved;
     return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   });
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("mpipe-theme", theme);
+    localStorage.setItem("pipeit-theme", theme);
   }, [theme]);
 
   const toggle = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
@@ -2458,8 +2458,8 @@ git commit -m "feat: reading position tracking + light/dark mode toggle"
 
 ```json
 {
-  "name": "mpipe",
-  "short_name": "mpipe",
+  "name": "pipeit",
+  "short_name": "pipeit",
   "description": "Pipe markdown to your browser",
   "start_url": "/",
   "display": "standalone",
@@ -2478,7 +2478,7 @@ git commit -m "feat: reading position tracking + light/dark mode toggle"
 /// <reference lib="webworker" />
 declare const self: ServiceWorkerGlobalScope;
 
-const CACHE_NAME = "mpipe-v1";
+const CACHE_NAME = "pipeit-v1";
 const SHELL_URLS = ["/", "/index.html"];
 
 self.addEventListener("install", (event) => {
@@ -2573,26 +2573,26 @@ git commit -m "feat: PWA — service worker, manifest, push notification support
 
 ---
 
-## Task 15: Skill — /mpipe for Claude Code
+## Task 15: Skill — /pipeit for Claude Code
 
 **Files:**
-- Create: `skills/mpipe/SKILL.md`
+- Create: `skills/pipeit/SKILL.md`
 
-- [ ] **Step 1: Create skills/mpipe/SKILL.md**
+- [ ] **Step 1: Create skills/pipeit/SKILL.md**
 
 ````markdown
 ---
-name: mpipe
-description: Pipe markdown from your conversation to mpipe.dev for reading on any device. Use when the user says "/mpipe", wants to share a markdown file, or asks to send a doc to their phone/browser.
+name: pipeit
+description: Pipe markdown from your conversation to pipeit.live for reading on any device. Use when the user says "/pipeit", wants to share a markdown file, or asks to send a doc to their phone/browser.
 ---
 
 ## Usage
 
 ```
-/mpipe                        → share the last markdown block from this conversation
-/mpipe ./path/to/file.md      → share a specific file
-/mpipe --new ./file.md        → force new link (snapshot)
-/mpipe --public ./file.md     → make the doc publicly shareable
+/pipeit                        → share the last markdown block from this conversation
+/pipeit ./path/to/file.md      → share a specific file
+/pipeit --new ./file.md        → force new link (snapshot)
+/pipeit --public ./file.md     → make the doc publicly shareable
 ```
 
 ## Behavior
@@ -2602,7 +2602,7 @@ description: Pipe markdown from your conversation to mpipe.dev for reading on an
    - If no path, extract the last significant markdown block from the conversation
 
 2. **Upload via MCP:**
-   Call the `mpipe_upload` MCP tool:
+   Call the `pipeit_upload` MCP tool:
    ```json
    {
      "content": "<markdown content>",
@@ -2616,7 +2616,7 @@ description: Pipe markdown from your conversation to mpipe.dev for reading on an
 3. **Return the link:**
    Print the URL returned by the tool. Example:
    ```
-   ✓ Piped to https://mpipe.dev/d/a8f3k2x9
+   ✓ Piped to https://pipeit.live/d/a8f3k2x9
    ```
 
 4. **Optional Slack share:**
@@ -2629,7 +2629,7 @@ description: Pipe markdown from your conversation to mpipe.dev for reading on an
 
 ```bash
 git add skills/
-git commit -m "feat: /mpipe skill for Claude Code"
+git commit -m "feat: /pipeit skill for Claude Code"
 ```
 
 ---
@@ -2644,15 +2644,15 @@ git commit -m "feat: /mpipe skill for Claude Code"
 
 ```yaml
 preset: web
-namespace: mpipe
-name: mpipe-web
-image: mpipe-web
+namespace: pipeit
+name: pipeit-web
+image: pipeit-web
 registry: leadfycr.azurecr.io
 tag: "0.1"
 dockerfile: docker/Dockerfile.server
 port: 3001
 replicas: 1
-image_pull_secrets: ns-mpipe-azcr-secret
+image_pull_secrets: ns-pipeit-azcr-secret
 ingress_class_field: nginx
 probe:
   path: /health
@@ -2671,8 +2671,8 @@ lifecycle:
     exec:
       command: ["sh", "-c", "sleep 5"]
 env_from:
-  - configmap/config-mpipe-web
-  - secret/secret-mpipe-web
+  - configmap/config-pipeit-web
+  - secret/secret-pipeit-web
 env:
   PORT: "3001"
   DATABASE_URL: ""
@@ -2681,13 +2681,13 @@ env:
   GOOGLE_CLIENT_SECRET: ""
   GITHUB_CLIENT_ID: ""
   GITHUB_CLIENT_SECRET: ""
-  PUBLIC_URL: "https://mpipe.dev"
-  WEB_URL: "https://mpipe.dev"
+  PUBLIC_URL: "https://pipeit.live"
+  WEB_URL: "https://pipeit.live"
   VAPID_PUBLIC_KEY: ""
   VAPID_PRIVATE_KEY: ""
-  VAPID_EMAIL: "mailto:admin@mpipe.dev"
+  VAPID_EMAIL: "mailto:admin@pipeit.live"
 domains:
-  - mpipe.dev
+  - pipeit.live
 ingress_annotations:
   cert-manager.io/cluster-issuer: letsencrypt
   nginx.ingress.kubernetes.io/proxy-body-size: "2m"
@@ -2717,8 +2717,8 @@ replicas: 1
 
 ```yaml
 preset: stateful
-namespace: mpipe
-name: mpipe-postgres
+namespace: pipeit
+name: pipeit-postgres
 image: postgres
 registry: docker.io/library
 tag: "17"
@@ -2732,10 +2732,10 @@ resources:
     cpu: 500m
     memory: 512Mi
 env_from:
-  - secret/secret-mpipe-postgres
+  - secret/secret-pipeit-postgres
 env:
-  POSTGRES_DB: mpipe
-  POSTGRES_USER: mpipe
+  POSTGRES_DB: pipeit
+  POSTGRES_USER: pipeit
   POSTGRES_PASSWORD: ""
 volumes:
   - name: pgdata
@@ -2788,8 +2788,8 @@ COPY packages/shared packages/shared
 COPY packages/server packages/server
 COPY packages/web packages/web
 COPY tsconfig.base.json ./
-RUN yarn workspace @mpipe/shared run build \
- && yarn workspace @mpipe/server run build \
+RUN yarn workspace @pipeit/shared run build \
+ && yarn workspace @pipeit/server run build \
  && yarn workspace web run build
 
 FROM node:22-slim
@@ -2846,7 +2846,7 @@ git commit -m "feat: production Docker image — server serves static PWA assets
 | 12 | TOC + Search panel + Cmd+K | 11 |
 | 13 | Reading position tracking + theme | 12, 7 |
 | 14 | PWA (service worker, push) | 13 |
-| 15 | /mpipe skill | 6 |
+| 15 | /pipeit skill | 6 |
 | 16 | kdep deployment config | 9 |
 | 17 | Production Dockerfile | 10, 2 |
 
@@ -2855,6 +2855,6 @@ git commit -m "feat: production Docker image — server serves static PWA assets
 These spec requirements are intentionally deferred until the core is working:
 
 - **MCP OAuth server** (`/mcp/authorize`, `/mcp/token`) — depends on MCP SDK which is still evolving across editors. Build after core API + web are stable.
-- **`npx mpipe` CLI** — onboarding tool that detects editor environment and configures MCP + installs skills. Requires knowing exact config paths for each editor (CC, Cursor, VSCode, Codex, OpenCode). Build after the skill and MCP server are proven.
+- **`npx pipeit` CLI** — onboarding tool that detects editor environment and configures MCP + installs skills. Requires knowing exact config paths for each editor (CC, Cursor, VSCode, Codex, OpenCode). Build after the skill and MCP server are proven.
 - **Email password reset** (`/auth/email/reset`) — needs an email sending service. Add when user base warrants it.
 - **Push notification triggers from doc update** — the `notifyDocUpdated` service function exists in Task 7 but is not wired into the doc update flow. Wire it into `POST /api/docs` and `PUT /api/docs/:slug` after push subscriptions are tested end-to-end.

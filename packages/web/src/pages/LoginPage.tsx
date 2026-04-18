@@ -16,7 +16,7 @@ export function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       <div className="w-full max-w-sm space-y-6 p-8">
-        <h1 className="text-2xl font-bold text-center">{isSignUp ? "Create an account" : "Sign in to mpipe"}</h1>
+        <h1 className="text-2xl font-bold text-center">{isSignUp ? "Create an account" : "Sign in to pipeit"}</h1>
         <div className="space-y-3">
           <a href={`/auth/google${returnTo !== "/" ? `?return_to=${encodeURIComponent(returnTo)}` : ""}`} className="block w-full text-center py-2.5 px-4 rounded-lg bg-white text-gray-900 font-medium hover:bg-gray-100 transition">
             Continue with Google

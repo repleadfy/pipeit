@@ -1,10 +1,10 @@
 {
-  "name": "mpipe.dev",
+  "name": "pipeit.live",
   "version": "0.1.0",
   "type": "module",
-  "description": "One-shot installer for the mpipe Claude Code plugin.",
+  "description": "One-shot installer for the pipeit Claude Code plugin.",
   "bin": {
-    "mpipe.dev": "./dist/index.js"
+    "pipeit.live": "./dist/index.js"
   },
   "files": ["dist"],
   "scripts": {

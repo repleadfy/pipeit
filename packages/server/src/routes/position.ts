@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { eq, and } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { docs, readingPositions } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { docs, readingPositions } from "@pipeit/shared/db/schema";
 
 const positionRouter = new Hono();
 

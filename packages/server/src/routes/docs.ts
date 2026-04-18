@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { eq, and, ilike, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import { db } from "@mpipe/shared/db";
-import { docs, readingPositions } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { docs, readingPositions } from "@pipeit/shared/db/schema";
 import { env } from "../env.js";
 
 const docsRouter = new Hono();

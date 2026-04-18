@@ -17,8 +17,8 @@ test("tryInstallViaCli returns true when both exec calls succeed", () => {
   const exec = (cmd: string) => { calls.push(cmd); };
   assert.equal(tryInstallViaCli(exec), true);
   assert.deepEqual(calls, [
-    "claude plugin marketplace add repleadfy/mpipe",
-    "claude plugin install mpipe@repleadfy/mpipe",
+    "claude plugin marketplace add repleadfy/pipeit",
+    "claude plugin install pipeit@repleadfy/pipeit",
   ]);
 });
 
@@ -30,14 +30,14 @@ test("tryInstallViaCli returns false if exec throws", () => {
 test("printManualInstructions writes the two /plugin lines", () => {
   const lines: string[] = [];
   printManualInstructions((s) => lines.push(s));
-  assert.ok(lines.some((l) => l.includes("/plugin marketplace add repleadfy/mpipe")));
-  assert.ok(lines.some((l) => l.includes("/plugin install mpipe")));
+  assert.ok(lines.some((l) => l.includes("/plugin marketplace add repleadfy/pipeit")));
+  assert.ok(lines.some((l) => l.includes("/plugin install pipeit")));
 });
 
-test("printNextStep mentions /mpipe and browser sign-in", () => {
+test("printNextStep mentions /pipeit and browser sign-in", () => {
   const lines: string[] = [];
   printNextStep((s) => lines.push(s));
   const joined = lines.join("\n");
-  assert.match(joined, /\/mpipe/);
+  assert.match(joined, /\/pipeit/);
   assert.match(joined, /browser/i);
 });

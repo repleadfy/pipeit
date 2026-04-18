@@ -1,12 +1,12 @@
 preset: web
-namespace: mpipe
-name: mpipe-web
-image: mpipe-web
+namespace: pipeit
+name: pipeit-web
+image: pipeit-web
 registry: leadfycr.azurecr.io
 dockerfile: docker/Dockerfile.server
 port: 3001
 replicas: 1
-image_pull_secrets: ns-mpipe-azcr-secret
+image_pull_secrets: ns-pipeit-azcr-secret
 ingress_class_field: nginx
 probe:
   path: /health
@@ -25,16 +25,16 @@ lifecycle:
     exec:
       command: ["sh", "-c", "sleep 5"]
 env_from:
-  - configmap/config-mpipe-web
-  - secret/secret-mpipe-web
+  - configmap/config-pipeit-web
+  - secret/secret-pipeit-web
 env:
   PORT: "3001"
-  PUBLIC_URL: "https://mpipe.dev"
-  WEB_URL: "https://mpipe.dev"
-  VAPID_EMAIL: "mailto:admin@mpipe.dev"
+  PUBLIC_URL: "https://pipeit.live"
+  WEB_URL: "https://pipeit.live"
+  VAPID_EMAIL: "mailto:admin@pipeit.live"
   NODE_ENV: "production"
 domains:
-  - mpipe.dev
+  - pipeit.live
 ingress_annotations:
   cert-manager.io/cluster-issuer: letsencrypt
   nginx.ingress.kubernetes.io/proxy-body-size: "2m"

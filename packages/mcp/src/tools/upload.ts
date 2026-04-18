@@ -1,15 +1,15 @@
 import { z } from "zod";
 import { nanoid } from "nanoid";
 import { eq, and } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { docs } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { docs } from "@pipeit/shared/db/schema";
 import type { McpServer } from "@modelcontextprotocol/server";
 
 export function registerUploadTool(server: McpServer, getUserId: () => string, getBaseUrl: () => string) {
   server.registerTool(
-    "mpipe_upload",
+    "pipeit_upload",
     {
-      description: "Upload or update a markdown document on mpipe. If file_path is provided and a doc exists with the same path, it updates in place. Otherwise creates a new doc.",
+      description: "Upload or update a markdown document on pipeit. If file_path is provided and a doc exists with the same path, it updates in place. Otherwise creates a new doc.",
       inputSchema: z.object({
         content: z.string().describe("Markdown content to upload"),
         file_path: z.string().optional().describe("Original file path — used for update-in-place matching"),

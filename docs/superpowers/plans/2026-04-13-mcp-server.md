@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add a remote MCP server to mpipe so any AI tool (Claude Code, Cursor, ChatGPT, etc.) can pipe markdown via `https://mpipe.dev/mcp` with OAuth authentication.
+**Goal:** Add a remote MCP server to pipeit so any AI tool (Claude Code, Cursor, ChatGPT, etc.) can pipe markdown via `https://pipeit.live/mcp` with OAuth authentication.
 
 **Architecture:** MCP tools defined in `packages/mcp/`, mounted into the Hono server at `/mcp`. Uses `@modelcontextprotocol/hono` for Streamable HTTP transport. OAuth 2.0 authorization code flow reuses existing Google/GitHub auth. Tools call the database directly (same process).
 
@@ -19,10 +19,10 @@ packages/mcp/
   src/
     index.ts              # McpServer setup + tool registrations, exports Hono sub-app
     tools/
-      upload.ts           # mpipe_upload tool handler
-      list.ts             # mpipe_list tool handler
-      delete.ts           # mpipe_delete tool handler
-      toggle.ts           # mpipe_toggle tool handler
+      upload.ts           # pipeit_upload tool handler
+      list.ts             # pipeit_list tool handler
+      delete.ts           # pipeit_delete tool handler
+      toggle.ts           # pipeit_toggle tool handler
     oauth.ts              # OAuth endpoints: authorize, token, metadata
     auth.ts               # Bearer token verification middleware for MCP routes
 
@@ -37,7 +37,7 @@ packages/server/src/
 | `@modelcontextprotocol/server` | packages/mcp | McpServer, tool registration |
 | `@modelcontextprotocol/hono` | packages/mcp | Hono integration, WebStandardStreamableHTTPServerTransport |
 | `zod` | packages/mcp | Tool input schema validation |
-| `@mpipe/shared` | packages/mcp | DB access, schema |
+| `@pipeit/shared` | packages/mcp | DB access, schema |
 | `jose` | packages/mcp (already in server) | JWT sign/verify for OAuth tokens |
 | `nanoid` | packages/mcp (already in shared) | Auth code generation |
 
@@ -47,10 +47,10 @@ packages/server/src/
 Task 1 (package setup)
   └─► Task 2 (OAuth endpoints)
        └─► Task 3 (Bearer auth middleware)
-            └─► Task 4 (mpipe_upload tool)
-            └─► Task 5 (mpipe_list tool)
-            └─► Task 6 (mpipe_delete tool)
-            └─► Task 7 (mpipe_toggle tool)
+            └─► Task 4 (pipeit_upload tool)
+            └─► Task 5 (pipeit_list tool)
+            └─► Task 6 (pipeit_delete tool)
+            └─► Task 7 (pipeit_toggle tool)
                  └─► Task 8 (mount in server + integration)
                       └─► Task 9 (build + deploy)
 ```
@@ -70,7 +70,7 @@ Tasks 4-7 are independent of each other (can be parallelized after Task 3).
 
 ```json
 {
-  "name": "@mpipe/mcp",
+  "name": "@pipeit/mcp",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
@@ -85,7 +85,7 @@ Tasks 4-7 are independent of each other (can be parallelized after Task 3).
   "dependencies": {
     "@modelcontextprotocol/server": "^2.0.0",
     "@modelcontextprotocol/hono": "^0.1.0",
-    "@mpipe/shared": "*",
+    "@pipeit/shared": "*",
     "hono": "^4.12.8",
     "jose": "^6.2.2",
     "nanoid": "^5.1.7",
@@ -129,7 +129,7 @@ Run: `yarn install`
 
 - [ ] **Step 5: Verify build**
 
-Run: `yarn workspace @mpipe/mcp run build`
+Run: `yarn workspace @pipeit/mcp run build`
 Expected: Compiles without errors.
 
 - [ ] **Step 6: Commit**
@@ -165,8 +165,8 @@ import { setCookie, getCookie } from "hono/cookie";
 import { nanoid } from "nanoid";
 import * as jose from "jose";
 import { eq } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { users } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { users } from "@pipeit/shared/db/schema";
 
 // In-memory auth code store (short-lived, 5 min TTL)
 const authCodes = new Map<string, { userId: string; redirectUri: string; codeChallenge: string; expiresAt: number }>();
@@ -221,7 +221,7 @@ oauthApp.get("/authorize", (c) => {
   // Render a simple login page with Google/GitHub buttons
   const base = new URL(c.req.url).origin;
   const html = `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>mpipe — Sign In</title>
+<html><head><meta charset="utf-8"><title>pipeit — Sign In</title>
 <style>
   body { font-family: system-ui; background: #0f172a; color: #e2e8f0; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
   .card { background: #1e293b; padding: 2rem; border-radius: 12px; text-align: center; max-width: 360px; }
@@ -232,7 +232,7 @@ oauthApp.get("/authorize", (c) => {
   .github { background: #333; }
 </style></head>
 <body><div class="card">
-  <h1>mpipe</h1>
+  <h1>pipeit</h1>
   <p>Sign in to connect your AI tool</p>
   <a class="google" href="${base}/auth/google?mcp_oauth=1">Continue with Google</a>
   <a class="github" href="${base}/auth/github?mcp_oauth=1">Continue with GitHub</a>
@@ -332,7 +332,7 @@ export { oauthApp, authCodes };
 
 - [ ] **Step 2: Verify build**
 
-Run: `yarn workspace @mpipe/mcp run build`
+Run: `yarn workspace @pipeit/mcp run build`
 Expected: Compiles without errors.
 
 - [ ] **Step 3: Commit**
@@ -393,7 +393,7 @@ export async function mcpAuthMiddleware(c: Context, next: Next) {
 
 - [ ] **Step 2: Verify build**
 
-Run: `yarn workspace @mpipe/mcp run build`
+Run: `yarn workspace @pipeit/mcp run build`
 Expected: Compiles without errors.
 
 - [ ] **Step 3: Commit**
@@ -405,7 +405,7 @@ git commit -m "feat(mcp): Bearer token auth middleware with OAuth discovery"
 
 ---
 
-## Task 4: mpipe_upload Tool
+## Task 4: pipeit_upload Tool
 
 **Files:**
 - Create: `packages/mcp/src/tools/upload.ts`
@@ -416,15 +416,15 @@ git commit -m "feat(mcp): Bearer token auth middleware with OAuth discovery"
 import { z } from "zod";
 import { nanoid } from "nanoid";
 import { eq, and } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { docs } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { docs } from "@pipeit/shared/db/schema";
 import type { McpServer } from "@modelcontextprotocol/server";
 
 export function registerUploadTool(server: McpServer, getUserId: () => string, getBaseUrl: () => string) {
   server.registerTool(
-    "mpipe_upload",
+    "pipeit_upload",
     {
-      description: "Upload or update a markdown document on mpipe. If file_path is provided and a doc exists with the same path, it updates in place. Otherwise creates a new doc.",
+      description: "Upload or update a markdown document on pipeit. If file_path is provided and a doc exists with the same path, it updates in place. Otherwise creates a new doc.",
       inputSchema: z.object({
         content: z.string().describe("Markdown content to upload"),
         file_path: z.string().optional().describe("Original file path — used for update-in-place matching"),
@@ -485,19 +485,19 @@ export function registerUploadTool(server: McpServer, getUserId: () => string, g
 
 - [ ] **Step 2: Verify build**
 
-Run: `yarn workspace @mpipe/mcp run build`
+Run: `yarn workspace @pipeit/mcp run build`
 Expected: Compiles without errors.
 
 - [ ] **Step 3: Commit**
 
 ```bash
 git add packages/mcp/src/tools/upload.ts
-git commit -m "feat(mcp): mpipe_upload tool — create/update markdown docs"
+git commit -m "feat(mcp): pipeit_upload tool — create/update markdown docs"
 ```
 
 ---
 
-## Task 5: mpipe_list Tool
+## Task 5: pipeit_list Tool
 
 **Files:**
 - Create: `packages/mcp/src/tools/list.ts`
@@ -507,15 +507,15 @@ git commit -m "feat(mcp): mpipe_upload tool — create/update markdown docs"
 ```typescript
 import { z } from "zod";
 import { eq, and, ilike, sql } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { docs, readingPositions } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { docs, readingPositions } from "@pipeit/shared/db/schema";
 import type { McpServer } from "@modelcontextprotocol/server";
 
 export function registerListTool(server: McpServer, getUserId: () => string) {
   server.registerTool(
-    "mpipe_list",
+    "pipeit_list",
     {
-      description: "List your documents on mpipe. Supports search, read state, and visibility filters.",
+      description: "List your documents on pipeit. Supports search, read state, and visibility filters.",
       inputSchema: z.object({
         q: z.string().optional().describe("Search query to filter by title"),
         read_state: z.enum(["not_started", "reading", "finished"]).optional().describe("Filter by reading progress"),
@@ -566,19 +566,19 @@ export function registerListTool(server: McpServer, getUserId: () => string) {
 
 - [ ] **Step 2: Verify build**
 
-Run: `yarn workspace @mpipe/mcp run build`
+Run: `yarn workspace @pipeit/mcp run build`
 Expected: Compiles without errors.
 
 - [ ] **Step 3: Commit**
 
 ```bash
 git add packages/mcp/src/tools/list.ts
-git commit -m "feat(mcp): mpipe_list tool — list docs with filters"
+git commit -m "feat(mcp): pipeit_list tool — list docs with filters"
 ```
 
 ---
 
-## Task 6: mpipe_delete Tool
+## Task 6: pipeit_delete Tool
 
 **Files:**
 - Create: `packages/mcp/src/tools/delete.ts`
@@ -588,15 +588,15 @@ git commit -m "feat(mcp): mpipe_list tool — list docs with filters"
 ```typescript
 import { z } from "zod";
 import { eq, and } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { docs } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { docs } from "@pipeit/shared/db/schema";
 import type { McpServer } from "@modelcontextprotocol/server";
 
 export function registerDeleteTool(server: McpServer, getUserId: () => string) {
   server.registerTool(
-    "mpipe_delete",
+    "pipeit_delete",
     {
-      description: "Delete a document from mpipe by its slug.",
+      description: "Delete a document from pipeit by its slug.",
       inputSchema: z.object({
         slug: z.string().describe("The document slug (from the URL /d/<slug>)"),
       }),
@@ -621,19 +621,19 @@ export function registerDeleteTool(server: McpServer, getUserId: () => string) {
 
 - [ ] **Step 2: Verify build**
 
-Run: `yarn workspace @mpipe/mcp run build`
+Run: `yarn workspace @pipeit/mcp run build`
 Expected: Compiles without errors.
 
 - [ ] **Step 3: Commit**
 
 ```bash
 git add packages/mcp/src/tools/delete.ts
-git commit -m "feat(mcp): mpipe_delete tool — delete docs by slug"
+git commit -m "feat(mcp): pipeit_delete tool — delete docs by slug"
 ```
 
 ---
 
-## Task 7: mpipe_toggle Tool
+## Task 7: pipeit_toggle Tool
 
 **Files:**
 - Create: `packages/mcp/src/tools/toggle.ts`
@@ -643,13 +643,13 @@ git commit -m "feat(mcp): mpipe_delete tool — delete docs by slug"
 ```typescript
 import { z } from "zod";
 import { eq, and } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { docs } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { docs } from "@pipeit/shared/db/schema";
 import type { McpServer } from "@modelcontextprotocol/server";
 
 export function registerToggleTool(server: McpServer, getUserId: () => string, getBaseUrl: () => string) {
   server.registerTool(
-    "mpipe_toggle",
+    "pipeit_toggle",
     {
       description: "Toggle a document's visibility between public and private.",
       inputSchema: z.object({
@@ -680,14 +680,14 @@ export function registerToggleTool(server: McpServer, getUserId: () => string, g
 
 - [ ] **Step 2: Verify build**
 
-Run: `yarn workspace @mpipe/mcp run build`
+Run: `yarn workspace @pipeit/mcp run build`
 Expected: Compiles without errors.
 
 - [ ] **Step 3: Commit**
 
 ```bash
 git add packages/mcp/src/tools/toggle.ts
-git commit -m "feat(mcp): mpipe_toggle tool — toggle doc visibility"
+git commit -m "feat(mcp): pipeit_toggle tool — toggle doc visibility"
 ```
 
 ---
@@ -727,7 +727,7 @@ mcpApp.all("/", mcpAuthMiddleware, async (c) => {
 
   // Create per-request server with user context
   const server = new McpServer({
-    name: "mpipe",
+    name: "pipeit",
     version: "0.1.0",
   });
 
@@ -753,7 +753,7 @@ export { mcpApp };
 Add to `packages/server/src/app.ts`, after the existing route mounts (after `app.route("/api/push", pushRouter);`) and before the static file serving:
 
 ```typescript
-import { mcpApp } from "@mpipe/mcp";
+import { mcpApp } from "@pipeit/mcp";
 
 // MCP remote server
 app.route("/mcp", mcpApp);
@@ -807,12 +807,12 @@ Same change in `packages/server/src/auth/github.ts`. Find `return c.redirect(env
 
 Add `getCookie` to the import from `hono/cookie` if not already imported.
 
-- [ ] **Step 5: Add @mpipe/mcp dependency to server**
+- [ ] **Step 5: Add @pipeit/mcp dependency to server**
 
 In `packages/server/package.json`, add to dependencies:
 
 ```json
-"@mpipe/mcp": "*"
+"@pipeit/mcp": "*"
 ```
 
 - [ ] **Step 6: Update root build script**
@@ -820,7 +820,7 @@ In `packages/server/package.json`, add to dependencies:
 In root `package.json`, update the build script to include mcp:
 
 ```json
-"build": "yarn workspace @mpipe/shared run build && yarn workspace @mpipe/mcp run build && yarn workspace @mpipe/server run build && yarn workspace web run build"
+"build": "yarn workspace @pipeit/shared run build && yarn workspace @pipeit/mcp run build && yarn workspace @pipeit/server run build && yarn workspace web run build"
 ```
 
 - [ ] **Step 7: Verify full build**
@@ -853,9 +853,9 @@ COPY packages/mcp/package.json packages/mcp/
 And update the build command:
 
 ```dockerfile
-RUN yarn workspace @mpipe/shared run build \
- && yarn workspace @mpipe/mcp run build \
- && yarn workspace @mpipe/server run build \
+RUN yarn workspace @pipeit/shared run build \
+ && yarn workspace @pipeit/mcp run build \
+ && yarn workspace @pipeit/server run build \
  && yarn workspace web run build
 ```
 
@@ -872,16 +872,16 @@ COPY --from=builder /app/packages/mcp/dist ./packages/mcp/dist
 kdep build web --platform linux/amd64
 kdep push web
 kdep apply web
-kubectl rollout restart deployment/mpipe-web -n mpipe
+kubectl rollout restart deployment/pipeit-web -n pipeit
 ```
 
 - [ ] **Step 3: Verify MCP endpoint**
 
 ```bash
-curl -s https://mpipe.dev/.well-known/oauth-authorization-server
+curl -s https://pipeit.live/.well-known/oauth-authorization-server
 # Should return JSON with authorization_endpoint and token_endpoint
 
-curl -s https://mpipe.dev/mcp -X POST
+curl -s https://pipeit.live/mcp -X POST
 # Should return 401 with WWW-Authenticate header
 ```
 
@@ -901,9 +901,9 @@ git commit -m "feat(mcp): update Docker build for MCP package + deploy"
 | 1 | Package scaffold | — |
 | 2 | OAuth endpoints (authorize, token, PKCE) | 1 |
 | 3 | Bearer auth middleware | 1 |
-| 4 | mpipe_upload tool | 1 |
-| 5 | mpipe_list tool | 1 |
-| 6 | mpipe_delete tool | 1 |
-| 7 | mpipe_toggle tool | 1 |
+| 4 | pipeit_upload tool | 1 |
+| 5 | pipeit_list tool | 1 |
+| 6 | pipeit_delete tool | 1 |
+| 7 | pipeit_toggle tool | 1 |
 | 8 | Wire up McpServer + mount in app | 2, 3, 4, 5, 6, 7 |
 | 9 | Docker build + deploy | 8 |

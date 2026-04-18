@@ -1,15 +1,15 @@
 ---
-name: mpipe
-description: Pipe markdown from your conversation to mpipe.dev for reading on any device. Use when the user says "/mpipe", wants to share a markdown file, or asks to send a doc to their phone/browser.
+name: pipeit
+description: Pipe markdown from your conversation to pipeit.live for reading on any device. Use when the user says "/pipeit", wants to share a markdown file, or asks to send a doc to their phone/browser.
 ---
 
 ## Usage
 
 ```
-/mpipe                        → share the last markdown block from this conversation
-/mpipe ./path/to/file.md      → share a specific file
-/mpipe --new ./file.md        → force new link (snapshot)
-/mpipe --public ./file.md     → make the doc publicly shareable
+/pipeit                        → share the last markdown block from this conversation
+/pipeit ./path/to/file.md      → share a specific file
+/pipeit --new ./file.md        → force new link (snapshot)
+/pipeit --public ./file.md     → make the doc publicly shareable
 ```
 
 ## Behavior
@@ -19,7 +19,7 @@ description: Pipe markdown from your conversation to mpipe.dev for reading on an
    - If no path, extract the last significant markdown block from the conversation
 
 2. **Upload via MCP:**
-   Call the `mpipe_upload` MCP tool:
+   Call the `pipeit_upload` MCP tool:
    ```json
    {
      "content": "<markdown content>",
@@ -33,7 +33,7 @@ description: Pipe markdown from your conversation to mpipe.dev for reading on an
 3. **Return the link:**
    Print the URL returned by the tool. Example:
    ```
-   ✓ Piped to https://mpipe.dev/d/a8f3k2x9
+   ✓ Piped to https://pipeit.live/d/a8f3k2x9
    ```
 
 4. **Optional Slack share:**

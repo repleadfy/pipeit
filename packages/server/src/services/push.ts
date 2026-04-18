@@ -1,7 +1,7 @@
 import webpush from "web-push";
 import { eq } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { pushSubscriptions } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { pushSubscriptions } from "@pipeit/shared/db/schema";
 import { env } from "../env.js";
 
 if (env.VAPID_PUBLIC_KEY && env.VAPID_PRIVATE_KEY) {

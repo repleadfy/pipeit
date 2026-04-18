@@ -1,14 +1,14 @@
 import { z } from "zod";
 import { eq, and, ilike, sql } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { docs, readingPositions } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { docs, readingPositions } from "@pipeit/shared/db/schema";
 import type { McpServer } from "@modelcontextprotocol/server";
 
 export function registerListTool(server: McpServer, getUserId: () => string) {
   server.registerTool(
-    "mpipe_list",
+    "pipeit_list",
     {
-      description: "List your documents on mpipe. Supports search, read state, and visibility filters.",
+      description: "List your documents on pipeit. Supports search, read state, and visibility filters.",
       inputSchema: z.object({
         q: z.string().optional().describe("Search query to filter by title"),
         read_state: z.enum(["not_started", "reading", "finished"]).optional().describe("Filter by reading progress"),

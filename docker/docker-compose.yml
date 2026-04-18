@@ -4,14 +4,14 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: mpipe
-      POSTGRES_USER: mpipe
-      POSTGRES_PASSWORD: mpipe
+      POSTGRES_DB: pipeit
+      POSTGRES_USER: pipeit
+      POSTGRES_PASSWORD: pipeit
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ../drizzle:/docker-entrypoint-initdb.d:ro
     networks:
-      - mpipe
+      - pipeit
 
   server:
     build:
@@ -21,7 +21,7 @@ services:
       - "3001:3001"
     environment:
       PORT: "3001"
-      DATABASE_URL: "postgresql://mpipe:mpipe@postgres:5432/mpipe"
+      DATABASE_URL: "postgresql://pipeit:pipeit@postgres:5432/pipeit"
       JWT_SECRET: "dev-secret-change-in-production"
       PUBLIC_URL: "http://localhost:3001"
       WEB_URL: "http://localhost:5173"
@@ -32,7 +32,7 @@ services:
     depends_on:
       - postgres
     networks:
-      - mpipe
+      - pipeit
 
   web:
     build:
@@ -50,10 +50,10 @@ services:
     depends_on:
       - server
     networks:
-      - mpipe
+      - pipeit
 
 volumes:
   pgdata:
 
 networks:
-  mpipe:
+  pipeit:

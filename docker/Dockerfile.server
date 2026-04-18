@@ -11,9 +11,9 @@ COPY packages/server packages/server
 COPY packages/web packages/web
 COPY packages/mcp packages/mcp
 COPY tsconfig.base.json ./
-RUN yarn workspace @mpipe/shared run build \
- && yarn workspace @mpipe/mcp run build \
- && yarn workspace @mpipe/server run build \
+RUN yarn workspace @pipeit/shared run build \
+ && yarn workspace @pipeit/mcp run build \
+ && yarn workspace @pipeit/server run build \
  && yarn workspace web run build
 
 FROM node:22-slim

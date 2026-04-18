@@ -3,9 +3,9 @@ import { setCookie, getCookie } from "hono/cookie";
 import { nanoid } from "nanoid";
 import * as jose from "jose";
 import { eq } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { users } from "@mpipe/shared/db/schema";
-import { verifyJwt } from "@mpipe/shared/jwt";
+import { db } from "@pipeit/shared/db";
+import { users } from "@pipeit/shared/db/schema";
+import { verifyJwt } from "@pipeit/shared/jwt";
 
 // In-memory auth code store (short-lived, 5 min TTL)
 const authCodes = new Map<string, { userId: string; redirectUri: string; codeChallenge: string; expiresAt: number }>();

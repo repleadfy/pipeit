@@ -9,7 +9,7 @@ import { SearchPanel } from "../components/SearchPanel.js";
 import { useKeyboard } from "../hooks/useKeyboard.js";
 import { useReadingPosition } from "../hooks/useReadingPosition.js";
 import { useTheme } from "../hooks/useTheme.js";
-import type { DocResponse } from "@mpipe/shared";
+import type { DocResponse } from "@pipeit/shared";
 
 export function DocPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -33,9 +33,9 @@ export function DocPage() {
     if (error === "no_docs") return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
         <div className="text-center space-y-4 max-w-md">
-          <h1 className="text-2xl font-bold">Welcome to mpipe</h1>
+          <h1 className="text-2xl font-bold">Welcome to pipeit</h1>
           <p className="text-gray-400">You don't have any documents yet. Push your first markdown file to get started:</p>
-          <pre className="text-left bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-gray-300 overflow-x-auto">npx mpipe push README.md</pre>
+          <pre className="text-left bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-gray-300 overflow-x-auto">npx pipeit push README.md</pre>
         </div>
       </div>
     );

@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { CopyButton } from "../components/CopyButton.js";
 
-const PLUGIN_COMMANDS = `/plugin marketplace add repleadfy/mpipe
-/plugin install mpipe`;
+const PLUGIN_COMMANDS = `/plugin marketplace add repleadfy/pipeit
+/plugin install pipeit`;
 
 function Block({ label, code, recommended }: { label: string; code: string; recommended?: boolean }) {
   return (
@@ -32,18 +32,18 @@ export function InstallPage() {
     <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       <div className="max-w-2xl mx-auto px-6 py-16 space-y-8">
         <header className="space-y-2">
-          <h1 className="text-3xl font-bold">mpipe</h1>
+          <h1 className="text-3xl font-bold">pipeit</h1>
           <p className="text-gray-600 dark:text-gray-400">
             Share markdown from AI conversations. Read on any device.
           </p>
         </header>
 
         <Block label="Claude Code plugin" code={PLUGIN_COMMANDS} recommended />
-        <Block label="npm" code="npx mpipe.dev" />
-        <Block label="Bun" code="bunx mpipe.dev" />
+        <Block label="npm" code="npx pipeit.live" />
+        <Block label="Bun" code="bunx pipeit.live" />
 
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          After install: run <code className="text-gray-900 dark:text-gray-100">/mpipe</code> in Claude Code. Your browser opens once to sign in.
+          After install: run <code className="text-gray-900 dark:text-gray-100">/pipeit</code> in Claude Code. Your browser opens once to sign in.
         </p>
 
         <p className="text-sm text-gray-500">

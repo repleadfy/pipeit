@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "pipeit": {
+      "type": "http",
+      "url": "https://pipeit.live/mcp"
+    }
+  }
+}

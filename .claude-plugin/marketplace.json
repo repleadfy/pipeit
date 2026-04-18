@@ -1,11 +1,11 @@
 {
   "name": "repleadfy",
-  "owner": { "name": "Leadfy", "url": "https://mpipe.dev" },
+  "owner": { "name": "Leadfy", "url": "https://pipeit.live" },
   "plugins": [
     {
-      "name": "mpipe",
-      "source": "./plugins/mpipe",
-      "description": "Share markdown from AI conversations to mpipe.dev — read on any device.",
+      "name": "pipeit",
+      "source": "./plugins/pipeit",
+      "description": "Share markdown from AI conversations to pipeit.live — read on any device.",
       "version": "0.1.0"
     }
   ]

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { api } from "../lib/api.js";
-import type { PositionPayload } from "@mpipe/shared";
+import type { PositionPayload } from "@pipeit/shared";
 
 export function useReadingPosition(slug: string | undefined) {
   const restored = useRef(false);

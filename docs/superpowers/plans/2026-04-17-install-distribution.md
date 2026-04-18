@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship mpipe as a Claude Code plugin installable via three channels (`/plugin marketplace add`, `npx mpipe.dev`, `bunx mpipe.dev`), with a public `/install` landing page and a React-based OAuth consent screen.
+**Goal:** Ship pipeit as a Claude Code plugin installable via three channels (`/plugin marketplace add`, `npx pipeit.live`, `bunx pipeit.live`), with a public `/install` landing page and a React-based OAuth consent screen.
 
-**Architecture:** Single monorepo (`repleadfy/mpipe`) hosts a root marketplace manifest, a `plugins/mpipe/` plugin package, a new `packages/cli/` bootstrap that shells out to the `claude` CLI when available, and two new SPA routes (`/install`, `/mcp/consent`). Install writes config only; OAuth happens lazily on the first MCP tool call.
+**Architecture:** Single monorepo (`repleadfy/pipeit`) hosts a root marketplace manifest, a `plugins/pipeit/` plugin package, a new `packages/cli/` bootstrap that shells out to the `claude` CLI when available, and two new SPA routes (`/install`, `/mcp/consent`). Install writes config only; OAuth happens lazily on the first MCP tool call.
 
 **Tech Stack:** TypeScript, Node 22, Hono, React 19 + react-router 7, Tailwind 4, Vite 8, Vitest + React Testing Library (new for this feature), GitHub Actions for release automation.
 
@@ -14,10 +14,10 @@
 
 **New files (create):**
 - `.claude-plugin/marketplace.json` — root marketplace manifest
-- `plugins/mpipe/.claude-plugin/plugin.json` — plugin manifest
-- `plugins/mpipe/.mcp.json` — MCP server pointer
-- `plugins/mpipe/skills/mpipe/SKILL.md` — relocated from `skills/mpipe/SKILL.md`
-- `packages/cli/package.json` — new npm package (`mpipe.dev`)
+- `plugins/pipeit/.claude-plugin/plugin.json` — plugin manifest
+- `plugins/pipeit/.mcp.json` — MCP server pointer
+- `plugins/pipeit/skills/pipeit/SKILL.md` — relocated from `skills/pipeit/SKILL.md`
+- `packages/cli/package.json` — new npm package (`pipeit.live`)
 - `packages/cli/tsconfig.json`
 - `packages/cli/src/index.ts` — CLI entry
 - `packages/cli/src/cli.ts` — testable helpers (`hasClaudeCli`, `tryInstallViaCli`, `printManualInstructions`, `printNextStep`)
@@ -43,52 +43,52 @@
 - `packages/server/src/auth/github.ts` — same
 - `packages/server/src/auth/email.ts` — same (plus honor `mcp_oauth=1` query like google/github)
 - `package.json` (root) — add `build:cli` script and include CLI in `build`
-- `skills/mpipe/SKILL.md` — **delete** after content move (in same commit as create of new path)
-- `README.md` — add install section pointing at `mpipe.dev` and the three install commands
+- `skills/pipeit/SKILL.md` — **delete** after content move (in same commit as create of new path)
+- `README.md` — add install section pointing at `pipeit.live` and the three install commands
 
 ---
 
 ## Task 1: Move SKILL.md into the plugin directory
 
 **Files:**
-- Create: `plugins/mpipe/.claude-plugin/plugin.json`
-- Create: `plugins/mpipe/.mcp.json`
-- Create: `plugins/mpipe/skills/mpipe/SKILL.md` (verbatim copy of `skills/mpipe/SKILL.md`)
-- Delete: `skills/mpipe/SKILL.md`
+- Create: `plugins/pipeit/.claude-plugin/plugin.json`
+- Create: `plugins/pipeit/.mcp.json`
+- Create: `plugins/pipeit/skills/pipeit/SKILL.md` (verbatim copy of `skills/pipeit/SKILL.md`)
+- Delete: `skills/pipeit/SKILL.md`
 - Delete: `skills/` directory (once empty)
 - Create: `.claude-plugin/marketplace.json`
 
 - [ ] **Step 1: Read the current SKILL.md and snapshot its exact content**
 
-Run: `cat skills/mpipe/SKILL.md`
+Run: `cat skills/pipeit/SKILL.md`
 
 (Keep the output in your head / scratch — the new file must be byte-identical except for path.)
 
-- [ ] **Step 2: Create `plugins/mpipe/skills/mpipe/SKILL.md` with the exact same content**
+- [ ] **Step 2: Create `plugins/pipeit/skills/pipeit/SKILL.md` with the exact same content**
 
-Use the Write tool with the content captured in Step 1. The YAML frontmatter (`name: mpipe`, `description: ...`) and the Usage/Behavior body must be preserved verbatim.
+Use the Write tool with the content captured in Step 1. The YAML frontmatter (`name: pipeit`, `description: ...`) and the Usage/Behavior body must be preserved verbatim.
 
-- [ ] **Step 3: Create `plugins/mpipe/.claude-plugin/plugin.json`**
+- [ ] **Step 3: Create `plugins/pipeit/.claude-plugin/plugin.json`**
 
 ```json
 {
-  "name": "mpipe",
+  "name": "pipeit",
   "version": "0.1.0",
-  "description": "Pipe markdown from Claude Code to mpipe.dev. Adds the /mpipe skill + MCP server connection.",
-  "homepage": "https://mpipe.dev",
-  "repository": "https://github.com/repleadfy/mpipe",
+  "description": "Pipe markdown from Claude Code to pipeit.live. Adds the /pipeit skill + MCP server connection.",
+  "homepage": "https://pipeit.live",
+  "repository": "https://github.com/repleadfy/pipeit",
   "license": "MIT"
 }
 ```
 
-- [ ] **Step 4: Create `plugins/mpipe/.mcp.json`**
+- [ ] **Step 4: Create `plugins/pipeit/.mcp.json`**
 
 ```json
 {
   "mcpServers": {
-    "mpipe": {
+    "pipeit": {
       "type": "http",
-      "url": "https://mpipe.dev/mcp"
+      "url": "https://pipeit.live/mcp"
     }
   }
 }
@@ -99,12 +99,12 @@ Use the Write tool with the content captured in Step 1. The YAML frontmatter (`n
 ```json
 {
   "name": "repleadfy",
-  "owner": { "name": "Leadfy", "url": "https://mpipe.dev" },
+  "owner": { "name": "Leadfy", "url": "https://pipeit.live" },
   "plugins": [
     {
-      "name": "mpipe",
-      "source": "./plugins/mpipe",
-      "description": "Share markdown from AI conversations to mpipe.dev — read on any device.",
+      "name": "pipeit",
+      "source": "./plugins/pipeit",
+      "description": "Share markdown from AI conversations to pipeit.live — read on any device.",
       "version": "0.1.0"
     }
   ]
@@ -114,8 +114,8 @@ Use the Write tool with the content captured in Step 1. The YAML frontmatter (`n
 - [ ] **Step 6: Delete the old skill location**
 
 ```bash
-rm skills/mpipe/SKILL.md
-rmdir skills/mpipe skills
+rm skills/pipeit/SKILL.md
+rmdir skills/pipeit skills
 ```
 
 - [ ] **Step 7: Verify layout matches the spec**
@@ -130,18 +130,18 @@ Expected:
 marketplace.json
 
 plugins:
-mpipe
+pipeit
 
-plugins/mpipe:
+plugins/pipeit:
 .claude-plugin  .mcp.json  skills
 
-plugins/mpipe/.claude-plugin:
+plugins/pipeit/.claude-plugin:
 plugin.json
 
-plugins/mpipe/skills:
-mpipe
+plugins/pipeit/skills:
+pipeit
 
-plugins/mpipe/skills/mpipe:
+plugins/pipeit/skills/pipeit:
 SKILL.md
 ```
 
@@ -149,7 +149,7 @@ SKILL.md
 
 ```bash
 git add .claude-plugin plugins skills
-git commit -m "feat: relocate SKILL.md into plugins/mpipe and add marketplace manifest"
+git commit -m "feat: relocate SKILL.md into plugins/pipeit and add marketplace manifest"
 ```
 
 ---
@@ -165,12 +165,12 @@ git commit -m "feat: relocate SKILL.md into plugins/mpipe and add marketplace ma
 
 ```json
 {
-  "name": "mpipe.dev",
+  "name": "pipeit.live",
   "version": "0.1.0",
   "type": "module",
-  "description": "One-shot installer for the mpipe Claude Code plugin.",
+  "description": "One-shot installer for the pipeit Claude Code plugin.",
   "bin": {
-    "mpipe.dev": "./dist/index.js"
+    "pipeit.live": "./dist/index.js"
   },
   "files": ["dist"],
   "scripts": {
@@ -249,8 +249,8 @@ test("tryInstallViaCli returns true when both exec calls succeed", () => {
   const exec = (cmd: string) => { calls.push(cmd); };
   assert.equal(tryInstallViaCli(exec), true);
   assert.deepEqual(calls, [
-    "claude plugin marketplace add repleadfy/mpipe",
-    "claude plugin install mpipe@repleadfy/mpipe",
+    "claude plugin marketplace add repleadfy/pipeit",
+    "claude plugin install pipeit@repleadfy/pipeit",
   ]);
 });
 
@@ -262,22 +262,22 @@ test("tryInstallViaCli returns false if exec throws", () => {
 test("printManualInstructions writes the two /plugin lines", () => {
   const lines: string[] = [];
   printManualInstructions((s) => lines.push(s));
-  assert.ok(lines.some((l) => l.includes("/plugin marketplace add repleadfy/mpipe")));
-  assert.ok(lines.some((l) => l.includes("/plugin install mpipe")));
+  assert.ok(lines.some((l) => l.includes("/plugin marketplace add repleadfy/pipeit")));
+  assert.ok(lines.some((l) => l.includes("/plugin install pipeit")));
 });
 
-test("printNextStep mentions /mpipe and browser sign-in", () => {
+test("printNextStep mentions /pipeit and browser sign-in", () => {
   const lines: string[] = [];
   printNextStep((s) => lines.push(s));
   const joined = lines.join("\n");
-  assert.match(joined, /\/mpipe/);
+  assert.match(joined, /\/pipeit/);
   assert.match(joined, /browser/i);
 });
 ```
 
 - [ ] **Step 2: Run the test to confirm it fails**
 
-Run: `yarn workspace mpipe.dev test`
+Run: `yarn workspace pipeit.live test`
 Expected: FAIL — "Cannot find module './cli.js'" or the helpers don't exist.
 
 - [ ] **Step 3: Write `packages/cli/src/cli.ts` with injected dependencies**
@@ -285,8 +285,8 @@ Expected: FAIL — "Cannot find module './cli.js'" or the helpers don't exist.
 ```typescript
 import { execSync as realExec, spawnSync as realSpawn } from "node:child_process";
 
-export const MARKETPLACE = "repleadfy/mpipe";
-export const PLUGIN = "mpipe";
+export const MARKETPLACE = "repleadfy/pipeit";
+export const PLUGIN = "pipeit";
 
 type SpawnFn = (cmd: string, args: string[]) => { status: number | null };
 type ExecFn = (cmd: string) => void;
@@ -317,10 +317,10 @@ export function printManualInstructions(log: LogFn = console.log): void {
 }
 
 export function printNextStep(log: LogFn = console.log): void {
-  log("✓ mpipe ready");
+  log("✓ pipeit ready");
   log("");
   log("Next step:");
-  log("  In Claude Code, run  /mpipe");
+  log("  In Claude Code, run  /pipeit");
   log("  Your browser will open once to sign in (Google / GitHub / email).");
   log("");
 }
@@ -328,7 +328,7 @@ export function printNextStep(log: LogFn = console.log): void {
 
 - [ ] **Step 4: Re-run tests**
 
-Run: `yarn workspace mpipe.dev test`
+Run: `yarn workspace pipeit.live test`
 Expected: PASS — all six tests green.
 
 - [ ] **Step 5: Commit**
@@ -361,7 +361,7 @@ if (hasClaudeCli() && tryInstallViaCli()) {
 
 - [ ] **Step 2: Build the CLI**
 
-Run: `yarn workspace mpipe.dev build`
+Run: `yarn workspace pipeit.live build`
 Expected: produces `packages/cli/dist/index.js` with a leading `#!/usr/bin/env node` line.
 
 - [ ] **Step 3: Smoke-test the manual path by forcing `claude` absent**
@@ -372,13 +372,13 @@ env PATH=/usr/bin:/bin node packages/cli/dist/index.js
 
 Expected output contains both:
 ```
-/plugin marketplace add repleadfy/mpipe
-/plugin install mpipe
+/plugin marketplace add repleadfy/pipeit
+/plugin install pipeit
 ```
 and:
 ```
 Next step:
-  In Claude Code, run  /mpipe
+  In Claude Code, run  /pipeit
 ```
 
 - [ ] **Step 4: Verify the dist entry is executable and shebang-first**
@@ -417,7 +417,7 @@ Append one of these lines at the bottom of this plan under a `## Verification no
 
 - [ ] **Step 3: If you made code changes, rerun the CLI tests**
 
-Run: `yarn workspace mpipe.dev test`
+Run: `yarn workspace pipeit.live test`
 Expected: PASS.
 
 - [ ] **Step 4: Commit (only if code changed)**
@@ -673,15 +673,15 @@ import { InstallPage } from "./InstallPage.js";
 describe("InstallPage", () => {
   test("renders all three install commands", () => {
     render(<MemoryRouter><InstallPage /></MemoryRouter>);
-    expect(screen.getByText(/plugin marketplace add repleadfy\/mpipe/)).toBeInTheDocument();
-    expect(screen.getByText(/plugin install mpipe/)).toBeInTheDocument();
-    expect(screen.getByText(/npx mpipe\.dev/)).toBeInTheDocument();
-    expect(screen.getByText(/bunx mpipe\.dev/)).toBeInTheDocument();
+    expect(screen.getByText(/plugin marketplace add repleadfy\/pipeit/)).toBeInTheDocument();
+    expect(screen.getByText(/plugin install pipeit/)).toBeInTheDocument();
+    expect(screen.getByText(/npx pipeit\.live/)).toBeInTheDocument();
+    expect(screen.getByText(/bunx pipeit\.live/)).toBeInTheDocument();
   });
 
-  test("shows the post-install hint mentioning /mpipe and browser sign-in", () => {
+  test("shows the post-install hint mentioning /pipeit and browser sign-in", () => {
     render(<MemoryRouter><InstallPage /></MemoryRouter>);
-    expect(screen.getByText(/\/mpipe/)).toBeInTheDocument();
+    expect(screen.getByText(/\/pipeit/)).toBeInTheDocument();
     expect(screen.getByText(/browser opens once to sign in/i)).toBeInTheDocument();
   });
 
@@ -709,8 +709,8 @@ Expected: FAIL — cannot resolve `./InstallPage.js`.
 import { Link } from "react-router-dom";
 import { CopyButton } from "../components/CopyButton.js";
 
-const PLUGIN_COMMANDS = `/plugin marketplace add repleadfy/mpipe
-/plugin install mpipe`;
+const PLUGIN_COMMANDS = `/plugin marketplace add repleadfy/pipeit
+/plugin install pipeit`;
 
 function Block({ label, code, recommended }: { label: string; code: string; recommended?: boolean }) {
   return (
@@ -740,18 +740,18 @@ export function InstallPage() {
     <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       <div className="max-w-2xl mx-auto px-6 py-16 space-y-8">
         <header className="space-y-2">
-          <h1 className="text-3xl font-bold">mpipe</h1>
+          <h1 className="text-3xl font-bold">pipeit</h1>
           <p className="text-gray-600 dark:text-gray-400">
             Share markdown from AI conversations. Read on any device.
           </p>
         </header>
 
         <Block label="Claude Code plugin" code={PLUGIN_COMMANDS} recommended />
-        <Block label="npm" code="npx mpipe.dev" />
-        <Block label="Bun" code="bunx mpipe.dev" />
+        <Block label="npm" code="npx pipeit.live" />
+        <Block label="Bun" code="bunx pipeit.live" />
 
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          After install: run <code className="text-gray-900 dark:text-gray-100">/mpipe</code> in Claude Code. Your browser opens once to sign in.
+          After install: run <code className="text-gray-900 dark:text-gray-100">/pipeit</code> in Claude Code. Your browser opens once to sign in.
         </p>
 
         <p className="text-sm text-gray-500">
@@ -1012,10 +1012,10 @@ oauthApp.post("/consent", async (c) => {
 });
 ```
 
-NOTE — the `verifyJwt` import path: `@mpipe/mcp` is a separate workspace; do NOT reach into `packages/server/src`. Instead, lift `verifyJwt` into `@mpipe/shared`. If it isn't already there, do:
+NOTE — the `verifyJwt` import path: `@pipeit/mcp` is a separate workspace; do NOT reach into `packages/server/src`. Instead, lift `verifyJwt` into `@pipeit/shared`. If it isn't already there, do:
 1. Move/copy `packages/server/src/auth/jwt.ts` into `packages/shared/src/jwt.ts` exporting `verifyJwt`.
-2. Update `packages/server/src/auth/jwt.ts` (and its importers) to re-export from `@mpipe/shared/jwt`.
-3. In `packages/mcp/src/oauth.ts`, use: `import { verifyJwt } from "@mpipe/shared/jwt";` at the top of the file.
+2. Update `packages/server/src/auth/jwt.ts` (and its importers) to re-export from `@pipeit/shared/jwt`.
+3. In `packages/mcp/src/oauth.ts`, use: `import { verifyJwt } from "@pipeit/shared/jwt";` at the top of the file.
 
 If `verifyJwt` is already shared, just use it. Delete the inline `await import` and put the import at the top of the file.
 
@@ -1025,7 +1025,7 @@ Do NOT delete `oauthApp.get("/callback", ...)` in this PR — it's still the red
 
 - [ ] **Step 5: Build to confirm no type errors**
 
-Run: `yarn workspace @mpipe/mcp build && yarn workspace @mpipe/server build`
+Run: `yarn workspace @pipeit/mcp build && yarn workspace @pipeit/server build`
 Expected: both succeed.
 
 - [ ] **Step 6: Commit**
@@ -1175,7 +1175,7 @@ export function ConsentPage() {
           <>
             <p className="text-gray-700 dark:text-gray-300">
               <span className="font-medium">{info.client_name}</span> is requesting
-              permission to upload markdown to your mpipe account.
+              permission to upload markdown to your pipeit account.
             </p>
             <p className="text-xs text-gray-500">
               Request issued {new Date(info.issued_at).toLocaleString()}
@@ -1331,9 +1331,9 @@ In `packages/mcp/src/oauth.ts`, remove the `oauthApp.get("/callback", ...)` hand
 - [ ] **Step 7: Build and test**
 
 ```bash
-yarn workspace @mpipe/mcp build
-yarn workspace @mpipe/server build
-yarn workspace @mpipe/server test
+yarn workspace @pipeit/mcp build
+yarn workspace @pipeit/server build
+yarn workspace @pipeit/server test
 yarn workspace web test
 yarn workspace web build
 ```
@@ -1360,11 +1360,11 @@ git commit -m "feat(auth): route MCP OAuth through SPA consent page, remove inli
 In root `package.json`, update `scripts`:
 ```json
   "scripts": {
-    "dev:server": "yarn workspace @mpipe/server run dev",
+    "dev:server": "yarn workspace @pipeit/server run dev",
     "dev:web": "yarn workspace web run dev",
-    "build": "yarn workspace @mpipe/shared run build && yarn workspace @mpipe/mcp run build && yarn workspace @mpipe/server run build && yarn workspace web run build && yarn workspace mpipe.dev run build",
-    "build:server": "yarn workspace @mpipe/shared run build && yarn workspace @mpipe/server run build",
-    "build:cli": "yarn workspace mpipe.dev run build"
+    "build": "yarn workspace @pipeit/shared run build && yarn workspace @pipeit/mcp run build && yarn workspace @pipeit/server run build && yarn workspace web run build && yarn workspace pipeit.live run build",
+    "build:server": "yarn workspace @pipeit/shared run build && yarn workspace @pipeit/server run build",
+    "build:cli": "yarn workspace pipeit.live run build"
   }
 ```
 
@@ -1377,7 +1377,7 @@ Expected: all five workspaces build successfully, `packages/cli/dist/index.js` i
 
 ```bash
 git add package.json
-git commit -m "chore: include mpipe.dev CLI in root build pipeline"
+git commit -m "chore: include pipeit.live CLI in root build pipeline"
 ```
 
 ---
@@ -1418,7 +1418,7 @@ jobs:
         run: |
           TAG="${GITHUB_REF_NAME#v}"
           PKG=$(node -p "require('./packages/cli/package.json').version")
-          PLUGIN=$(node -p "require('./plugins/mpipe/.claude-plugin/plugin.json').version")
+          PLUGIN=$(node -p "require('./plugins/pipeit/.claude-plugin/plugin.json').version")
           MKT=$(node -p "require('./.claude-plugin/marketplace.json').plugins[0].version")
           echo "tag=$TAG cli=$PKG plugin=$PLUGIN marketplace=$MKT"
           if [ "$TAG" != "$PKG" ] || [ "$TAG" != "$PLUGIN" ] || [ "$TAG" != "$MKT" ]; then
@@ -1430,7 +1430,7 @@ jobs:
       - run: yarn build
 
       - name: Publish CLI to npm
-        run: yarn workspace mpipe.dev publish --new-version ${GITHUB_REF_NAME#v} --no-git-tag-version --non-interactive
+        run: yarn workspace pipeit.live publish --new-version ${GITHUB_REF_NAME#v} --no-git-tag-version --non-interactive
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -1442,7 +1442,7 @@ jobs:
 
 - [ ] **Step 2: Record the required secret**
 
-Append to `docs/install.md` (created in Task 17) the operator note: "CI requires the repository secret `NPM_TOKEN` — an npm access token with publish rights to `mpipe.dev`."
+Append to `docs/install.md` (created in Task 17) the operator note: "CI requires the repository secret `NPM_TOKEN` — an npm access token with publish rights to `pipeit.live`."
 
 - [ ] **Step 3: Validate YAML syntax locally**
 
@@ -1454,7 +1454,7 @@ Run: `node -e "require('js-yaml').load(require('fs').readFileSync('.github/workf
 
 ```bash
 git add .github/workflows/release.yml
-git commit -m "ci: add tag-triggered release workflow for mpipe.dev npm publish"
+git commit -m "ci: add tag-triggered release workflow for pipeit.live npm publish"
 ```
 
 ---
@@ -1465,30 +1465,30 @@ git commit -m "ci: add tag-triggered release workflow for mpipe.dev npm publish"
 
 - [ ] **Step 1: Verify the npm name is available**
 
-Run: `npm view mpipe.dev 2>&1`
+Run: `npm view pipeit.live 2>&1`
 
 - If output contains `404` or `Not Found` → name is available; proceed.
-- If output shows a package already exists → fall back to `@repleadfy/mpipe`:
-  1. Edit `packages/cli/package.json` → change `name` to `@repleadfy/mpipe` and add `"publishConfig": { "access": "public" }`.
+- If output shows a package already exists → fall back to `@repleadfy/pipeit`:
+  1. Edit `packages/cli/package.json` → change `name` to `@repleadfy/pipeit` and add `"publishConfig": { "access": "public" }`.
   2. Edit `packages/cli/src/cli.ts` → nothing changes (MARKETPLACE/PLUGIN constants are unaffected).
-  3. Edit `packages/web/src/pages/InstallPage.tsx` → change the npm/Bun blocks to `npx @repleadfy/mpipe` and `bunx @repleadfy/mpipe`, update the test file accordingly.
-  4. Edit `.github/workflows/release.yml` → change the workspace name to `@repleadfy/mpipe`.
+  3. Edit `packages/web/src/pages/InstallPage.tsx` → change the npm/Bun blocks to `npx @repleadfy/pipeit` and `bunx @repleadfy/pipeit`, update the test file accordingly.
+  4. Edit `.github/workflows/release.yml` → change the workspace name to `@repleadfy/pipeit`.
 
 - [ ] **Step 2: Record the verdict**
 
 Append to the `## Verification notes` section at the end of this plan:
-- `Task 16 verdict (YYYY-MM-DD): mpipe.dev available — no changes.`
+- `Task 16 verdict (YYYY-MM-DD): pipeit.live available — no changes.`
  OR
-- `Task 16 verdict (YYYY-MM-DD): mpipe.dev unavailable — switched to @repleadfy/mpipe in <files>.`
+- `Task 16 verdict (YYYY-MM-DD): pipeit.live unavailable — switched to @repleadfy/pipeit in <files>.`
 
 - [ ] **Step 3: If changes were made, rerun tests and commit**
 
 ```bash
 yarn workspace web test
-yarn workspace mpipe.dev test
-yarn workspace mpipe.dev build
+yarn workspace pipeit.live test
+yarn workspace pipeit.live build
 git add packages/cli packages/web/src/pages/InstallPage.tsx packages/web/src/pages/InstallPage.test.tsx .github/workflows/release.yml
-git commit -m "chore: fall back to @repleadfy/mpipe for CLI npm package"
+git commit -m "chore: fall back to @repleadfy/pipeit for CLI npm package"
 ```
 
 ---
@@ -1502,45 +1502,45 @@ git commit -m "chore: fall back to @repleadfy/mpipe for CLI npm package"
 - [ ] **Step 1: Create `docs/install.md`**
 
 ```markdown
-# Installing mpipe
+# Installing pipeit
 
-Three paths, same end state: the mpipe Claude Code plugin is registered with its MCP server pointer.
+Three paths, same end state: the pipeit Claude Code plugin is registered with its MCP server pointer.
 
 ## 1. Claude Code plugin (recommended)
 
 Inside Claude Code:
 
-    /plugin marketplace add repleadfy/mpipe
-    /plugin install mpipe
+    /plugin marketplace add repleadfy/pipeit
+    /plugin install pipeit
 
 ## 2. npm
 
-    npx mpipe.dev
+    npx pipeit.live
 
 ## 3. Bun
 
-    bunx mpipe.dev
+    bunx pipeit.live
 
 Both `npx` and `bunx` variants either shell out to the `claude` CLI (if present) or print the two `/plugin` lines for you to paste.
 
 ## After install
 
-Run `/mpipe` inside Claude Code. Your browser opens once, you sign in (Google / GitHub / email), and the plugin's MCP server receives an access token managed by Claude Code. No credentials are stored on disk outside Claude Code.
+Run `/pipeit` inside Claude Code. Your browser opens once, you sign in (Google / GitHub / email), and the plugin's MCP server receives an access token managed by Claude Code. No credentials are stored on disk outside Claude Code.
 
 ## Updates
 
-- Plugin: `/plugin update mpipe`
+- Plugin: `/plugin update pipeit`
 - CLI: `npx`/`bunx` always fetch the latest published version — no local state.
-- Server: transparent — the plugin points at the stable `https://mpipe.dev/mcp` URL.
+- Server: transparent — the plugin points at the stable `https://pipeit.live/mcp` URL.
 
 ## Uninstall
 
-- Plugin: `/plugin uninstall mpipe`
+- Plugin: `/plugin uninstall pipeit`
 - Account deletion: `DELETE /api/account`
 
 ## Operator notes
 
-- CI requires repository secret `NPM_TOKEN` (publish rights for `mpipe.dev`).
+- CI requires repository secret `NPM_TOKEN` (publish rights for `pipeit.live`).
 - Plugin, CLI, and marketplace versions must stay in lockstep (enforced by the release workflow).
 ```
 
@@ -1554,12 +1554,12 @@ Near the top (after the title/tagline), insert:
 
 The fastest path is the Claude Code plugin:
 
-    /plugin marketplace add repleadfy/mpipe
-    /plugin install mpipe
+    /plugin marketplace add repleadfy/pipeit
+    /plugin install pipeit
 
 Or from a terminal:
 
-    npx mpipe.dev   # or: bunx mpipe.dev
+    npx pipeit.live   # or: bunx pipeit.live
 
 Full install reference: [docs/install.md](docs/install.md).
 ```
@@ -1581,39 +1581,39 @@ git commit -m "docs: add install instructions for plugin, npx, and bunx paths"
 
 In a clean shell with `claude` not on PATH:
 ```bash
-bunx mpipe.dev
+bunx pipeit.live
 ```
 Expected: prints the two `/plugin ...` lines, then the next-step hint.
 
 - [ ] **Step 2: Fresh install via `npx` with `claude` CLI present**
 
 ```bash
-npx mpipe.dev
+npx pipeit.live
 ```
-Expected: runs `claude plugin marketplace add repleadfy/mpipe` and `claude plugin install mpipe@repleadfy/mpipe`, prints the next-step hint.
+Expected: runs `claude plugin marketplace add repleadfy/pipeit` and `claude plugin install pipeit@repleadfy/pipeit`, prints the next-step hint.
 
 - [ ] **Step 3: Plugin install via CC**
 
 Inside Claude Code:
 ```
-/plugin marketplace add repleadfy/mpipe
-/plugin install mpipe
+/plugin marketplace add repleadfy/pipeit
+/plugin install pipeit
 ```
-Expected: plugin card appears; `/mpipe` appears in the skills list; MCP server `mpipe` appears in the MCP servers list but `401` / unauthenticated status.
+Expected: plugin card appears; `/pipeit` appears in the skills list; MCP server `pipeit` appears in the MCP servers list but `401` / unauthenticated status.
 
-- [ ] **Step 4: First `/mpipe` call triggers browser OAuth**
+- [ ] **Step 4: First `/pipeit` call triggers browser OAuth**
 
-Run `/mpipe ./README.md` in CC.
-Expected: browser opens, lands on `/login?return_to=/mcp/consent` (unauthed) or `/mcp/consent` (authed). After approving, CC retries the tool call and prints `✓ Piped to https://mpipe.dev/d/<slug>`.
+Run `/pipeit ./README.md` in CC.
+Expected: browser opens, lands on `/login?return_to=/mcp/consent` (unauthed) or `/mcp/consent` (authed). After approving, CC retries the tool call and prints `✓ Piped to https://pipeit.live/d/<slug>`.
 
 - [ ] **Step 5: Deny path**
 
-Trigger another `/mpipe` from a CC instance that hasn't authorized yet. On `/mcp/consent`, click **Deny**.
+Trigger another `/pipeit` from a CC instance that hasn't authorized yet. On `/mcp/consent`, click **Deny**.
 Expected: browser redirects to CC's localhost callback with `?error=access_denied`. CC surfaces an auth error to the user.
 
-- [ ] **Step 6: Shared `mpipe.dev` link for a teammate**
+- [ ] **Step 6: Shared `pipeit.live` link for a teammate**
 
-In a fresh browser profile (no session cookie), visit `https://mpipe.dev`.
+In a fresh browser profile (no session cookie), visit `https://pipeit.live`.
 Expected: lands on `/install`. Copy-buttons work. Clicking "Sign in →" goes to `/login`.
 
 - [ ] **Step 7: Record QA results**
@@ -1631,8 +1631,8 @@ git commit -m "docs: record pre-release manual QA results"
 
 ## Verification notes
 
-- **Task 5 verdict (2026-04-17):** `claude plugin` subcommands confirmed as `marketplace add <source>` and `install <plugin>` (supporting the `plugin@marketplace` form). Current `tryInstallViaCli` strings (`claude plugin marketplace add repleadfy/mpipe`, `claude plugin install mpipe@repleadfy/mpipe`) match the live CLI shape — no code changes needed.
-- **Task 16 verdict (2026-04-18):** `npm view mpipe.dev` returns 404 — name available on npm. No changes required. CLI package retains `"name": "mpipe.dev"`.
+- **Task 5 verdict (2026-04-17):** `claude plugin` subcommands confirmed as `marketplace add <source>` and `install <plugin>` (supporting the `plugin@marketplace` form). Current `tryInstallViaCli` strings (`claude plugin marketplace add repleadfy/pipeit`, `claude plugin install pipeit@repleadfy/pipeit`) match the live CLI shape — no code changes needed.
+- **Task 16 verdict (2026-04-18):** `npm view pipeit.live` returns 404 — name available on npm. No changes required. CLI package retains `"name": "pipeit.live"`.
 
 ---
 
@@ -1642,7 +1642,7 @@ git commit -m "docs: record pre-release manual QA results"
 |---|---|---|
 | CLI helpers | `node --test` + tsx | `hasClaudeCli`, `tryInstallViaCli`, `printManualInstructions`, `printNextStep` |
 | Web components | Vitest + RTL + jsdom | `CopyButton`, `InstallPage`, `ConsentPage`, `App` routing fallback |
-| Server OAuth | existing `@mpipe/server` tests | (no new server tests required — consent logic is thin and covered by E2E manual QA) |
+| Server OAuth | existing `@pipeit/server` tests | (no new server tests required — consent logic is thin and covered by E2E manual QA) |
 | End-to-end | manual | Task 18 checklist — both install entry points + browser OAuth + deny path + shared link |
 
 ---
@@ -1650,6 +1650,6 @@ git commit -m "docs: record pre-release manual QA results"
 ## Risk register (from spec §Risks)
 
 1. **`claude plugin` subcommand shape** — resolved by Task 5 verification step; fallback is the manual-instructions path (still fully functional).
-2. **`mpipe.dev` npm name availability** — resolved by Task 16; fallback is `@repleadfy/mpipe`.
+2. **`pipeit.live` npm name availability** — resolved by Task 16; fallback is `@repleadfy/pipeit`.
 3. **Consent page design** — Tailwind + existing typography patterns used; reviewed visually during Task 18 Step 6.
 4. **Marketplace.json schema drift** — verified during Task 18 Step 3 (plugin card appears).

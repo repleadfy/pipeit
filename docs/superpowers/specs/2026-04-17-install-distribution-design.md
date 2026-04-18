@@ -1,54 +1,54 @@
-# mpipe — Install & Distribution Design
+# pipeit — Install & Distribution Design
 
-Make mpipe installable via three channels — `npx mpipe.dev`, `bunx mpipe.dev`, and the Claude Code plugin marketplace (`/plugin marketplace add repleadfy/mpipe` + `/plugin install mpipe`) — with a clear separation between *install*, *auth*, and *share*.
+Make pipeit installable via three channels — `npx pipeit.live`, `bunx pipeit.live`, and the Claude Code plugin marketplace (`/plugin marketplace add repleadfy/pipeit` + `/plugin install pipeit`) — with a clear separation between *install*, *auth*, and *share*.
 
 ## Scope
 
 **In scope:**
 - Claude Code as the only supported environment for this pass.
-- Three install paths: CC plugin marketplace, `npx mpipe.dev`, `bunx mpipe.dev`.
-- Shareable install page at `mpipe.dev/install`.
+- Three install paths: CC plugin marketplace, `npx pipeit.live`, `bunx pipeit.live`.
+- Shareable install page at `pipeit.live/install`.
 
 **Out of scope (v1):**
 - Cursor, VSCode, Codex, OpenCode — stay in the original design spec as future work.
 - Invite links that pre-authenticate teammates.
 - Server-side revocation UI for MCP tokens.
-- Local credential files (`~/.mpipe/*`) — never exist. MCP client owns all tokens.
-- `npx mpipe.dev uninstall` — uninstall is `/plugin uninstall mpipe`.
+- Local credential files (`~/.pipeit/*`) — never exist. MCP client owns all tokens.
+- `npx pipeit.live uninstall` — uninstall is `/plugin uninstall pipeit`.
 
 ## Guiding Principles
 
 1. **One source of truth** — the plugin. Every install path ends in the same CC plugin state.
-2. **Install ≠ auth.** Install writes config, does no network to mpipe.dev, opens no browser. Auth happens on first `/mpipe` call via MCP OAuth.
-3. **CC owns credentials.** No files under `~/.mpipe/`. CC manages access/refresh tokens.
-4. **Ship one repo.** Plugin, CLI, server, web, skill all live in `repleadfy/mpipe`, versioned together.
+2. **Install ≠ auth.** Install writes config, does no network to pipeit.live, opens no browser. Auth happens on first `/pipeit` call via MCP OAuth.
+3. **CC owns credentials.** No files under `~/.pipeit/`. CC manages access/refresh tokens.
+4. **Ship one repo.** Plugin, CLI, server, web, skill all live in `repleadfy/pipeit`, versioned together.
 
 ## Repo Layout
 
 ```
-repleadfy/mpipe/                     ← GitHub repo; also npm publisher and marketplace
+repleadfy/pipeit/                     ← GitHub repo; also npm publisher and marketplace
 ├── .claude-plugin/
 │   └── marketplace.json             ← what /plugin marketplace add reads
 ├── plugins/
-│   └── mpipe/                       ← the Claude Code plugin
+│   └── pipeit/                       ← the Claude Code plugin
 │       ├── .claude-plugin/
 │       │   └── plugin.json
 │       ├── .mcp.json                ← MCP server pointer
 │       └── skills/
-│           └── mpipe/
+│           └── pipeit/
 │               └── SKILL.md         ← migrated from top-level skills/
 ├── packages/
 │   ├── shared/                      ← existing
 │   ├── mcp/                         ← existing
 │   ├── server/                      ← existing
 │   ├── web/                         ← existing; gains /install page
-│   └── cli/                         ← NEW — publishes as `mpipe.dev` on npm
-├── skills/                          ← REMOVED (contents moved into plugins/mpipe/)
+│   └── cli/                         ← NEW — publishes as `pipeit.live` on npm
+├── skills/                          ← REMOVED (contents moved into plugins/pipeit/)
 ├── kdep/                            ← existing
 └── docs/                            ← existing
 ```
 
-The root `.claude-plugin/marketplace.json` is what `/plugin marketplace add repleadfy/mpipe` fetches and parses.
+The root `.claude-plugin/marketplace.json` is what `/plugin marketplace add repleadfy/pipeit` fetches and parses.
 
 ## Plugin & Marketplace Files
 
@@ -57,63 +57,63 @@ The root `.claude-plugin/marketplace.json` is what `/plugin marketplace add repl
 ```json
 {
   "name": "repleadfy",
-  "owner": { "name": "Leadfy", "url": "https://mpipe.dev" },
+  "owner": { "name": "Leadfy", "url": "https://pipeit.live" },
   "plugins": [
     {
-      "name": "mpipe",
-      "source": "./plugins/mpipe",
-      "description": "Share markdown from AI conversations to mpipe.dev — read on any device.",
+      "name": "pipeit",
+      "source": "./plugins/pipeit",
+      "description": "Share markdown from AI conversations to pipeit.live — read on any device.",
       "version": "0.1.0"
     }
   ]
 }
 ```
 
-### `plugins/mpipe/.claude-plugin/plugin.json`
+### `plugins/pipeit/.claude-plugin/plugin.json`
 
 ```json
 {
-  "name": "mpipe",
+  "name": "pipeit",
   "version": "0.1.0",
-  "description": "Pipe markdown from Claude Code to mpipe.dev. Adds the /mpipe skill + MCP server connection.",
-  "homepage": "https://mpipe.dev",
-  "repository": "https://github.com/repleadfy/mpipe",
+  "description": "Pipe markdown from Claude Code to pipeit.live. Adds the /pipeit skill + MCP server connection.",
+  "homepage": "https://pipeit.live",
+  "repository": "https://github.com/repleadfy/pipeit",
   "license": "MIT"
 }
 ```
 
-### `plugins/mpipe/.mcp.json`
+### `plugins/pipeit/.mcp.json`
 
 ```json
 {
   "mcpServers": {
-    "mpipe": {
+    "pipeit": {
       "type": "http",
-      "url": "https://mpipe.dev/mcp"
+      "url": "https://pipeit.live/mcp"
     }
   }
 }
 ```
 
-CC loads this automatically when the plugin is enabled. It registers `mpipe` as an MCP server but does NOT authenticate — auth is triggered lazily on the first tool call.
+CC loads this automatically when the plugin is enabled. It registers `pipeit` as an MCP server but does NOT authenticate — auth is triggered lazily on the first tool call.
 
-### `plugins/mpipe/skills/mpipe/SKILL.md`
+### `plugins/pipeit/skills/pipeit/SKILL.md`
 
-Moved verbatim from the existing `skills/mpipe/SKILL.md`. The file at the old top-level path is removed in the same commit.
+Moved verbatim from the existing `skills/pipeit/SKILL.md`. The file at the old top-level path is removed in the same commit.
 
-## CLI — `mpipe.dev` on npm
+## CLI — `pipeit.live` on npm
 
-New monorepo package `packages/cli/`, published to npm as `mpipe.dev`.
+New monorepo package `packages/cli/`, published to npm as `pipeit.live`.
 
 ### `packages/cli/package.json`
 
 ```json
 {
-  "name": "mpipe.dev",
+  "name": "pipeit.live",
   "version": "0.1.0",
   "type": "module",
   "bin": {
-    "mpipe.dev": "./dist/index.js"
+    "pipeit.live": "./dist/index.js"
   },
   "files": ["dist"],
   "scripts": {
@@ -126,7 +126,7 @@ New monorepo package `packages/cli/`, published to npm as `mpipe.dev`.
 }
 ```
 
-The `bin` mapping means `npx mpipe.dev` and `bunx mpipe.dev` invoke the same binary.
+The `bin` mapping means `npx pipeit.live` and `bunx pipeit.live` invoke the same binary.
 
 ### `packages/cli/src/index.ts`
 
@@ -134,8 +134,8 @@ The `bin` mapping means `npx mpipe.dev` and `bunx mpipe.dev` invoke the same bin
 #!/usr/bin/env node
 import { execSync, spawnSync } from "node:child_process";
 
-const MARKETPLACE = "repleadfy/mpipe";
-const PLUGIN = "mpipe";
+const MARKETPLACE = "repleadfy/pipeit";
+const PLUGIN = "pipeit";
 
 function hasClaudeCli(): boolean {
   const r = spawnSync("claude", ["--version"], { stdio: "ignore" });
@@ -162,10 +162,10 @@ function printManualInstructions() {
 }
 
 function printNextStep() {
-  console.log("✓ mpipe ready");
+  console.log("✓ pipeit ready");
   console.log();
   console.log("Next step:");
-  console.log("  In Claude Code, run  /mpipe");
+  console.log("  In Claude Code, run  /pipeit");
   console.log("  Your browser will open once to sign in (Google / GitHub / email).");
   console.log();
 }
@@ -192,7 +192,7 @@ Before merging the CLI, verify that `claude plugin marketplace add <slug>` and `
 
 ## `/install` Landing Page
 
-Current state: `/` redirects authed users to `/d/latest` and unauthed users to `/login`. A teammate clicking a shared `mpipe.dev` link lands on the sign-in form with zero context.
+Current state: `/` redirects authed users to `/d/latest` and unauthed users to `/login`. A teammate clicking a shared `pipeit.live` link lands on the sign-in form with zero context.
 
 ### Changes
 
@@ -204,12 +204,12 @@ Current state: `/` redirects authed users to `/d/latest` and unauthed users to `
 - Three copy-to-clipboard install blocks:
   1. **Claude Code plugin (recommended)** — two lines:
      ```
-     /plugin marketplace add repleadfy/mpipe
-     /plugin install mpipe
+     /plugin marketplace add repleadfy/pipeit
+     /plugin install pipeit
      ```
-  2. **npm:** `npx mpipe.dev`
-  3. **Bun:** `bunx mpipe.dev`
-- Post-install hint: "After install: run `/mpipe` in Claude Code. Your browser opens once to sign in."
+  2. **npm:** `npx pipeit.live`
+  3. **Bun:** `bunx pipeit.live`
+- Post-install hint: "After install: run `/pipeit` in Claude Code. Your browser opens once to sign in."
 - Link: "Already installed? [Sign in →]" → `/login`.
 
 Respects dark/light mode using the system already in place (commit `06c047e`).
@@ -235,31 +235,31 @@ Small component: `navigator.clipboard.writeText()` + brief visual confirmation. 
 
 Two things need to be disentangled in the original spec:
 
-1. **Install** — writes config only. No network call to mpipe.dev. No browser opens.
-2. **Auth** — happens on the FIRST `/mpipe` tool call, via MCP OAuth 2.0 dynamic client registration.
+1. **Install** — writes config only. No network call to pipeit.live. No browser opens.
+2. **Auth** — happens on the FIRST `/pipeit` tool call, via MCP OAuth 2.0 dynamic client registration.
 
 ### Canonical sequence (plugin install path)
 
-1. User: `/plugin marketplace add repleadfy/mpipe`
-   - CC fetches `marketplace.json` from the repo. Shows plugin card. No mpipe.dev traffic.
-2. User: `/plugin install mpipe`
-   - CC clones `plugins/mpipe/` from the repo.
+1. User: `/plugin marketplace add repleadfy/pipeit`
+   - CC fetches `marketplace.json` from the repo. Shows plugin card. No pipeit.live traffic.
+2. User: `/plugin install pipeit`
+   - CC clones `plugins/pipeit/` from the repo.
    - Loads `plugin.json`, `SKILL.md`, `.mcp.json`.
-   - Registers MCP server `mpipe` pointing at `https://mpipe.dev/mcp`. No token acquired yet. No browser opens.
-3. Post-install hint printed: "Next step: run `/mpipe`. Your browser will open once to sign in."
-4. (Minutes, hours, or days later) User: `/mpipe ./spec.md`
-   - Skill instructs Claude to call `mpipe_upload` MCP tool.
-5. CC: `POST https://mpipe.dev/mcp` → server returns `401 Unauthorized` + `WWW-Authenticate: Bearer` header with OAuth AS URL.
+   - Registers MCP server `pipeit` pointing at `https://pipeit.live/mcp`. No token acquired yet. No browser opens.
+3. Post-install hint printed: "Next step: run `/pipeit`. Your browser will open once to sign in."
+4. (Minutes, hours, or days later) User: `/pipeit ./spec.md`
+   - Skill instructs Claude to call `pipeit_upload` MCP tool.
+5. CC: `POST https://pipeit.live/mcp` → server returns `401 Unauthorized` + `WWW-Authenticate: Bearer` header with OAuth AS URL.
 6. CC performs RFC 7591 dynamic client registration: `POST /mcp/register` → receives `{ client_id, client_secret }`. (Already implemented; commit `1acb97b`.)
-7. CC opens user's browser to `https://mpipe.dev/mcp/authorize?client_id=...&redirect_uri=http://localhost:XXXX/callback&...`
+7. CC opens user's browser to `https://pipeit.live/mcp/authorize?client_id=...&redirect_uri=http://localhost:XXXX/callback&...`
 8. Two sub-cases:
-   - **8a.** User already has a session cookie on mpipe.dev → consent screen ("Allow Claude Code to upload docs?") → Allow → redirect to localhost with `?code=...`
+   - **8a.** User already has a session cookie on pipeit.live → consent screen ("Allow Claude Code to upload docs?") → Allow → redirect to localhost with `?code=...`
    - **8b.** No session → `/login` page prompts for Google / GitHub / email/password → on success, redirect back to `/mcp/authorize` → consent → redirect with code.
 9. CC: `POST /mcp/token` exchanges code for `{ access_token, refresh_token }`. CC stores tokens internally.
-10. CC retries the original `mpipe_upload` call with `Authorization: Bearer <access_token>`. Server accepts, creates doc.
-11. Claude prints: `✓ Piped to https://mpipe.dev/d/<slug>`
+10. CC retries the original `pipeit_upload` call with `Authorization: Bearer <access_token>`. Server accepts, creates doc.
+11. Claude prints: `✓ Piped to https://pipeit.live/d/<slug>`
 
-### Path: `npx mpipe.dev` / `bunx mpipe.dev`
+### Path: `npx pipeit.live` / `bunx pipeit.live`
 
 Identical to above from step 1 onward. The CLI either shells out to `claude plugin ...` (collapsing to the same plugin install) or prints instructions for the user to run them. Credentials never pass through the CLI.
 
@@ -274,21 +274,21 @@ Identical to above from step 1 onward. The CLI either shells out to `claude plug
 
 No new infra. The command string itself IS the share artifact.
 
-- Slack-friendly one-liner: paste `mpipe.dev` or the two `/plugin ...` commands.
-- Teammates clicking `mpipe.dev` land on `/install` (thanks to the routing change above), see the three copy-paste blocks, run them.
+- Slack-friendly one-liner: paste `pipeit.live` or the two `/plugin ...` commands.
+- Teammates clicking `pipeit.live` land on `/install` (thanks to the routing change above), see the three copy-paste blocks, run them.
 - Dropped: authenticated invite links. Out of scope v1 (significant server-side work for marginal UX gain).
 
 ## Updates & Uninstall
 
 ### Updates
 
-- **Plugin**: bump `plugin.json.version` when skill or `.mcp.json` content changes. Users pull via `/plugin update mpipe`. App/server-only changes do NOT require a plugin bump because the plugin only points at the stable `https://mpipe.dev/mcp` URL.
-- **CLI** (`mpipe.dev` on npm): `npx`/`bunx` always fetch the latest published version. No local state to update.
+- **Plugin**: bump `plugin.json.version` when skill or `.mcp.json` content changes. Users pull via `/plugin update pipeit`. App/server-only changes do NOT require a plugin bump because the plugin only points at the stable `https://pipeit.live/mcp` URL.
+- **CLI** (`pipeit.live` on npm): `npx`/`bunx` always fetch the latest published version. No local state to update.
 - **Server / skill / plugin**: all versioned together in the monorepo — impossible to drift.
 
 ### Uninstall
 
-- **Plugin**: `/plugin uninstall mpipe` removes skill + MCP config from CC.
+- **Plugin**: `/plugin uninstall pipeit` removes skill + MCP config from CC.
 - **MCP tokens**: managed by CC. Revocation server-side is out of scope v1.
 - **Account deletion**: `DELETE /api/account` — covered by `on delete cascade` in existing schema.
 
@@ -296,7 +296,7 @@ No new infra. The command string itself IS the share artifact.
 
 A single `git tag vX.Y.Z` triggers:
 1. GitHub release created — surfaces as latest version to `/plugin update`.
-2. `yarn workspace mpipe.dev publish` to npm.
+2. `yarn workspace pipeit.live publish` to npm.
 3. Docker image build + push (existing kdep path).
 
 All three version strings stay in lockstep: `plugin.json.version` = `packages/cli/package.json.version` = git tag.
@@ -306,9 +306,9 @@ All three version strings stay in lockstep: `plugin.json.version` = `packages/cl
 | Action | Path | Purpose |
 |---|---|---|
 | Add | `.claude-plugin/marketplace.json` | Marketplace manifest |
-| Add | `plugins/mpipe/.claude-plugin/plugin.json` | Plugin manifest |
-| Add | `plugins/mpipe/.mcp.json` | MCP server pointer |
-| Move | `skills/mpipe/SKILL.md` → `plugins/mpipe/skills/mpipe/SKILL.md` | Relocate into plugin |
+| Add | `plugins/pipeit/.claude-plugin/plugin.json` | Plugin manifest |
+| Add | `plugins/pipeit/.mcp.json` | MCP server pointer |
+| Move | `skills/pipeit/SKILL.md` → `plugins/pipeit/skills/pipeit/SKILL.md` | Relocate into plugin |
 | Remove | `skills/` (top-level, after move) | No longer used |
 | Add | `packages/cli/package.json` | New npm package |
 | Add | `packages/cli/src/index.ts` | CLI logic |
@@ -318,7 +318,7 @@ All three version strings stay in lockstep: `plugin.json.version` = `packages/cl
 | Modify | `packages/web/src/components/ProtectedRoute.tsx` | `fallback` prop |
 | Add | `packages/web/src/pages/ConsentPage.tsx` | OAuth consent screen (SPA route at `/mcp/consent`) |
 | Modify | root `package.json` | Add `cli` to workspace build |
-| Modify | CI config | Publish `mpipe.dev` to npm on tag |
+| Modify | CI config | Publish `pipeit.live` to npm on tag |
 
 ## Testing
 
@@ -326,11 +326,11 @@ All three version strings stay in lockstep: `plugin.json.version` = `packages/cl
 - **Plugin**: smoke test by running `/plugin marketplace add <local-file-path>` against a local checkout and verifying plugin loads + skill appears.
 - **Install page**: RTL test for copy-button behavior + route-fallback test that unauthed `/` goes to `/install`.
 - **Consent page**: RTL test for Allow/Deny actions; integration test against a local MCP authorize flow.
-- **End-to-end**: manual QA — `bunx mpipe.dev` on a fresh machine, then `/mpipe` in CC, verify browser opens, sign in, doc uploads.
+- **End-to-end**: manual QA — `bunx pipeit.live` on a fresh machine, then `/pipeit` in CC, verify browser opens, sign in, doc uploads.
 
 ## Risks & Open Questions
 
 1. **CC plugin CLI API shape.** Need to verify `claude plugin marketplace add` and `claude plugin install` exist as non-interactive subcommands before merge. If they don't, the shell-out branch is dead and everyone falls through to manual instructions (still fine, just less polish).
-2. **`mpipe.dev` on npm availability.** Need to check `npm view mpipe.dev` before publishing. If taken, fall back to `@repleadfy/mpipe` (uglier but guaranteed).
+2. **`pipeit.live` on npm availability.** Need to check `npm view pipeit.live` before publishing. If taken, fall back to `@repleadfy/pipeit` (uglier but guaranteed).
 3. **Consent page design.** No prior consent UI in the repo. Small scope but needs a mock — follows existing Tailwind/typography patterns.
 4. **Marketplace.json schema.** Following the CC public plugin spec as of 2026-04. Schema could evolve; pin to the latest shape and verify with a `/plugin marketplace add` dry run before release.

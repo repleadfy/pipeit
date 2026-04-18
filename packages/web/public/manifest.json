@@ -1,6 +1,6 @@
 {
-  "name": "mpipe",
-  "short_name": "mpipe",
+  "name": "pipeit",
+  "short_name": "pipeit",
   "description": "Pipe markdown to your browser",
   "start_url": "/",
   "display": "standalone",

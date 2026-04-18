@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../lib/api.js";
 import { DocListItem } from "./DocListItem.js";
 import { CycleFilter } from "./CycleFilter.js";
-import type { DocListItem as DocItem } from "@mpipe/shared";
+import type { DocListItem as DocItem } from "@pipeit/shared";
 
 const READ_STATES = ["All", "Not started", "Reading", "Finished"];
 const VISIBILITY = ["All", "Private", "Public"];

@@ -1,5 +1,5 @@
 {
-  "name": "@mpipe/mcp",
+  "name": "@pipeit/mcp",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
@@ -15,7 +15,7 @@
     "@cfworker/json-schema": "^4.1.1",
     "@modelcontextprotocol/server": "2.0.0-alpha.2",
     "@modelcontextprotocol/hono": "2.0.0-alpha.2",
-    "@mpipe/shared": "*",
+    "@pipeit/shared": "*",
     "hono": "^4.12.8",
     "jose": "^6.2.2",
     "nanoid": "^5.1.7",

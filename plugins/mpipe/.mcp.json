@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "mpipe": {
-      "type": "http",
-      "url": "https://mpipe.dev/mcp"
-    }
-  }
-}

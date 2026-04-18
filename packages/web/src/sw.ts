@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 declare const self: ServiceWorkerGlobalScope;
 
-const CACHE_NAME = "mpipe-v1";
+const CACHE_NAME = "pipeit-v1";
 const SHELL_URLS = ["/", "/index.html"];
 
 self.addEventListener("install", (event) => {

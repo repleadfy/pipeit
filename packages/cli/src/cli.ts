@@ -1,7 +1,7 @@
 import { execSync as realExec, spawnSync as realSpawn } from "node:child_process";
 
-export const MARKETPLACE = "repleadfy/mpipe";
-export const PLUGIN = "mpipe";
+export const MARKETPLACE = "repleadfy/pipeit";
+export const PLUGIN = "pipeit";
 
 type SpawnFn = (cmd: string, args: string[]) => { status: number | null };
 type ExecFn = (cmd: string) => void;
@@ -32,10 +32,10 @@ export function printManualInstructions(log: LogFn = console.log): void {
 }
 
 export function printNextStep(log: LogFn = console.log): void {
-  log("✓ mpipe ready");
+  log("✓ pipeit ready");
   log("");
   log("Next step:");
-  log("  In Claude Code, run  /mpipe");
+  log("  In Claude Code, run  /pipeit");
   log("  Your browser will open once to sign in (Google / GitHub / email).");
   log("");
 }

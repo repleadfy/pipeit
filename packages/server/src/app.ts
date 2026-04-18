@@ -3,8 +3,8 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { getCookie, deleteCookie } from "hono/cookie";
 import { eq } from "drizzle-orm";
-import { db } from "@mpipe/shared/db";
-import { users } from "@mpipe/shared/db/schema";
+import { db } from "@pipeit/shared/db";
+import { users } from "@pipeit/shared/db/schema";
 import { env } from "./env.js";
 import { google } from "./auth/google.js";
 import { github } from "./auth/github.js";
@@ -15,7 +15,7 @@ import { authRateLimit, apiRateLimit } from "./middleware/rate-limit.js";
 import { docsRouter } from "./routes/docs.js";
 import { positionRouter } from "./routes/position.js";
 import { pushRouter } from "./routes/push.js";
-import { mcpApp } from "@mpipe/mcp";
+import { mcpApp } from "@pipeit/mcp";
 
 const app = new Hono();
 
