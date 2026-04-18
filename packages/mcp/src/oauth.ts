@@ -145,37 +145,6 @@ oauthApp.post("/consent", async (c) => {
   return c.json({ redirect: url.toString() });
 });
 
-// Called after Google/GitHub OAuth completes — generates auth code and redirects to MCP client
-// The existing OAuth callbacks need to check for mcp_oauth=1 and redirect here instead of WEB_URL
-oauthApp.get("/callback", async (c) => {
-  const userId = c.req.query("user_id");
-  const oauthStateCookie = getCookie(c, "mcp_oauth_state");
-
-  if (!userId || !oauthStateCookie) {
-    return c.json({ error: "missing user_id or oauth state" }, 400);
-  }
-
-  const { redirectUri, state, codeChallenge } = JSON.parse(oauthStateCookie);
-
-  // Generate authorization code
-  const code = nanoid(32);
-  authCodes.set(code, {
-    userId,
-    redirectUri,
-    codeChallenge,
-    expiresAt: Date.now() + 5 * 60 * 1000, // 5 min
-  });
-
-  // Clear the oauth state cookie
-  setCookie(c, "mcp_oauth_state", "", { maxAge: 0, path: "/" });
-
-  // Redirect back to MCP client with the code
-  const url = new URL(redirectUri);
-  url.searchParams.set("code", code);
-  if (state) url.searchParams.set("state", state);
-  return c.redirect(url.toString());
-});
-
 // Token exchange endpoint
 oauthApp.post("/token", async (c) => {
   const body = await c.req.parseBody();

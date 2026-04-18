@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { setCookie } from "hono/cookie";
+import { setCookie, getCookie } from "hono/cookie";
 import { eq, and } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { db } from "@mpipe/shared/db";
@@ -36,6 +36,11 @@ email.post("/email/signup", async (c) => {
     path: "/",
   });
 
+  const mcpOauthState = getCookie(c, "mcp_oauth_state");
+  if (mcpOauthState) {
+    return c.json({ redirect: "/mcp/consent" });
+  }
+
   return c.json({ id: newUser.id, email: newUser.email, name: newUser.name });
 });
 
@@ -65,6 +70,11 @@ email.post("/email/login", async (c) => {
     maxAge: 60 * 60 * 24 * 30,
     path: "/",
   });
+
+  const mcpOauthState = getCookie(c, "mcp_oauth_state");
+  if (mcpOauthState) {
+    return c.json({ redirect: "/mcp/consent" });
+  }
 
   return c.json({ id: user.id, email: user.email, name: user.name });
 });

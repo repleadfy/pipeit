@@ -9,6 +9,16 @@ import { env } from "../env.js";
 const google = new Hono();
 
 google.get("/google", (c) => {
+  const returnTo = c.req.query("return_to");
+  if (returnTo && returnTo.startsWith("/")) {
+    setCookie(c, "return_to", returnTo, {
+      httpOnly: true,
+      sameSite: "Lax",
+      maxAge: 600,
+      path: "/",
+      secure: env.PUBLIC_URL.startsWith("https"),
+    });
+  }
   const params = new URLSearchParams({
     client_id: env.GOOGLE_CLIENT_ID,
     redirect_uri: `${env.PUBLIC_URL}/auth/google/callback`,
@@ -83,7 +93,13 @@ google.get("/google/callback", async (c) => {
   // Check if this is an MCP OAuth flow
   const mcpOauthState = getCookie(c, "mcp_oauth_state");
   if (mcpOauthState) {
-    return c.redirect(`${env.PUBLIC_URL}/mcp/callback?user_id=${userId}`);
+    return c.redirect(`${env.PUBLIC_URL}/mcp/consent`);
+  }
+
+  const returnToCookie = getCookie(c, "return_to");
+  if (returnToCookie && returnToCookie.startsWith("/")) {
+    setCookie(c, "return_to", "", { maxAge: 0, path: "/" });
+    return c.redirect(`${env.WEB_URL}${returnToCookie}`);
   }
 
   return c.redirect(env.WEB_URL);

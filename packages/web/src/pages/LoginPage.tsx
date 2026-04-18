@@ -1,24 +1,26 @@
 import { useState } from "react";
 import { useAuth } from "../lib/auth.js";
-import { Navigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 
 export function LoginPage() {
   const { user, loading } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState("");
+  const [searchParams] = useSearchParams();
+  const returnTo = searchParams.get("return_to") || "/";
 
   if (loading) return null;
-  if (user) return <Navigate to="/" replace />;
+  if (user) return <Navigate to={returnTo} replace />;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       <div className="w-full max-w-sm space-y-6 p-8">
         <h1 className="text-2xl font-bold text-center">{isSignUp ? "Create an account" : "Sign in to mpipe"}</h1>
         <div className="space-y-3">
-          <a href="/auth/google" className="block w-full text-center py-2.5 px-4 rounded-lg bg-white text-gray-900 font-medium hover:bg-gray-100 transition">
+          <a href={`/auth/google${returnTo !== "/" ? `?return_to=${encodeURIComponent(returnTo)}` : ""}`} className="block w-full text-center py-2.5 px-4 rounded-lg bg-white text-gray-900 font-medium hover:bg-gray-100 transition">
             Continue with Google
           </a>
-          <a href="/auth/github" className="block w-full text-center py-2.5 px-4 rounded-lg bg-gray-800 text-white font-medium hover:bg-gray-700 transition">
+          <a href={`/auth/github${returnTo !== "/" ? `?return_to=${encodeURIComponent(returnTo)}` : ""}`} className="block w-full text-center py-2.5 px-4 rounded-lg bg-gray-800 text-white font-medium hover:bg-gray-700 transition">
             Continue with GitHub
           </a>
         </div>
@@ -39,7 +41,8 @@ export function LoginPage() {
             body: JSON.stringify(body),
           });
           if (res.ok) {
-            window.location.href = "/";
+            const data = await res.json().catch(() => ({}));
+            window.location.href = data.redirect || returnTo;
           } else {
             const data = await res.json().catch(() => ({}));
             setError(data.error || "Something went wrong");

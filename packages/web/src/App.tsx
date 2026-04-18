@@ -4,6 +4,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute.js";
 import { LoginPage } from "./pages/LoginPage.js";
 import { DocPage } from "./pages/DocPage.js";
 import { InstallPage } from "./pages/InstallPage.js";
+import { ConsentPage } from "./pages/ConsentPage.js";
 import { NotFoundPage } from "./pages/NotFoundPage.js";
 
 export function App() {
@@ -14,6 +15,7 @@ export function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/install" element={<InstallPage />} />
           <Route path="/d/:slug" element={<DocPage />} />
+          <Route path="/mcp/consent" element={<ConsentPage />} />
           <Route
             path="/"
             element={
