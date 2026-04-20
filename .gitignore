@@ -8,3 +8,4 @@ kdep/*/secrets.yml
 kdep/*/.rendered
 .prod_test_creds
 .gstack/
+.claude/settings.local.json
