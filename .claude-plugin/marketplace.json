@@ -6,7 +6,7 @@
       "name": "pipeit",
       "source": "./plugins/pipeit",
       "description": "Share markdown from AI conversations to pipeit.live — read on any device.",
-      "version": "0.1.2"
+      "version": "0.1.3"
     }
   ]
 }
