@@ -4,7 +4,8 @@
   "type": "module",
   "description": "One-shot installer for the pipeit Claude Code plugin.",
   "bin": {
-    "pipeit.live": "./dist/index.js"
+    "pipeit.live": "./dist/index.js",
+    "pipeit-upload": "./dist/upload-cli.js"
   },
   "files": ["dist"],
   "scripts": {

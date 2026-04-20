@@ -14,29 +14,47 @@ description: Pipe markdown from your conversation to pipeit.live for reading on 
 
 ## Behavior
 
-1. **Determine content:**
-   - If a file path is provided, read that file
-   - If no path, extract the last significant markdown block from the conversation
+### A. File path provided → use the `pipeit-upload` CLI via Bash
 
-2. **Upload via MCP:**
-   Call the `pipeit_upload` MCP tool:
-   ```json
-   {
-     "content": "<markdown content>",
-     "file_path": "<original path or null>",
-     "is_public": false
-   }
-   ```
-   - If `--new` flag: omit `file_path` to force a new document
-   - If `--public` flag: set `is_public: true`
+Always prefer this path when a file path is given. The CLI reads the file from disk and uploads it directly, so the content never has to be re-tokenized by the LLM. Works for files of any size in under a second.
 
-3. **Return the link:**
-   Print the URL returned by the tool. Example:
-   ```
-   ✓ Piped to https://pipeit.live/d/a8f3k2x9
-   ```
+Run via Bash — the script is bundled with this plugin:
 
-4. **Optional Slack share:**
-   If Slack MCP tools are available (check for `slack_send_message`), ask:
-   > "Want to share this on Slack? Which channel?"
-   If yes, call `slack_send_message` with the URL.
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/bin/pipeit-upload.js" [--public] [--new] <path>
+```
+
+The command prints the URL to stdout. Echo it back to the user:
+
+```
+✓ Piped to https://pipeit.live/d/a8f3k2x9
+```
+
+First run opens a browser for a one-time authorization; the token is cached at `~/.config/pipeit/token`. Subsequent runs are token-cached and upload directly.
+
+**Fallback:** if for any reason the bin can't run (e.g. `node` missing), fall back to the MCP tool (next section) — but warn the user that large files will be slow because content must be passed through LLM tokens.
+
+### B. No file path → use the `pipeit_upload` MCP tool
+
+Extract the last significant markdown block from the conversation and call the MCP tool:
+
+```json
+{
+  "content": "<markdown content>",
+  "is_public": false
+}
+```
+
+Flags:
+- `--new` — omit `file_path` (always true in this branch anyway).
+- `--public` — set `is_public: true`.
+
+The tool returns the URL. Print it.
+
+## Optional Slack share
+
+After upload, if Slack MCP tools are available (`slack_send_message`), ask:
+
+> "Want to share this on Slack? Which channel?"
+
+If yes, call `slack_send_message` with the URL.
