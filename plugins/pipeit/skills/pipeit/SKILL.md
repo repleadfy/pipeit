@@ -21,7 +21,7 @@ Always prefer this path when a file path is given. The CLI reads the file from d
 Run via Bash — the script is bundled with this plugin:
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}/bin/pipeit-upload.js" [--public] [--new] <path>
+node "${CLAUDE_PLUGIN_ROOT}/bin/pipeit-upload.mjs" [--public] [--new] <path>
 ```
 
 The command prints the URL to stdout. Echo it back to the user:
