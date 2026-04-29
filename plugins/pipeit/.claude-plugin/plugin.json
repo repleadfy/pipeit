@@ -1,6 +1,6 @@
 {
   "name": "pipeit",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Pipe markdown from Claude Code to pipeit.live. Adds the /pipeit skill + MCP server connection.",
   "homepage": "https://pipeit.live",
   "repository": "https://github.com/repleadfy/pipeit",
