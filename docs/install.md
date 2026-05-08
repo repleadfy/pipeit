@@ -54,9 +54,9 @@ Symptom if you skip it: web pod logs `PostgresError code 42P01` ("relation 'user
     kubectl -n pipeit get certificate
     # READY=True means done
 
-**`kdep render` alone produces `:latest`.** The `state.yml` tag isn't merged into the render config — only `kdep bump` picks it up. Symptom: a rollout-restart pulls `ImagePullBackOff` for `leadfycr.azurecr.io/pipeit-web:latest`. Either use `kdep bump web` to keep the tag lineage clean, or patch the deployment image directly:
+**`kdep render` alone produces `:latest`.** The `state.yml` tag isn't merged into the render config — only `kdep bump` picks it up. Symptom: a rollout-restart pulls `ImagePullBackOff` for `<your-registry>/pipeit-web:latest`. Either use `kdep bump web` to keep the tag lineage clean, or patch the deployment image directly:
 
-    kubectl -n pipeit set image deployment/pipeit-web pipeit-web=leadfycr.azurecr.io/pipeit-web:<tag>
+    kubectl -n pipeit set image deployment/pipeit-web pipeit-web=<your-registry>/pipeit-web:<tag>
 
 **Claude plugin install syntax is `plugin@marketplace-name`, not `plugin@source-path`.** `/plugin marketplace add repleadfy/pipeit` registers the marketplace under its JSON `name` field (`repleadfy`). The install step then uses that name:
 
