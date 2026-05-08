@@ -1,8 +1,19 @@
 {
   "name": "pipeit.live",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "type": "module",
   "description": "One-shot installer for the pipeit Claude Code plugin.",
+  "license": "MIT",
+  "homepage": "https://pipeit.live",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/repleadfy/pipeit.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/repleadfy/pipeit/issues"
+  },
+  "author": "Leadfy",
   "bin": {
     "pipeit.live": "./dist/index.js",
     "pipeit-upload": "./dist/upload-cli.js"

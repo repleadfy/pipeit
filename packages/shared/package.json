@@ -2,6 +2,7 @@
   "name": "@pipeit/shared",
   "version": "0.1.0",
   "type": "module",
+  "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -12,7 +13,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "test": "JWT_SECRET=test-secret-not-for-prod-use-1234 node --import tsx --test src/*.test.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.44.0",
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.15.3",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }
