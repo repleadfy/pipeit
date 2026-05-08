@@ -1,0 +1,43 @@
+# Example kdep config for self-hosting pipeit on your own Kubernetes cluster.
+# Copy to app.yml and adjust the marked fields for your environment.
+# kdep is Leadfy's render-and-apply tool: https://github.com/repleadfy/kdep
+preset: web
+namespace: pipeit
+name: pipeit-web
+image: pipeit-web
+registry: <your-registry>          # e.g. ghcr.io/your-org or your-registry.azurecr.io
+dockerfile: docker/Dockerfile.server
+port: 3001
+replicas: 1
+image_pull_secrets: <your-pull-secret>   # name of the dockerconfigjson Secret in this namespace
+ingress_class_field: nginx
+probe:
+  path: /health
+  port: 3001
+  initial_delay: 10
+  period: 15
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+lifecycle:
+  preStop:
+    exec:
+      command: ["sh", "-c", "sleep 5"]
+env_from:
+  - configmap/config-pipeit-web
+  - secret/secret-pipeit-web
+env:
+  PORT: "3001"
+  PUBLIC_URL: "https://your-domain.example"
+  WEB_URL: "https://your-domain.example"
+  VAPID_EMAIL: "mailto:admin@your-domain.example"
+  NODE_ENV: "production"
+domains:
+  - your-domain.example
+ingress_annotations:
+  cert-manager.io/cluster-issuer: letsencrypt
+  nginx.ingress.kubernetes.io/proxy-body-size: "2m"
