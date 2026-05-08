@@ -1,0 +1,51 @@
+name: Feature request
+description: Suggest an idea or enhancement.
+title: "[feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for thinking about how to make pipeit better. Be specific about the use case — that's what helps us decide.
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: What are you trying to do? Start from the problem, not the solution.
+      placeholder: |
+        I'm sharing long design specs from my AI conversations and want to send a single link that updates as I iterate.
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Current workaround
+      description: How do you handle this today?
+      placeholder: |
+        I copy the markdown into Notion every time I update.
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Rough sketch — implementation isn't required.
+      placeholder: |
+        `pipeit --watch ./file.md` would re-upload on save.
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      placeholder: |
+        - Just re-running /pipeit manually after every edit.
+        - A separate file-watcher script that calls the API.
+
+  - type: checkboxes
+    id: searched
+    attributes:
+      label: I searched existing issues and the roadmap
+      options:
+        - label: Yes, and didn't find a duplicate.
+          required: true

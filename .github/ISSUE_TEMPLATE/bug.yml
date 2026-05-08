@@ -1,0 +1,73 @@
+name: Bug report
+description: Something doesn't work the way it should.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug. The more concrete you can be, the faster we can fix it.
+
+  - type: input
+    id: pipeit-version
+    attributes:
+      label: pipeit version
+      description: From `/plugin list` inside Claude Code, or the npm package version.
+      placeholder: "0.1.4"
+    validations:
+      required: true
+
+  - type: input
+    id: claude-code-version
+    attributes:
+      label: Claude Code version
+      description: From `claude --version`.
+      placeholder: "2.1.133"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: OS / Node version
+      placeholder: "macOS 14.5 / Node 22.13.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Be specific. Numbered steps a stranger could follow.
+      placeholder: |
+        1. In a fresh Claude Code session, run `/pipeit ./README.md`
+        2. URL prints, browser opens
+        3. Click "Sign in with GitHub"
+        4. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual behavior
+      placeholder: |
+        Expected: doc renders at the URL.
+        Actual: 404 page.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / error output
+      description: Paste any error messages, stack traces, or relevant terminal output.
+      render: shell
+
+  - type: checkboxes
+    id: searched
+    attributes:
+      label: I searched existing issues
+      options:
+        - label: Yes, and didn't find a duplicate.
+          required: true
