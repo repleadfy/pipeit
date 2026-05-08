@@ -1,12 +1,12 @@
+import mermaid from "mermaid";
+import { useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
 import rehypeSlug from "rehype-slug";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import { useEffect, useRef } from "react";
-import mermaid from "mermaid";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 
 mermaid.initialize({ startOnLoad: false, theme: "dark" });
 
@@ -34,7 +34,11 @@ export function MarkdownRenderer({ content }: { content: string }) {
           code({ className, children, ...props }) {
             const match = /language-mermaid/.exec(className ?? "");
             if (match) return <MermaidBlock code={String(children).trim()} />;
-            return <code className={className} {...props}>{children}</code>;
+            return (
+              <code className={className} {...props}>
+                {children}
+              </code>
+            );
           },
         }}
       >

@@ -1,15 +1,15 @@
-import { useParams, Link } from "react-router-dom";
+import type { DocResponse } from "@pipeit/shared";
 import { useCallback, useEffect, useState } from "react";
-import { api } from "../lib/api.js";
+import { Link, useParams } from "react-router-dom";
 import { Header } from "../components/Header.js";
 import { MarkdownRenderer } from "../components/MarkdownRenderer.js";
 import { ReadingProgress } from "../components/ReadingProgress.js";
-import { TOCSidebar } from "../components/TOCSidebar.js";
 import { SearchPanel } from "../components/SearchPanel.js";
+import { TOCSidebar } from "../components/TOCSidebar.js";
 import { useKeyboard } from "../hooks/useKeyboard.js";
 import { useReadingPosition } from "../hooks/useReadingPosition.js";
 import { useTheme } from "../hooks/useTheme.js";
-import type { DocResponse } from "@pipeit/shared";
+import { api } from "../lib/api.js";
 
 export function DocPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -30,39 +30,54 @@ export function DocPage() {
   }, [slug]);
 
   if (error) {
-    if (error === "no_docs") return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-        <div className="text-center space-y-4 max-w-md">
-          <h1 className="text-2xl font-bold">Welcome to pipeit</h1>
-          <p className="text-gray-400">You don't have any documents yet. Push your first markdown file to get started:</p>
-          <pre className="text-left bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-gray-300 overflow-x-auto">npx pipeit push README.md</pre>
+    if (error === "no_docs")
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+          <div className="text-center space-y-4 max-w-md">
+            <h1 className="text-2xl font-bold">Welcome to pipeit</h1>
+            <p className="text-gray-400">
+              You don't have any documents yet. Push your first markdown file to get started:
+            </p>
+            <pre className="text-left bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-gray-300 overflow-x-auto">
+              npx pipeit push README.md
+            </pre>
+          </div>
         </div>
-      </div>
-    );
+      );
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
         <div className="text-center">
           <p className="text-gray-400 mb-4">{error === "not found" ? "Document not found" : error}</p>
-          <Link to="/" className="text-indigo-400 hover:text-indigo-300 text-sm">Back to home</Link>
+          <Link to="/" className="text-indigo-400 hover:text-indigo-300 text-sm">
+            Back to home
+          </Link>
         </div>
       </div>
     );
   }
 
-  if (!doc) return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-      <p className="text-gray-400">Loading...</p>
-    </div>
-  );
+  if (!doc)
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+        <p className="text-gray-400">Loading...</p>
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-      <Header onToggleTOC={() => setTocOpen(!tocOpen)} onToggleSearch={() => setSearchOpen(!searchOpen)} theme={theme} onToggleTheme={toggleTheme} />
+      <Header
+        onToggleTOC={() => setTocOpen(!tocOpen)}
+        onToggleSearch={() => setSearchOpen(!searchOpen)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+      />
       <TOCSidebar open={tocOpen} onClose={() => setTocOpen(false)} />
       <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} />
       <main className="max-w-3xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-2">{doc.title}</h1>
-        <p className="text-sm text-gray-500 mb-8">v{doc.version} &middot; {new Date(doc.updated_at).toLocaleDateString()}</p>
+        <p className="text-sm text-gray-500 mb-8">
+          v{doc.version} &middot; {new Date(doc.updated_at).toLocaleDateString()}
+        </p>
         <MarkdownRenderer content={doc.content.replace(/^#\s+.+\n?/, "")} />
       </main>
       <ReadingProgress />

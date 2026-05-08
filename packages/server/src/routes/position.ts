@@ -1,7 +1,7 @@
-import { Hono } from "hono";
-import { eq, and } from "drizzle-orm";
 import { db } from "@pipeit/shared/db";
 import { docs, readingPositions } from "@pipeit/shared/db/schema";
+import { and, eq } from "drizzle-orm";
+import { Hono } from "hono";
 
 const positionRouter = new Hono();
 
@@ -13,16 +13,21 @@ positionRouter.put("/:slug/position", async (c) => {
   const doc = await db.select().from(docs).where(eq(docs.slug, slug)).limit(1);
   if (doc.length === 0) return c.json({ error: "not found" }, 404);
 
-  const existing = await db.select().from(readingPositions)
+  const existing = await db
+    .select()
+    .from(readingPositions)
     .where(and(eq(readingPositions.userId, userId), eq(readingPositions.docId, doc[0].id)))
     .limit(1);
 
   if (existing.length > 0) {
-    await db.update(readingPositions).set({
-      scrollPct: body.scroll_pct,
-      headingId: body.heading_id ?? null,
-      updatedAt: new Date(),
-    }).where(eq(readingPositions.id, existing[0].id));
+    await db
+      .update(readingPositions)
+      .set({
+        scrollPct: body.scroll_pct,
+        headingId: body.heading_id ?? null,
+        updatedAt: new Date(),
+      })
+      .where(eq(readingPositions.id, existing[0].id));
   } else {
     await db.insert(readingPositions).values({
       userId,
@@ -42,7 +47,9 @@ positionRouter.get("/:slug/position", async (c) => {
   const doc = await db.select().from(docs).where(eq(docs.slug, slug)).limit(1);
   if (doc.length === 0) return c.json({ error: "not found" }, 404);
 
-  const pos = await db.select().from(readingPositions)
+  const pos = await db
+    .select()
+    .from(readingPositions)
     .where(and(eq(readingPositions.userId, userId), eq(readingPositions.docId, doc[0].id)))
     .limit(1);
 

@@ -1,7 +1,7 @@
-import webpush from "web-push";
-import { eq } from "drizzle-orm";
 import { db } from "@pipeit/shared/db";
 import { pushSubscriptions } from "@pipeit/shared/db/schema";
+import { eq } from "drizzle-orm";
+import webpush from "web-push";
 import { env } from "../env.js";
 
 if (env.VAPID_PUBLIC_KEY && env.VAPID_PRIVATE_KEY) {
@@ -19,10 +19,13 @@ export async function notifyDocUpdated(docId: string, title: string, version: nu
 
   for (const sub of subs) {
     try {
-      await webpush.sendNotification({
-        endpoint: sub.endpoint,
-        keys: { p256dh: sub.p256dh, auth: sub.auth },
-      }, payload);
+      await webpush.sendNotification(
+        {
+          endpoint: sub.endpoint,
+          keys: { p256dh: sub.p256dh, auth: sub.auth },
+        },
+        payload,
+      );
     } catch {
       // Remove stale subscriptions
       await db.delete(pushSubscriptions).where(eq(pushSubscriptions.id, sub.id));

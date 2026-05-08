@@ -1,8 +1,8 @@
-import { z } from "zod";
-import { eq, and } from "drizzle-orm";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { db } from "@pipeit/shared/db";
 import { docs } from "@pipeit/shared/db/schema";
-import type { McpServer } from "@modelcontextprotocol/server";
+import { and, eq } from "drizzle-orm";
+import { z } from "zod";
 
 export function registerToggleTool(server: McpServer, getUserId: () => string, getBaseUrl: () => string) {
   server.registerTool(
@@ -18,18 +18,23 @@ export function registerToggleTool(server: McpServer, getUserId: () => string, g
       const userId = getUserId();
       const baseUrl = getBaseUrl();
 
-      const existing = await db.select({ id: docs.id }).from(docs)
+      const existing = await db
+        .select({ id: docs.id })
+        .from(docs)
         .where(and(eq(docs.slug, slug), eq(docs.userId, userId)))
         .limit(1);
 
       if (existing.length === 0) {
-        return { content: [{ type: "text" as const, text: `Error: document "${slug}" not found or not owned by you.` }], isError: true };
+        return {
+          content: [{ type: "text" as const, text: `Error: document "${slug}" not found or not owned by you.` }],
+          isError: true,
+        };
       }
 
       await db.update(docs).set({ isPublic: is_public }).where(eq(docs.id, existing[0].id));
       const status = is_public ? "public" : "private";
       const url = `${baseUrl}/d/${slug}`;
       return { content: [{ type: "text" as const, text: `${url} is now ${status}` }] };
-    }
+    },
   );
 }

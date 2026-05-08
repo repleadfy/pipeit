@@ -1,10 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./lib/auth.js";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "./components/ProtectedRoute.js";
-import { LoginPage } from "./pages/LoginPage.js";
+import { AuthProvider } from "./lib/auth.js";
+import { ConsentPage } from "./pages/ConsentPage.js";
 import { DocPage } from "./pages/DocPage.js";
 import { InstallPage } from "./pages/InstallPage.js";
-import { ConsentPage } from "./pages/ConsentPage.js";
+import { LoginPage } from "./pages/LoginPage.js";
 import { NotFoundPage } from "./pages/NotFoundPage.js";
 
 export function App() {

@@ -1,11 +1,11 @@
-import { Hono } from "hono";
-import { setCookie, getCookie } from "hono/cookie";
-import { eq, and } from "drizzle-orm";
-import bcrypt from "bcrypt";
 import { db } from "@pipeit/shared/db";
-import { users, authIdentities } from "@pipeit/shared/db/schema";
-import { signJwt } from "./jwt.js";
+import { authIdentities, users } from "@pipeit/shared/db/schema";
+import bcrypt from "bcrypt";
+import { and, eq } from "drizzle-orm";
+import { Hono } from "hono";
+import { getCookie, setCookie } from "hono/cookie";
 import { env } from "../env.js";
+import { signJwt } from "./jwt.js";
 
 const email = new Hono();
 
@@ -19,12 +19,19 @@ email.post("/email/signup", async (c) => {
   if (existing.length > 0) return c.json({ error: "email already registered" }, 409);
 
   const hash = await bcrypt.hash(body.password, 10);
-  const [newUser] = await db.insert(users).values({
-    name: body.name, email: body.email,
-  }).returning();
+  const [newUser] = await db
+    .insert(users)
+    .values({
+      name: body.name,
+      email: body.email,
+    })
+    .returning();
 
   await db.insert(authIdentities).values({
-    userId: newUser.id, provider: "email", providerId: hash, email: body.email,
+    userId: newUser.id,
+    provider: "email",
+    providerId: hash,
+    email: body.email,
   });
 
   const jwt = await signJwt({ sub: newUser.id, email: newUser.email, name: newUser.name });
@@ -52,7 +59,9 @@ email.post("/email/login", async (c) => {
     return c.json({ error: "email and password are required" }, 400);
   }
 
-  const identity = await db.select().from(authIdentities)
+  const identity = await db
+    .select()
+    .from(authIdentities)
     .where(and(eq(authIdentities.provider, "email"), eq(authIdentities.email, body.email)))
     .limit(1);
 

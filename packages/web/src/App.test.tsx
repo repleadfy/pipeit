@@ -1,8 +1,8 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./lib/auth.js";
+import { MemoryRouter, Navigate, Route, Routes } from "react-router-dom";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ProtectedRoute } from "./components/ProtectedRoute.js";
+import { AuthProvider } from "./lib/auth.js";
 import { InstallPage } from "./pages/InstallPage.js";
 
 function TestRoutes() {
@@ -35,7 +35,7 @@ describe("unauthed routing", () => {
     render(
       <MemoryRouter initialEntries={["/"]}>
         <TestRoutes />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     await waitFor(() => {
       expect(screen.getByText(/Share markdown from AI conversations/)).toBeInTheDocument();

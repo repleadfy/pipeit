@@ -1,7 +1,7 @@
-import { Hono } from "hono";
-import { eq, and } from "drizzle-orm";
 import { db } from "@pipeit/shared/db";
 import { pushSubscriptions } from "@pipeit/shared/db/schema";
+import { and, eq } from "drizzle-orm";
+import { Hono } from "hono";
 
 const pushRouter = new Hono();
 
@@ -13,13 +13,18 @@ pushRouter.post("/subscribe", async (c) => {
     return c.json({ error: "endpoint, p256dh, and auth are required" }, 400);
   }
 
-  const existing = await db.select().from(pushSubscriptions)
+  const existing = await db
+    .select()
+    .from(pushSubscriptions)
     .where(and(eq(pushSubscriptions.userId, userId), eq(pushSubscriptions.endpoint, body.endpoint)))
     .limit(1);
 
   if (existing.length === 0) {
     await db.insert(pushSubscriptions).values({
-      userId, endpoint: body.endpoint, p256dh: body.p256dh, auth: body.auth,
+      userId,
+      endpoint: body.endpoint,
+      p256dh: body.p256dh,
+      auth: body.auth,
     });
   }
 
@@ -30,7 +35,8 @@ pushRouter.delete("/subscribe", async (c) => {
   const userId = c.get("user").sub;
   const body = await c.req.json<{ endpoint: string }>();
 
-  await db.delete(pushSubscriptions)
+  await db
+    .delete(pushSubscriptions)
     .where(and(eq(pushSubscriptions.userId, userId), eq(pushSubscriptions.endpoint, body.endpoint)));
 
   return c.json({ ok: true });

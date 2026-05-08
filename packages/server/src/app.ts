@@ -1,28 +1,31 @@
 import { serveStatic } from "@hono/node-server/serve-static";
-import { Hono } from "hono";
-import { cors } from "hono/cors";
-import { getCookie, deleteCookie } from "hono/cookie";
-import { eq } from "drizzle-orm";
+import { mcpApp } from "@pipeit/mcp";
 import { db } from "@pipeit/shared/db";
 import { users } from "@pipeit/shared/db/schema";
-import { env } from "./env.js";
-import { google } from "./auth/google.js";
-import { github } from "./auth/github.js";
+import { eq } from "drizzle-orm";
+import { Hono } from "hono";
+import { deleteCookie, getCookie } from "hono/cookie";
+import { cors } from "hono/cors";
 import { email } from "./auth/email.js";
+import { github } from "./auth/github.js";
+import { google } from "./auth/google.js";
 import { verifyJwt } from "./auth/jwt.js";
 import { authMiddleware } from "./auth/middleware.js";
-import { authRateLimit, apiRateLimit } from "./middleware/rate-limit.js";
+import { env } from "./env.js";
+import { apiRateLimit, authRateLimit } from "./middleware/rate-limit.js";
 import { docsRouter } from "./routes/docs.js";
 import { positionRouter } from "./routes/position.js";
 import { pushRouter } from "./routes/push.js";
-import { mcpApp } from "@pipeit/mcp";
 
 const app = new Hono();
 
-app.use("*", cors({
-  origin: [env.WEB_URL, env.PUBLIC_URL],
-  credentials: true,
-}));
+app.use(
+  "*",
+  cors({
+    origin: [env.WEB_URL, env.PUBLIC_URL],
+    credentials: true,
+  }),
+);
 
 app.get("/health", (c) => c.json({ status: "ok" }));
 

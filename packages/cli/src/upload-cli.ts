@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { exec } from "node:child_process";
+import * as crypto from "node:crypto";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import * as http from "node:http";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
-import * as http from "node:http";
-import * as crypto from "node:crypto";
-import { exec } from "node:child_process";
 
 const BASE = process.env.PIPEIT_URL ?? "https://pipeit.live";
 const TOKEN_PATH = join(homedir(), ".config", "pipeit", "token");
@@ -125,7 +125,13 @@ async function upload(filePath: string, opts: { isPublic: boolean; forceNew: boo
   return j.url;
 }
 
-function parseArgs(argv: string[]): { file?: string; isPublic: boolean; forceNew: boolean; logout: boolean; help: boolean } {
+function parseArgs(argv: string[]): {
+  file?: string;
+  isPublic: boolean;
+  forceNew: boolean;
+  logout: boolean;
+  help: boolean;
+} {
   const out = { file: undefined as string | undefined, isPublic: false, forceNew: false, logout: false, help: false };
   for (const a of argv) {
     if (a === "--public") out.isPublic = true;
@@ -164,7 +170,7 @@ async function main() {
     process.exit(2);
   }
   const url = await upload(args.file, { isPublic: args.isPublic, forceNew: args.forceNew });
-  process.stdout.write(url + "\n");
+  process.stdout.write(`${url}\n`);
 }
 
 main().catch((err) => {

@@ -1,10 +1,10 @@
-import { Hono } from "hono";
-import { setCookie, getCookie } from "hono/cookie";
-import { eq } from "drizzle-orm";
 import { db } from "@pipeit/shared/db";
-import { users, authIdentities } from "@pipeit/shared/db/schema";
-import { signJwt } from "./jwt.js";
+import { authIdentities, users } from "@pipeit/shared/db/schema";
+import { eq } from "drizzle-orm";
+import { Hono } from "hono";
+import { getCookie, setCookie } from "hono/cookie";
 import { env } from "../env.js";
+import { signJwt } from "./jwt.js";
 
 const google = new Hono();
 
@@ -49,16 +49,14 @@ google.get("/google/callback", async (c) => {
       grant_type: "authorization_code",
     }),
   });
-  const tokens = await tokenRes.json() as { access_token: string };
+  const tokens = (await tokenRes.json()) as { access_token: string };
 
   const profileRes = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
     headers: { Authorization: `Bearer ${tokens.access_token}` },
   });
-  const profile = await profileRes.json() as { id: string; email: string; name: string; picture: string };
+  const profile = (await profileRes.json()) as { id: string; email: string; name: string; picture: string };
 
-  const existing = await db.select().from(authIdentities)
-    .where(eq(authIdentities.providerId, profile.id))
-    .limit(1);
+  const existing = await db.select().from(authIdentities).where(eq(authIdentities.providerId, profile.id)).limit(1);
 
   let userId: string;
 
@@ -70,15 +68,26 @@ google.get("/google/callback", async (c) => {
     if (existingUser.length > 0) {
       userId = existingUser[0].id;
       await db.insert(authIdentities).values({
-        userId, provider: "google", providerId: profile.id, email: profile.email,
+        userId,
+        provider: "google",
+        providerId: profile.id,
+        email: profile.email,
       });
     } else {
-      const [newUser] = await db.insert(users).values({
-        name: profile.name, email: profile.email, avatarUrl: profile.picture,
-      }).returning();
+      const [newUser] = await db
+        .insert(users)
+        .values({
+          name: profile.name,
+          email: profile.email,
+          avatarUrl: profile.picture,
+        })
+        .returning();
       userId = newUser.id;
       await db.insert(authIdentities).values({
-        userId, provider: "google", providerId: profile.id, email: profile.email,
+        userId,
+        provider: "google",
+        providerId: profile.id,
+        email: profile.email,
       });
     }
   }

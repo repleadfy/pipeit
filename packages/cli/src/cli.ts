@@ -13,7 +13,11 @@ export function hasClaudeCli(spawn: SpawnFn = (c, a) => realSpawn(c, a, { stdio:
   return r.status === 0;
 }
 
-export function tryInstallViaCli(exec: ExecFn = (c) => { realExec(c, { stdio: "inherit" }); }): boolean {
+export function tryInstallViaCli(
+  exec: ExecFn = (c) => {
+    realExec(c, { stdio: "inherit" });
+  },
+): boolean {
   try {
     exec(`claude plugin marketplace add ${MARKETPLACE_SOURCE}`);
     exec(`claude plugin install ${PLUGIN}@${MARKETPLACE_NAME}`);

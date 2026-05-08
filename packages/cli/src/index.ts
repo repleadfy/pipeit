@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { hasClaudeCli, tryInstallViaCli, printManualInstructions, printNextStep } from "./cli.js";
+import { hasClaudeCli, printManualInstructions, printNextStep, tryInstallViaCli } from "./cli.js";
 
 if (hasClaudeCli() && tryInstallViaCli()) {
   printNextStep();

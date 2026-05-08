@@ -1,8 +1,8 @@
-import { Hono } from "hono";
-import { eq, and, ilike, sql } from "drizzle-orm";
-import { nanoid } from "nanoid";
 import { db } from "@pipeit/shared/db";
 import { docs, readingPositions } from "@pipeit/shared/db/schema";
+import { and, eq, ilike, sql } from "drizzle-orm";
+import { Hono } from "hono";
+import { nanoid } from "nanoid";
 import { env } from "../env.js";
 
 const docsRouter = new Hono();
@@ -19,19 +19,24 @@ docsRouter.post("/", async (c) => {
 
   // Update-in-place: same user + same file_path
   if (body.file_path) {
-    const existing = await db.select().from(docs)
+    const existing = await db
+      .select()
+      .from(docs)
       .where(and(eq(docs.userId, userId), eq(docs.filePath, body.file_path)))
       .limit(1);
 
     if (existing.length > 0) {
       const doc = existing[0];
-      await db.update(docs).set({
-        content: body.content,
-        title,
-        version: doc.version + 1,
-        isPublic: body.is_public ?? doc.isPublic,
-        updatedAt: new Date(),
-      }).where(eq(docs.id, doc.id));
+      await db
+        .update(docs)
+        .set({
+          content: body.content,
+          title,
+          version: doc.version + 1,
+          isPublic: body.is_public ?? doc.isPublic,
+          updatedAt: new Date(),
+        })
+        .where(eq(docs.id, doc.id));
 
       return c.json({
         slug: doc.slug,
@@ -52,11 +57,14 @@ docsRouter.post("/", async (c) => {
     isPublic: body.is_public ?? false,
   });
 
-  return c.json({
-    slug,
-    url: `${env.WEB_URL}/d/${slug}`,
-    is_new: true,
-  }, 201);
+  return c.json(
+    {
+      slug,
+      url: `${env.WEB_URL}/d/${slug}`,
+      is_new: true,
+    },
+    201,
+  );
 });
 
 // GET /api/docs — list user's docs with filters
@@ -76,16 +84,15 @@ docsRouter.get("/", async (c) => {
       readPct: readingPositions.scrollPct,
     })
     .from(docs)
-    .leftJoin(readingPositions, and(
-      eq(readingPositions.docId, docs.id),
-      eq(readingPositions.userId, userId),
-    ))
-    .where(and(
-      eq(docs.userId, userId),
-      q ? ilike(docs.title, `%${q}%`) : undefined,
-      visibility === "public" ? eq(docs.isPublic, true) : undefined,
-      visibility === "private" ? eq(docs.isPublic, false) : undefined,
-    ))
+    .leftJoin(readingPositions, and(eq(readingPositions.docId, docs.id), eq(readingPositions.userId, userId)))
+    .where(
+      and(
+        eq(docs.userId, userId),
+        q ? ilike(docs.title, `%${q}%`) : undefined,
+        visibility === "public" ? eq(docs.isPublic, true) : undefined,
+        visibility === "private" ? eq(docs.isPublic, false) : undefined,
+      ),
+    )
     .orderBy(sql`${docs.updatedAt} DESC`);
 
   let filtered = userDocs;
@@ -93,14 +100,16 @@ docsRouter.get("/", async (c) => {
   if (readState === "reading") filtered = userDocs.filter((d) => d.readPct !== null && d.readPct > 0 && d.readPct < 1);
   if (readState === "finished") filtered = userDocs.filter((d) => d.readPct !== null && d.readPct >= 1);
 
-  return c.json(filtered.map((d) => ({
-    slug: d.slug,
-    title: d.title,
-    version: d.version,
-    is_public: d.isPublic,
-    updated_at: d.updatedAt.toISOString(),
-    read_pct: d.readPct,
-  })));
+  return c.json(
+    filtered.map((d) => ({
+      slug: d.slug,
+      title: d.title,
+      version: d.version,
+      is_public: d.isPublic,
+      updated_at: d.updatedAt.toISOString(),
+      read_pct: d.readPct,
+    })),
+  );
 });
 
 // GET /api/docs/:slug — get single doc (slug "latest" returns most recent)
@@ -111,7 +120,9 @@ docsRouter.get("/:slug", async (c) => {
   if (slug === "latest") {
     const user = c.get("user");
     if (!user) return c.json({ error: "not found" }, 404);
-    const latest = await db.select().from(docs)
+    const latest = await db
+      .select()
+      .from(docs)
       .where(eq(docs.userId, user.sub))
       .orderBy(sql`${docs.updatedAt} DESC`)
       .limit(1);
@@ -157,7 +168,9 @@ docsRouter.put("/:slug", async (c) => {
   const slug = c.req.param("slug");
   const body = await c.req.json<{ content: string }>();
 
-  const doc = await db.select().from(docs)
+  const doc = await db
+    .select()
+    .from(docs)
     .where(and(eq(docs.slug, slug), eq(docs.userId, userId)))
     .limit(1);
 
@@ -165,12 +178,15 @@ docsRouter.put("/:slug", async (c) => {
 
   const title = body.content.match(/^#\s+(.+)$/m)?.[1] ?? doc[0].title;
 
-  await db.update(docs).set({
-    content: body.content,
-    title,
-    version: doc[0].version + 1,
-    updatedAt: new Date(),
-  }).where(eq(docs.id, doc[0].id));
+  await db
+    .update(docs)
+    .set({
+      content: body.content,
+      title,
+      version: doc[0].version + 1,
+      updatedAt: new Date(),
+    })
+    .where(eq(docs.id, doc[0].id));
 
   return c.json({
     slug,
@@ -185,7 +201,9 @@ docsRouter.patch("/:slug", async (c) => {
   const slug = c.req.param("slug");
   const body = await c.req.json<{ is_public?: boolean; title?: string }>();
 
-  const doc = await db.select().from(docs)
+  const doc = await db
+    .select()
+    .from(docs)
     .where(and(eq(docs.slug, slug), eq(docs.userId, userId)))
     .limit(1);
 
@@ -207,8 +225,7 @@ docsRouter.delete("/:slug", async (c) => {
   const userId = c.get("user").sub;
   const slug = c.req.param("slug");
 
-  const result = await db.delete(docs)
-    .where(and(eq(docs.slug, slug), eq(docs.userId, userId)));
+  const _result = await db.delete(docs).where(and(eq(docs.slug, slug), eq(docs.userId, userId)));
 
   return c.json({ ok: true });
 });

@@ -1,5 +1,5 @@
-import { describe, it } from "node:test";
 import assert from "node:assert";
+import { describe, it } from "node:test";
 import { signJwt, verifyJwt } from "./auth/jwt.js";
 
 describe("JWT", () => {

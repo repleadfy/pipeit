@@ -5,7 +5,9 @@ export async function subscribeToPush(): Promise<void> {
   const existing = await registration.pushManager.getSubscription();
   if (existing) return;
 
-  const vapidKey = await fetch("/api/push/vapid-key").then((r) => r.text()).catch(() => "");
+  const vapidKey = await fetch("/api/push/vapid-key")
+    .then((r) => r.text())
+    .catch(() => "");
   if (!vapidKey) return;
 
   const subscription = await registration.pushManager.subscribe({

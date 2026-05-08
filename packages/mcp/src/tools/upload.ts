@@ -1,15 +1,16 @@
-import { z } from "zod";
-import { nanoid } from "nanoid";
-import { eq, and } from "drizzle-orm";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { db } from "@pipeit/shared/db";
 import { docs } from "@pipeit/shared/db/schema";
-import type { McpServer } from "@modelcontextprotocol/server";
+import { and, eq } from "drizzle-orm";
+import { nanoid } from "nanoid";
+import { z } from "zod";
 
 export function registerUploadTool(server: McpServer, getUserId: () => string, getBaseUrl: () => string) {
   server.registerTool(
     "pipeit_upload",
     {
-      description: "Upload or update a markdown document on pipeit. If file_path is provided and a doc exists with the same path, it updates in place. Otherwise creates a new doc.",
+      description:
+        "Upload or update a markdown document on pipeit. If file_path is provided and a doc exists with the same path, it updates in place. Otherwise creates a new doc.",
       inputSchema: z.object({
         content: z.string().describe("Markdown content to upload"),
         file_path: z.string().optional().describe("Original file path — used for update-in-place matching"),
@@ -31,19 +32,24 @@ export function registerUploadTool(server: McpServer, getUserId: () => string, g
 
       // Update-in-place if same user + same file_path
       if (file_path) {
-        const existing = await db.select().from(docs)
+        const existing = await db
+          .select()
+          .from(docs)
           .where(and(eq(docs.userId, userId), eq(docs.filePath, file_path)))
           .limit(1);
 
         if (existing.length > 0) {
           const doc = existing[0];
-          await db.update(docs).set({
-            content,
-            title,
-            version: doc.version + 1,
-            isPublic: is_public ?? doc.isPublic,
-            updatedAt: new Date(),
-          }).where(eq(docs.id, doc.id));
+          await db
+            .update(docs)
+            .set({
+              content,
+              title,
+              version: doc.version + 1,
+              isPublic: is_public ?? doc.isPublic,
+              updatedAt: new Date(),
+            })
+            .where(eq(docs.id, doc.id));
 
           const url = `${baseUrl}/d/${doc.slug}`;
           return { content: [{ type: "text" as const, text: `Updated: ${url} (v${doc.version + 1})` }] };
@@ -63,6 +69,6 @@ export function registerUploadTool(server: McpServer, getUserId: () => string, g
 
       const url = `${baseUrl}/d/${slug}`;
       return { content: [{ type: "text" as const, text: `Created: ${url}` }] };
-    }
+    },
   );
 }

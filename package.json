@@ -1,15 +1,22 @@
 {
   "name": "pipeit",
   "private": true,
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev:server": "yarn workspace @pipeit/server run dev",
     "dev:web": "yarn workspace web run dev",
     "build": "yarn workspace @pipeit/shared run build && yarn workspace @pipeit/mcp run build && yarn workspace @pipeit/server run build && yarn workspace web run build && yarn workspace pipeit.live run build",
     "build:server": "yarn workspace @pipeit/shared run build && yarn workspace @pipeit/server run build",
-    "build:cli": "yarn workspace pipeit.live run build"
+    "build:cli": "yarn workspace pipeit.live run build",
+    "test": "yarn workspace @pipeit/shared test && yarn workspace @pipeit/mcp test && yarn workspace @pipeit/server test && yarn workspace pipeit.live test && yarn workspace web test",
+    "check:types": "yarn workspace @pipeit/shared exec tsc --noEmit && yarn workspace @pipeit/mcp exec tsc --noEmit && yarn workspace @pipeit/server exec tsc --noEmit && yarn workspace pipeit.live exec tsc --noEmit && yarn workspace web exec tsc --noEmit",
+    "lint": "biome check",
+    "format": "biome format --write"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.14",
     "drizzle-kit": "^0.31.10"
   },
   "dependencies": {

@@ -1,6 +1,6 @@
+import type { PositionPayload } from "@pipeit/shared";
 import { useEffect, useRef } from "react";
 import { api } from "../lib/api.js";
-import type { PositionPayload } from "@pipeit/shared";
 
 export function useReadingPosition(slug: string | undefined) {
   const restored = useRef(false);
@@ -8,17 +8,23 @@ export function useReadingPosition(slug: string | undefined) {
   // Restore position on mount
   useEffect(() => {
     if (!slug || restored.current) return;
-    api<PositionPayload>(`/api/docs/${slug}/position`).then((pos) => {
-      if (pos.heading_id) {
-        const el = document.getElementById(pos.heading_id);
-        if (el) { el.scrollIntoView(); restored.current = true; return; }
-      }
-      if (pos.scroll_pct > 0) {
-        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-        window.scrollTo(0, scrollHeight * pos.scroll_pct);
-      }
-      restored.current = true;
-    }).catch(() => {});
+    api<PositionPayload>(`/api/docs/${slug}/position`)
+      .then((pos) => {
+        if (pos.heading_id) {
+          const el = document.getElementById(pos.heading_id);
+          if (el) {
+            el.scrollIntoView();
+            restored.current = true;
+            return;
+          }
+        }
+        if (pos.scroll_pct > 0) {
+          const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+          window.scrollTo(0, scrollHeight * pos.scroll_pct);
+        }
+        restored.current = true;
+      })
+      .catch(() => {});
   }, [slug]);
 
   // Save position on scroll (debounced)
@@ -48,6 +54,9 @@ export function useReadingPosition(slug: string | undefined) {
     };
 
     window.addEventListener("scroll", handler, { passive: true });
-    return () => { window.removeEventListener("scroll", handler); clearTimeout(timeout); };
+    return () => {
+      window.removeEventListener("scroll", handler);
+      clearTimeout(timeout);
+    };
   }, [slug]);
 }

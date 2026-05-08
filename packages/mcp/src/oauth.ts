@@ -1,11 +1,11 @@
-import { Hono } from "hono";
-import { setCookie, getCookie } from "hono/cookie";
-import { nanoid } from "nanoid";
-import * as jose from "jose";
-import { eq } from "drizzle-orm";
 import { db } from "@pipeit/shared/db";
 import { users } from "@pipeit/shared/db/schema";
 import { verifyJwt } from "@pipeit/shared/jwt";
+import { eq } from "drizzle-orm";
+import { Hono } from "hono";
+import { getCookie, setCookie } from "hono/cookie";
+import * as jose from "jose";
+import { nanoid } from "nanoid";
 
 // In-memory auth code store (short-lived, 5 min TTL)
 const authCodes = new Map<string, { userId: string; redirectUri: string; codeChallenge: string; expiresAt: number }>();
@@ -48,14 +48,17 @@ oauthApp.post("/register", async (c) => {
   }>();
 
   const clientId = nanoid(21);
-  return c.json({
-    client_id: clientId,
-    client_name: body.client_name ?? "MCP Client",
-    redirect_uris: body.redirect_uris ?? [],
-    grant_types: body.grant_types ?? ["authorization_code"],
-    response_types: body.response_types ?? ["code"],
-    token_endpoint_auth_method: body.token_endpoint_auth_method ?? "none",
-  }, 201);
+  return c.json(
+    {
+      client_id: clientId,
+      client_name: body.client_name ?? "MCP Client",
+      redirect_uris: body.redirect_uris ?? [],
+      grant_types: body.grant_types ?? ["authorization_code"],
+      response_types: body.response_types ?? ["code"],
+      token_endpoint_auth_method: body.token_endpoint_auth_method ?? "none",
+    },
+    201,
+  );
 });
 
 // Authorization endpoint — routes the user into the SPA consent flow.
@@ -71,7 +74,14 @@ oauthApp.get("/authorize", async (c) => {
     return c.json({ error: "missing redirect_uri or code_challenge" }, 400);
   }
 
-  const oauthState = JSON.stringify({ clientId, redirectUri, state, codeChallenge, codeChallengeMethod, issuedAt: Date.now() });
+  const oauthState = JSON.stringify({
+    clientId,
+    redirectUri,
+    state,
+    codeChallenge,
+    codeChallengeMethod,
+    issuedAt: Date.now(),
+  });
   setCookie(c, "mcp_oauth_state", oauthState, {
     httpOnly: true,
     secure: true,
@@ -179,7 +189,9 @@ oauthApp.post("/token", async (c) => {
   const encoder = new TextEncoder();
   const digest = await crypto.subtle.digest("SHA-256", encoder.encode(codeVerifier));
   const computedChallenge = btoa(String.fromCharCode(...new Uint8Array(digest)))
-    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
 
   if (computedChallenge !== authCode.codeChallenge) {
     return c.json({ error: "invalid_grant", error_description: "PKCE verification failed" }, 400);
@@ -213,4 +225,4 @@ oauthApp.post("/token", async (c) => {
   });
 });
 
-export { oauthApp, authCodes };
+export { authCodes, oauthApp };

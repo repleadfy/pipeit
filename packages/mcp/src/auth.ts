@@ -27,7 +27,11 @@ export async function mcpAuthMiddleware(c: Context, next: Next) {
 
   try {
     const { payload } = await jose.jwtVerify(token, secret);
-    c.set("mcpUser", { sub: payload.sub as string, email: payload.email as string, name: payload.name as string | undefined });
+    c.set("mcpUser", {
+      sub: payload.sub as string,
+      email: payload.email as string,
+      name: payload.name as string | undefined,
+    });
     return next();
   } catch {
     return c.json({ error: "invalid_token" }, 401);

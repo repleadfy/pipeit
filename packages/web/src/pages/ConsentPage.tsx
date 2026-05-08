@@ -50,12 +50,10 @@ export function ConsentPage() {
         {info && (
           <>
             <p className="text-gray-700 dark:text-gray-300">
-              <span className="font-medium">{info.client_name}</span> is requesting
-              permission to upload markdown to your pipeit account.
+              <span className="font-medium">{info.client_name}</span> is requesting permission to upload markdown to
+              your pipeit account.
             </p>
-            <p className="text-xs text-gray-500">
-              Request issued {new Date(info.issued_at).toLocaleString()}
-            </p>
+            <p className="text-xs text-gray-500">Request issued {new Date(info.issued_at).toLocaleString()}</p>
             <div className="flex gap-3 pt-2">
               <button
                 type="button"

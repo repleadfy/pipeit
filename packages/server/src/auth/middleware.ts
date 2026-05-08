@@ -1,6 +1,6 @@
 import type { Context, Next } from "hono";
 import { getCookie } from "hono/cookie";
-import { verifyJwt, type JwtPayload } from "./jwt.js";
+import { type JwtPayload, verifyJwt } from "./jwt.js";
 
 declare module "hono" {
   interface ContextVariableMap {
@@ -14,7 +14,9 @@ export async function authMiddleware(c: Context, next: Next) {
   if (c.req.method === "GET" && /^\/api\/docs\/[^/]+$/.test(path) && !path.endsWith("/latest")) {
     const token = getCookie(c, "token") ?? c.req.header("Authorization")?.replace("Bearer ", "");
     if (token) {
-      try { c.set("user", await verifyJwt(token)); } catch {}
+      try {
+        c.set("user", await verifyJwt(token));
+      } catch {}
     }
     return next();
   }

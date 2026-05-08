@@ -1,29 +1,30 @@
-import { test } from "node:test";
 import assert from "node:assert/strict";
-import { hasClaudeCli, tryInstallViaCli, printManualInstructions, printNextStep } from "./cli.js";
+import { test } from "node:test";
+import { hasClaudeCli, printManualInstructions, printNextStep, tryInstallViaCli } from "./cli.js";
 
 test("hasClaudeCli returns false when spawn status is non-zero", () => {
-  const spawn = () => ({ status: 127 } as { status: number });
+  const spawn = () => ({ status: 127 }) as { status: number };
   assert.equal(hasClaudeCli(spawn), false);
 });
 
 test("hasClaudeCli returns true when spawn status is zero", () => {
-  const spawn = () => ({ status: 0 } as { status: number });
+  const spawn = () => ({ status: 0 }) as { status: number };
   assert.equal(hasClaudeCli(spawn), true);
 });
 
 test("tryInstallViaCli returns true when both exec calls succeed", () => {
   const calls: string[] = [];
-  const exec = (cmd: string) => { calls.push(cmd); };
+  const exec = (cmd: string) => {
+    calls.push(cmd);
+  };
   assert.equal(tryInstallViaCli(exec), true);
-  assert.deepEqual(calls, [
-    "claude plugin marketplace add repleadfy/pipeit",
-    "claude plugin install pipeit@repleadfy",
-  ]);
+  assert.deepEqual(calls, ["claude plugin marketplace add repleadfy/pipeit", "claude plugin install pipeit@repleadfy"]);
 });
 
 test("tryInstallViaCli returns false if exec throws", () => {
-  const exec = () => { throw new Error("not found"); };
+  const exec = () => {
+    throw new Error("not found");
+  };
   assert.equal(tryInstallViaCli(exec), false);
 });
 

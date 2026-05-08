@@ -1,10 +1,10 @@
-import { Hono } from "hono";
-import { setCookie, getCookie } from "hono/cookie";
-import { eq } from "drizzle-orm";
 import { db } from "@pipeit/shared/db";
-import { users, authIdentities } from "@pipeit/shared/db/schema";
-import { signJwt } from "./jwt.js";
+import { authIdentities, users } from "@pipeit/shared/db/schema";
+import { eq } from "drizzle-orm";
+import { Hono } from "hono";
+import { getCookie, setCookie } from "hono/cookie";
 import { env } from "../env.js";
+import { signJwt } from "./jwt.js";
 
 const github = new Hono();
 
@@ -44,26 +44,24 @@ github.get("/github/callback", async (c) => {
       code,
     }),
   });
-  const { access_token } = await tokenRes.json() as { access_token: string };
+  const { access_token } = (await tokenRes.json()) as { access_token: string };
 
   const userRes = await fetch("https://api.github.com/user", {
     headers: { Authorization: `Bearer ${access_token}`, Accept: "application/json" },
   });
-  const ghUser = await userRes.json() as { id: number; login: string; avatar_url: string; email: string | null };
+  const ghUser = (await userRes.json()) as { id: number; login: string; avatar_url: string; email: string | null };
 
   let email = ghUser.email;
   if (!email) {
     const emailsRes = await fetch("https://api.github.com/user/emails", {
       headers: { Authorization: `Bearer ${access_token}`, Accept: "application/json" },
     });
-    const emails = await emailsRes.json() as { email: string; primary: boolean }[];
+    const emails = (await emailsRes.json()) as { email: string; primary: boolean }[];
     email = emails.find((e) => e.primary)?.email ?? emails[0]?.email ?? `${ghUser.id}@github.noreply`;
   }
 
   const providerId = String(ghUser.id);
-  const existing = await db.select().from(authIdentities)
-    .where(eq(authIdentities.providerId, providerId))
-    .limit(1);
+  const existing = await db.select().from(authIdentities).where(eq(authIdentities.providerId, providerId)).limit(1);
 
   let userId: string;
 
@@ -75,15 +73,26 @@ github.get("/github/callback", async (c) => {
     if (existingUser.length > 0) {
       userId = existingUser[0].id;
       await db.insert(authIdentities).values({
-        userId, provider: "github", providerId, email,
+        userId,
+        provider: "github",
+        providerId,
+        email,
       });
     } else {
-      const [newUser] = await db.insert(users).values({
-        name: ghUser.login, email, avatarUrl: ghUser.avatar_url,
-      }).returning();
+      const [newUser] = await db
+        .insert(users)
+        .values({
+          name: ghUser.login,
+          email,
+          avatarUrl: ghUser.avatar_url,
+        })
+        .returning();
       userId = newUser.id;
       await db.insert(authIdentities).values({
-        userId, provider: "github", providerId, email,
+        userId,
+        provider: "github",
+        providerId,
+        email,
       });
     }
   }

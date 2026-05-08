@@ -1,11 +1,11 @@
 import { McpServer, WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/server";
 import { Hono } from "hono";
-import { oauthApp } from "./oauth.js";
 import { mcpAuthMiddleware } from "./auth.js";
-import { registerUploadTool } from "./tools/upload.js";
-import { registerListTool } from "./tools/list.js";
+import { oauthApp } from "./oauth.js";
 import { registerDeleteTool } from "./tools/delete.js";
+import { registerListTool } from "./tools/list.js";
 import { registerToggleTool } from "./tools/toggle.js";
+import { registerUploadTool } from "./tools/upload.js";
 
 const mcpApp = new Hono();
 
