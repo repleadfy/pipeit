@@ -4,6 +4,8 @@ dist/
 .env.*
 .DS_Store
 .superpowers/
+docs/oss-audit.md
+docs/superpowers/
 kdep/*/secrets.yml
 kdep/*/.rendered
 .prod_test_creds
