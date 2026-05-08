@@ -9,3 +9,8 @@ kdep/*/.rendered
 .prod_test_creds
 .gstack/
 .claude/settings.local.json
+
+# raw recordings used to produce docs/assets/*.gif — keep the gif, not the source
+*.mov
+*.mp4
+!docs/assets/*.mp4
