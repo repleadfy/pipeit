@@ -1,4 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/server";
+import { detectFormat, extractTitle } from "@pipeit/shared";
 import { db } from "@pipeit/shared/db";
 import { docs } from "@pipeit/shared/db/schema";
 import { and, eq } from "drizzle-orm";
@@ -10,10 +11,13 @@ export function registerUploadTool(server: McpServer, getUserId: () => string, g
     "pipeit_upload",
     {
       description:
-        "Upload or update a markdown document on pipeit. If file_path is provided and a doc exists with the same path, it updates in place. Otherwise creates a new doc.",
+        "Upload or update a text document on pipeit (markdown, HTML, or plain text — format is auto-detected). If file_path is provided and a doc exists with the same path, it updates in place. Otherwise creates a new doc. For PDFs, use the web upload or CLI.",
       inputSchema: z.object({
-        content: z.string().describe("Markdown content to upload"),
-        file_path: z.string().optional().describe("Original file path — used for update-in-place matching"),
+        content: z.string().describe("Document content (markdown, HTML, or plain text)"),
+        file_path: z
+          .string()
+          .optional()
+          .describe("Original file path — used for update-in-place matching and format detection"),
         is_public: z.boolean().optional().default(false).describe("Make the document publicly shareable"),
       }),
     },
@@ -28,7 +32,8 @@ export function registerUploadTool(server: McpServer, getUserId: () => string, g
         return { content: [{ type: "text" as const, text: "Error: content exceeds 1MB limit" }], isError: true };
       }
 
-      const title = content.match(/^#\s+(.+)$/m)?.[1] ?? "Untitled";
+      const format = detectFormat({ fileName: file_path, content });
+      const title = extractTitle(format, { content, fileName: file_path });
 
       // Update-in-place if same user + same file_path
       if (file_path) {
@@ -45,6 +50,7 @@ export function registerUploadTool(server: McpServer, getUserId: () => string, g
             .set({
               content,
               title,
+              format,
               version: doc.version + 1,
               isPublic: is_public ?? doc.isPublic,
               updatedAt: new Date(),
@@ -63,6 +69,7 @@ export function registerUploadTool(server: McpServer, getUserId: () => string, g
         slug,
         filePath: file_path ?? null,
         title,
+        format,
         content,
         isPublic: is_public ?? false,
       });

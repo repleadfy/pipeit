@@ -1,15 +1,20 @@
 import type { DocResponse } from "@pipeit/shared";
-import { useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Header } from "../components/Header.js";
+import { HtmlRenderer } from "../components/HtmlRenderer.js";
 import { MarkdownRenderer } from "../components/MarkdownRenderer.js";
 import { ReadingProgress } from "../components/ReadingProgress.js";
 import { SearchPanel } from "../components/SearchPanel.js";
 import { TOCSidebar } from "../components/TOCSidebar.js";
+import { TxtRenderer } from "../components/TxtRenderer.js";
 import { useKeyboard } from "../hooks/useKeyboard.js";
 import { useReadingPosition } from "../hooks/useReadingPosition.js";
 import { useTheme } from "../hooks/useTheme.js";
 import { api } from "../lib/api.js";
+
+// pdf.js is heavy (~1MB worker) — only load it when actually viewing a PDF.
+const PdfRenderer = lazy(() => import("../components/PdfRenderer.js").then((m) => ({ default: m.PdfRenderer })));
 
 export function DocPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -73,12 +78,24 @@ export function DocPage() {
       />
       <TOCSidebar open={tocOpen} onClose={() => setTocOpen(false)} />
       <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} />
-      <main className="max-w-3xl mx-auto px-4 py-8">
+      <main
+        className={`${doc.format === "pdf" || doc.format === "html" ? "max-w-5xl" : "max-w-3xl"} mx-auto px-4 py-8`}
+      >
         <h1 className="text-3xl font-bold mb-2">{doc.title}</h1>
         <p className="text-sm text-gray-500 mb-8">
           v{doc.version} &middot; {new Date(doc.updated_at).toLocaleDateString()}
         </p>
-        <MarkdownRenderer content={doc.content.replace(/^#\s+.+\n?/, "")} />
+        {doc.format === "pdf" ? (
+          <Suspense fallback={<p className="text-gray-400">Loading PDF viewer…</p>}>
+            <PdfRenderer slug={doc.slug} />
+          </Suspense>
+        ) : doc.format === "html" ? (
+          <HtmlRenderer content={doc.content} />
+        ) : doc.format === "txt" ? (
+          <TxtRenderer content={doc.content} />
+        ) : (
+          <MarkdownRenderer content={doc.content.replace(/^#\s+.+\n?/, "")} />
+        )}
       </main>
       <ReadingProgress />
     </div>

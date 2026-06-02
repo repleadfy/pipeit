@@ -13,6 +13,9 @@ export interface DocUploadResponse {
 export interface DocResponse {
   slug: string;
   title: string;
+  /** "markdown" | "html" | "txt" | "pdf" — drives which renderer the web app uses. */
+  format: import("./format.js").DocFormat;
+  /** Text payload (md/html/txt). Empty for pdf — fetch bytes from /api/docs/:slug/raw. */
   content: string;
   version: number;
   is_public: boolean;
@@ -24,6 +27,7 @@ export interface DocResponse {
 export interface DocListItem {
   slug: string;
   title: string;
+  format: import("./format.js").DocFormat;
   version: number;
   is_public: boolean;
   updated_at: string;

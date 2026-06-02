@@ -1,6 +1,6 @@
 FROM node:22-slim AS builder
 WORKDIR /app
-COPY package.json yarn.lock .yarnrc ./
+COPY package.json yarn.lock ./
 COPY packages/shared/package.json packages/shared/
 COPY packages/server/package.json packages/server/
 COPY packages/web/package.json packages/web/

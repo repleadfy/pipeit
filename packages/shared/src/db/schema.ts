@@ -1,5 +1,6 @@
 import {
   boolean,
+  customType,
   doublePrecision,
   index,
   integer,
@@ -11,7 +12,15 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType() {
+    return "bytea";
+  },
+});
+
 export const authProviderEnum = pgEnum("auth_provider", ["google", "github", "email"]);
+
+export const docFormatEnum = pgEnum("doc_format", ["markdown", "html", "txt", "pdf"]);
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -47,6 +56,7 @@ export const docs = pgTable(
     slug: text("slug").notNull().unique(),
     filePath: text("file_path"),
     title: text("title").notNull(),
+    format: docFormatEnum("format").notNull().default("markdown"),
     content: text("content").notNull(),
     version: integer("version").notNull().default(1),
     isPublic: boolean("is_public").notNull().default(false),
@@ -55,6 +65,18 @@ export const docs = pgTable(
   },
   (table) => [index("docs_user_id_file_path_idx").on(table.userId, table.filePath)],
 );
+
+// Binary payloads (currently PDFs). One row per doc; text formats keep their
+// payload in docs.content and have no blob row.
+export const docBlobs = pgTable("doc_blobs", {
+  docId: uuid("doc_id")
+    .primaryKey()
+    .references(() => docs.id, { onDelete: "cascade" }),
+  data: bytea("data").notNull(),
+  mimeType: text("mime_type").notNull(),
+  byteSize: integer("byte_size").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
 
 export const readingPositions = pgTable(
   "reading_positions",

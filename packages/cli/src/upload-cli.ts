@@ -98,21 +98,44 @@ async function getToken(forceLogin = false): Promise<string> {
   return await login();
 }
 
+function isBinaryDoc(abs: string, bytes: Buffer): boolean {
+  if (/\.pdf$/i.test(abs)) return true;
+  // %PDF- magic number
+  return (
+    bytes.length >= 5 &&
+    bytes[0] === 0x25 &&
+    bytes[1] === 0x50 &&
+    bytes[2] === 0x44 &&
+    bytes[3] === 0x46 &&
+    bytes[4] === 0x2d
+  );
+}
+
 async function upload(filePath: string, opts: { isPublic: boolean; forceNew: boolean }): Promise<string> {
   const abs = resolve(filePath);
-  const content = readFileSync(abs, "utf8");
-  const body = JSON.stringify({
-    content,
-    file_path: opts.forceNew ? undefined : abs,
-    is_public: opts.isPublic,
-  });
+  const bytes = readFileSync(abs);
+  const fileName = abs.replace(/^.*[/\\]/, "");
 
-  const post = (token: string) =>
-    fetch(`${BASE}/api/docs`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body,
-    });
+  // Binary files (PDFs) go as multipart; the server auto-detects the format.
+  // Text files stay on the JSON path. Either way the client never declares a format.
+  const post = isBinaryDoc(abs, bytes)
+    ? (token: string) => {
+        const form = new FormData();
+        form.append("file", new Blob([new Uint8Array(bytes)], { type: "application/pdf" }), fileName);
+        if (!opts.forceNew) form.append("file_path", abs);
+        form.append("is_public", String(opts.isPublic));
+        return fetch(`${BASE}/api/docs`, { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: form });
+      }
+    : (token: string) =>
+        fetch(`${BASE}/api/docs`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            content: bytes.toString("utf8"),
+            file_path: opts.forceNew ? undefined : abs,
+            is_public: opts.isPublic,
+          }),
+        });
 
   let token = await getToken();
   let r = await post(token);
@@ -145,9 +168,9 @@ function parseArgs(argv: string[]): {
 
 function printHelp() {
   process.stderr.write(
-    `pipeit-upload — upload a markdown file to pipeit.live\n\n` +
+    `pipeit-upload — upload a markdown / text / HTML / PDF file to pipeit.live\n\n` +
       `Usage:\n` +
-      `  pipeit-upload [--public] [--new] <file.md>\n` +
+      `  pipeit-upload [--public] [--new] <file>\n` +
       `  pipeit-upload --logout\n\n` +
       `Flags:\n` +
       `  --public   make the doc publicly shareable\n` +

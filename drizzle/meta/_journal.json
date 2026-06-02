@@ -8,6 +8,13 @@
       "when": 1776117581157,
       "tag": "0000_harsh_red_skull",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780435915325,
+      "tag": "0001_multi_format",
+      "breakpoints": true
     }
   ]
 }

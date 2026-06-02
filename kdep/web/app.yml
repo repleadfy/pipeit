@@ -37,4 +37,4 @@ domains:
   - pipeit.live
 ingress_annotations:
   cert-manager.io/cluster-issuer: letsencrypt
-  nginx.ingress.kubernetes.io/proxy-body-size: "2m"
+  nginx.ingress.kubernetes.io/proxy-body-size: "26m"

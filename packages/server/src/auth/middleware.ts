@@ -9,9 +9,10 @@ declare module "hono" {
 }
 
 export async function authMiddleware(c: Context, next: Next) {
-  // Allow public doc access: GET /api/docs/:slug (except "latest" which needs auth)
+  // Allow public doc access: GET /api/docs/:slug and /api/docs/:slug/raw
+  // (except "latest" which needs auth). Per-doc visibility is enforced in the handler.
   const path = new URL(c.req.url).pathname;
-  if (c.req.method === "GET" && /^\/api\/docs\/[^/]+$/.test(path) && !path.endsWith("/latest")) {
+  if (c.req.method === "GET" && /^\/api\/docs\/[^/]+(\/raw)?$/.test(path) && !path.endsWith("/latest")) {
     const token = getCookie(c, "token") ?? c.req.header("Authorization")?.replace("Bearer ", "");
     if (token) {
       try {
