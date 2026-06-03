@@ -1,5 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../lib/auth.js";
+import { LoadingScreen } from "./LoadingScreen.js";
 
 export function ProtectedRoute({
   children,
@@ -9,7 +10,7 @@ export function ProtectedRoute({
   fallback?: React.ReactNode;
 }) {
   const { user, loading } = useAuth();
-  if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  if (loading) return <LoadingScreen />;
   if (!user) return <>{fallback}</>;
   return <>{children}</>;
 }

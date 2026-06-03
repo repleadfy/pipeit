@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
+import { LoadingScreen } from "../components/LoadingScreen.js";
 import { useAuth } from "../lib/auth.js";
 
 export function LoginPage() {
@@ -10,7 +11,7 @@ export function LoginPage() {
   const rawReturnTo = searchParams.get("return_to") || "/";
   const returnTo = /^\/(?![/\\])/.test(rawReturnTo) ? rawReturnTo : "/";
 
-  if (loading) return null;
+  if (loading) return <LoadingScreen />;
   if (user) return <Navigate to={returnTo} replace />;
 
   return (
