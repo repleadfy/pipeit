@@ -22,7 +22,11 @@ export function HtmlRenderer({ content }: { content: string }) {
     const resize = () => {
       try {
         const doc = iframe.contentDocument;
-        if (doc) setHeight(doc.documentElement.scrollHeight + 24);
+        // Measure <body>, not <html>: the documentElement stretches to fill the
+        // iframe's current height, so measuring it ratchets up and never shrinks,
+        // leaving an empty box under short docs. body wraps the actual content.
+        const content = doc?.body?.scrollHeight ?? doc?.documentElement.scrollHeight;
+        if (content) setHeight(content + 24);
       } catch {
         /* measurement blocked — keep fallback height */
       }
