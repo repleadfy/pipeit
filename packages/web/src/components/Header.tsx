@@ -18,7 +18,7 @@ export function Header({ onToggleTOC, onToggleSearch, theme, onToggleTheme }: He
       <button
         type="button"
         onClick={onToggleTOC}
-        className="px-2 py-1 rounded text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800 transition"
+        className="lg:hidden px-2 py-1 rounded text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800 transition"
       >
         &#9776; TOC
       </button>

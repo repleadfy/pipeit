@@ -83,27 +83,29 @@ export function DocPage() {
         theme={theme}
         onToggleTheme={toggleTheme}
       />
-      <TOCSidebar open={tocOpen} onClose={() => setTocOpen(false)} />
       <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} />
-      <main
-        className={`${doc.format === "pdf" || doc.format === "html" ? "max-w-5xl" : "max-w-3xl"} mx-auto px-4 py-8`}
-      >
-        <h1 className="text-3xl font-bold mb-2">{doc.title}</h1>
-        <p className="text-sm text-gray-500 mb-8">
-          v{doc.version} &middot; {new Date(doc.updated_at).toLocaleDateString()}
-        </p>
-        {doc.format === "pdf" ? (
-          <Suspense fallback={<p className="text-gray-400">Loading PDF viewer…</p>}>
-            <PdfRenderer slug={doc.slug} />
-          </Suspense>
-        ) : doc.format === "html" ? (
-          <HtmlRenderer content={doc.content} />
-        ) : doc.format === "txt" ? (
-          <TxtRenderer content={doc.content} />
-        ) : (
-          <MarkdownRenderer content={doc.content.replace(/^#\s+.+\n?/, "")} />
-        )}
-      </main>
+      <div className="mx-auto max-w-7xl px-4 py-8 lg:flex lg:gap-8 lg:items-start">
+        <TOCSidebar open={tocOpen} onClose={() => setTocOpen(false)} />
+        <main
+          className={`w-full mx-auto ${doc.format === "pdf" || doc.format === "html" ? "lg:max-w-5xl" : "lg:max-w-3xl"}`}
+        >
+          <h1 className="text-3xl font-bold mb-2">{doc.title}</h1>
+          <p className="text-sm text-gray-500 mb-8">
+            v{doc.version} &middot; {new Date(doc.updated_at).toLocaleDateString()}
+          </p>
+          {doc.format === "pdf" ? (
+            <Suspense fallback={<p className="text-gray-400">Loading PDF viewer…</p>}>
+              <PdfRenderer slug={doc.slug} />
+            </Suspense>
+          ) : doc.format === "html" ? (
+            <HtmlRenderer content={doc.content} />
+          ) : doc.format === "txt" ? (
+            <TxtRenderer content={doc.content} />
+          ) : (
+            <MarkdownRenderer content={doc.content.replace(/^#\s+.+\n?/, "")} />
+          )}
+        </main>
+      </div>
       <ReadingProgress />
     </div>
   );

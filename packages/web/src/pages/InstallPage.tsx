@@ -14,15 +14,13 @@ function Block({ label, code, recommended }: { label: string; code: string; reco
             recommended
           </span>
         )}
-      </div>
-      <div className="relative">
-        <pre className="rounded-lg bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-3 pr-16 text-sm overflow-x-auto">
-          <code>{code}</code>
-        </pre>
-        <div className="absolute top-2 right-2">
+        <div className="ml-auto">
           <CopyButton text={code} />
         </div>
       </div>
+      <pre className="rounded-lg bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-3 text-sm overflow-x-auto">
+        <code>{code}</code>
+      </pre>
     </section>
   );
 }
