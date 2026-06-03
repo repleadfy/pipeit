@@ -56,7 +56,21 @@ export function DocPage() {
               to="/upload"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-accent hover:opacity-90 text-on-accent text-sm font-semibold transition"
             >
-              &#128228; Upload a file
+              <svg
+                width={16}
+                height={16}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M12 15V4M12 4 8 8M12 4l4 4" />
+                <path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />
+              </svg>
+              Upload a file
             </Link>
           </div>
         </div>

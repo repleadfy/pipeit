@@ -4,6 +4,36 @@ import type { Skin } from "../hooks/useTheme.js";
 import { useAuth } from "../lib/auth.js";
 import { ThemePicker } from "./ThemePicker.js";
 
+const iconProps = {
+  width: 16,
+  height: 16,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.5,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+  "aria-hidden": true,
+};
+
+function UploadIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M12 15V4M12 4 8 8M12 4l4 4" />
+      <path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />
+    </svg>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg {...iconProps}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+    </svg>
+  );
+}
+
 interface HeaderProps {
   onToggleTOC: () => void;
   onToggleSearch: () => void;
@@ -54,11 +84,12 @@ export function Header({ onToggleTOC, onToggleSearch, theme, onToggleTheme, skin
       <div className="flex items-center gap-1">
         {user && (
           <Link to="/upload" className={`hidden sm:inline-flex ${ghost}`} aria-label="Upload a document">
-            &#128228; Upload
+            <UploadIcon />
+            Upload
           </Link>
         )}
         <button type="button" onClick={onToggleSearch} className={ghost} aria-label="Search your docs">
-          &#x1F50D;
+          <SearchIcon />
           <kbd className="hidden sm:inline text-[11px] text-muted bg-surface px-1.5 py-0.5 rounded border border-hair">
             &#x2318;K
           </kbd>
