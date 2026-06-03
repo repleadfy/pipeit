@@ -149,26 +149,6 @@
     color: var(--pi-ink);
   }
 
-  /* Theme the Typography plugin via its own vars — skin + mode aware,
-     so dark:prose-invert is unnecessary. */
-  .prose {
-    --tw-prose-body: var(--pi-ink);
-    --tw-prose-headings: var(--pi-ink);
-    --tw-prose-links: var(--pi-accent);
-    --tw-prose-bold: var(--pi-ink);
-    --tw-prose-code: var(--pi-accent);
-    --tw-prose-quotes: var(--pi-muted);
-    --tw-prose-quote-borders: var(--pi-accent);
-    --tw-prose-hr: var(--pi-hair);
-    --tw-prose-th-borders: var(--pi-hair);
-    --tw-prose-td-borders: var(--pi-hair);
-    --tw-prose-pre-bg: var(--pi-raise);
-    --tw-prose-pre-code: var(--pi-code-ink);
-    --tw-prose-counters: var(--pi-muted);
-    --tw-prose-bullets: var(--pi-hair);
-    --tw-prose-captions: var(--pi-muted);
-    font-family: var(--pi-font-prose);
-  }
   .prose :is(h1, h2, h3, h4) {
     font-family: var(--pi-font-heading);
   }
@@ -180,4 +160,28 @@
   .prose :where(code):not(:where(pre *))::after {
     content: none;
   }
+}
+
+/* Theme the Typography plugin via its own vars — skin + mode aware, so
+   dark:prose-invert is unnecessary. MUST stay unlayered: the plugin emits its
+   own --tw-prose-* defaults (dark oklch values) into a later cascade layer, so
+   an @layer base override loses to them and dark-mode prose text (h2–h4, bold,
+   code, blockquote, th) renders nearly invisible. Unlayered CSS wins. */
+.prose {
+  --tw-prose-body: var(--pi-ink);
+  --tw-prose-headings: var(--pi-ink);
+  --tw-prose-links: var(--pi-accent);
+  --tw-prose-bold: var(--pi-ink);
+  --tw-prose-code: var(--pi-accent);
+  --tw-prose-quotes: var(--pi-muted);
+  --tw-prose-quote-borders: var(--pi-accent);
+  --tw-prose-hr: var(--pi-hair);
+  --tw-prose-th-borders: var(--pi-hair);
+  --tw-prose-td-borders: var(--pi-hair);
+  --tw-prose-pre-bg: var(--pi-raise);
+  --tw-prose-pre-code: var(--pi-code-ink);
+  --tw-prose-counters: var(--pi-muted);
+  --tw-prose-bullets: var(--pi-hair);
+  --tw-prose-captions: var(--pi-muted);
+  font-family: var(--pi-font-prose);
 }
