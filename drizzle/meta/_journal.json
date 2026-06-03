@@ -15,6 +15,13 @@
       "when": 1780435915325,
       "tag": "0001_multi_format",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780492842536,
+      "tag": "0002_fts_search_vector",
+      "breakpoints": true
     }
   ]
 }

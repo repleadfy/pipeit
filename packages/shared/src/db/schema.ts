@@ -1,3 +1,4 @@
+import { sql, type SQL } from "drizzle-orm";
 import {
   boolean,
   customType,
@@ -15,6 +16,12 @@ import {
 const bytea = customType<{ data: Buffer; driverData: Buffer }>({
   dataType() {
     return "bytea";
+  },
+});
+
+const tsvector = customType<{ data: string; driverData: string }>({
+  dataType() {
+    return "tsvector";
   },
 });
 
@@ -62,8 +69,17 @@ export const docs = pgTable(
     isPublic: boolean("is_public").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    // Full-text search vector: title weighted A (highest), body content B.
+    // Generated/stored so it stays in sync with title/content automatically.
+    searchVector: tsvector("search_vector").generatedAlwaysAs(
+      (): SQL =>
+        sql`setweight(to_tsvector('english', coalesce(title, '')), 'A') || setweight(to_tsvector('english', coalesce(content, '')), 'B')`,
+    ),
   },
-  (table) => [index("docs_user_id_file_path_idx").on(table.userId, table.filePath)],
+  (table) => [
+    index("docs_user_id_file_path_idx").on(table.userId, table.filePath),
+    index("docs_search_idx").using("gin", table.searchVector),
+  ],
 );
 
 // Binary payloads (currently PDFs). One row per doc; text formats keep their

@@ -1,7 +1,7 @@
 import { type DocFormat, detectFormat, extractTitle } from "@pipeit/shared";
 import { db } from "@pipeit/shared/db";
 import { docBlobs, docs, readingPositions } from "@pipeit/shared/db/schema";
-import { and, eq, ilike, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { nanoid } from "nanoid";
 import { env } from "../env.js";
@@ -170,6 +170,12 @@ docsRouter.get("/", async (c) => {
   const readState = c.req.query("read_state");
   const visibility = c.req.query("visibility");
 
+  // Full-text search across title (weight A) + content (weight B) via the
+  // generated search_vector. websearch_to_tsquery safely parses raw user input
+  // (no thrown syntax errors), and ts_rank orders by relevance — title hits
+  // outrank body hits, ties broken by recency.
+  const tsQuery = q?.trim() ? sql`websearch_to_tsquery('english', ${q})` : null;
+
   const userDocs = await db
     .select({
       slug: docs.slug,
@@ -185,12 +191,14 @@ docsRouter.get("/", async (c) => {
     .where(
       and(
         eq(docs.userId, userId),
-        q ? ilike(docs.title, `%${q}%`) : undefined,
+        tsQuery ? sql`${docs.searchVector} @@ ${tsQuery}` : undefined,
         visibility === "public" ? eq(docs.isPublic, true) : undefined,
         visibility === "private" ? eq(docs.isPublic, false) : undefined,
       ),
     )
-    .orderBy(sql`${docs.updatedAt} DESC`);
+    .orderBy(
+      tsQuery ? sql`ts_rank(${docs.searchVector}, ${tsQuery}) DESC, ${docs.updatedAt} DESC` : sql`${docs.updatedAt} DESC`,
+    );
 
   let filtered = userDocs;
   if (readState === "not_started") filtered = userDocs.filter((d) => d.readPct === null || d.readPct === 0);
