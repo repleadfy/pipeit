@@ -10,5 +10,7 @@ createRoot(document.getElementById("root")!).render(
 );
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/src/sw.ts", { type: "module" });
+  // Dev: Vite transforms TS on the fly. Prod: esbuild emits dist/sw.js at root scope.
+  const swUrl = import.meta.env.DEV ? "/src/sw.ts" : "/sw.js";
+  navigator.serviceWorker.register(swUrl, { type: "module" });
 }

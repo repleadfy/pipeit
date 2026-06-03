@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 declare const self: ServiceWorkerGlobalScope;
 
-const CACHE_NAME = "pipeit-v1";
+const CACHE_NAME = "pipeit-v2";
 const SHELL_URLS = ["/", "/index.html"];
 
 self.addEventListener("install", (event) => {
@@ -17,8 +17,26 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.url.includes("/api/")) return;
-  event.respondWith(caches.match(event.request).then((cached) => cached ?? fetch(event.request)));
+  const { request } = event;
+  if (request.url.includes("/api/")) return;
+
+  // Network-first for navigations: deploys ship a fresh HTML shell instead of
+  // trapping users on a stale cached index. Falls back to cache when offline.
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put("/index.html", copy));
+          return res;
+        })
+        .catch(() => caches.match(request).then((c) => c ?? caches.match("/index.html")) as Promise<Response>),
+    );
+    return;
+  }
+
+  // Cache-first for hashed static assets (immutable → safe to serve from cache).
+  event.respondWith(caches.match(request).then((cached) => cached ?? fetch(request)));
 });
 
 self.addEventListener("push", (event) => {

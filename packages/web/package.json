@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && esbuild src/sw.ts --bundle --format=esm --minify --target=es2020 --outfile=dist/sw.js",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -37,6 +37,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^6.0.0",
+    "esbuild": "^0.27.7",
     "jsdom": "^25",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
