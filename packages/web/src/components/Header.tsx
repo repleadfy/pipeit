@@ -13,12 +13,11 @@ const iconProps = {
   strokeWidth: 1.5,
   strokeLinecap: "round" as const,
   strokeLinejoin: "round" as const,
-  "aria-hidden": true,
 };
 
 function UploadIcon() {
   return (
-    <svg {...iconProps}>
+    <svg {...iconProps} aria-hidden="true">
       <path d="M12 15V4M12 4 8 8M12 4l4 4" />
       <path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />
     </svg>
@@ -27,7 +26,7 @@ function UploadIcon() {
 
 function SearchIcon() {
   return (
-    <svg {...iconProps}>
+    <svg {...iconProps} aria-hidden="true">
       <circle cx="11" cy="11" r="7" />
       <path d="m20 20-3.5-3.5" />
     </svg>

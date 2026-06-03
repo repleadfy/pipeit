@@ -197,7 +197,9 @@ docsRouter.get("/", async (c) => {
       ),
     )
     .orderBy(
-      tsQuery ? sql`ts_rank(${docs.searchVector}, ${tsQuery}) DESC, ${docs.updatedAt} DESC` : sql`${docs.updatedAt} DESC`,
+      tsQuery
+        ? sql`ts_rank(${docs.searchVector}, ${tsQuery}) DESC, ${docs.updatedAt} DESC`
+        : sql`${docs.updatedAt} DESC`,
     );
 
   let filtered = userDocs;
