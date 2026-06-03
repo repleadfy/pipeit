@@ -46,6 +46,13 @@ export function DocPage() {
             <pre className="text-left bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-gray-300 overflow-x-auto">
               npx pipeit push README.md
             </pre>
+            <p className="text-gray-500 text-sm">or</p>
+            <Link
+              to="/upload"
+              className="inline-block px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium"
+            >
+              &#128228; Upload a file
+            </Link>
           </div>
         </div>
       );

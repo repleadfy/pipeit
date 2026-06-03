@@ -1,0 +1,157 @@
+import { useCallback, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
+const ACCEPT = ".md,.markdown,.txt,.text,.html,.htm,.pdf";
+const ACCEPT_HINT = "Markdown, text, HTML, or PDF";
+const MAX_BYTES = 25_000_000;
+
+type Item = {
+  id: number;
+  name: string;
+  status: "uploading" | "done" | "error";
+  url?: string;
+  slug?: string;
+  error?: string;
+};
+
+let nextItemId = 0;
+
+// Everything goes through the multipart endpoint — the server auto-detects format
+// (PDF magic bytes / extension / HTML sniff) and reads text files as UTF-8. One
+// code path for all formats.
+async function uploadFile(file: File, isPublic: boolean): Promise<{ slug: string; url: string }> {
+  const form = new FormData();
+  form.append("file", file);
+  form.append("file_path", file.name);
+  form.append("is_public", String(isPublic));
+  const res = await fetch("/api/docs", { method: "POST", credentials: "include", body: form });
+  if (!res.ok) {
+    const body = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(body.error ?? `HTTP ${res.status}`);
+  }
+  return res.json() as Promise<{ slug: string; url: string }>;
+}
+
+export function UploadPage() {
+  const navigate = useNavigate();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = useState(false);
+  const [isPublic, setIsPublic] = useState(false);
+  const [items, setItems] = useState<Item[]>([]);
+
+  const handleFiles = useCallback(
+    async (files: FileList | File[]) => {
+      const list = Array.from(files);
+      if (list.length === 0) return;
+
+      for (const file of list) {
+        const id = nextItemId++;
+        if (file.size > MAX_BYTES) {
+          setItems((prev) => [...prev, { id, name: file.name, status: "error", error: "exceeds 25MB limit" }]);
+          continue;
+        }
+        setItems((prev) => [...prev, { id, name: file.name, status: "uploading" }]);
+        try {
+          const { slug, url } = await uploadFile(file, isPublic);
+          setItems((prev) => prev.map((it) => (it.id === id ? { ...it, status: "done", url, slug } : it)));
+          // Single-file upload → jump straight to the doc.
+          if (list.length === 1) navigate(`/d/${slug}`);
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : "upload failed";
+          setItems((prev) => prev.map((it) => (it.id === id ? { ...it, status: "error", error: msg } : it)));
+        }
+      }
+    },
+    [isPublic, navigate],
+  );
+
+  const onDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragging(false);
+      if (e.dataTransfer.files?.length) handleFiles(e.dataTransfer.files);
+    },
+    [handleFiles],
+  );
+
+  return (
+    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+      <header className="sticky top-0 z-40 flex items-center justify-between px-4 py-2 bg-white/80 dark:bg-gray-950/80 backdrop-blur border-b border-gray-200 dark:border-gray-800">
+        <Link
+          to="/d/latest"
+          className="px-2 py-1 rounded text-sm text-gray-500 hover:text-gray-900 dark:hover:text-gray-100"
+        >
+          &larr; Back
+        </Link>
+        <span className="text-sm font-semibold">Upload</span>
+        <span className="w-12" />
+      </header>
+
+      <main className="max-w-2xl mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold mb-2">Upload a document</h1>
+        <p className="text-sm text-gray-500 mb-6">{ACCEPT_HINT} — up to 25 MB.</p>
+
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={onDrop}
+          className={`w-full rounded-2xl border-2 border-dashed px-6 py-16 text-center transition cursor-pointer ${
+            dragging
+              ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30"
+              : "border-gray-300 dark:border-gray-700 hover:border-indigo-400"
+          }`}
+        >
+          <div className="text-4xl mb-3">&#128228;</div>
+          <p className="text-base font-medium">Tap to choose a file</p>
+          <p className="text-sm text-gray-500 mt-1">or drag &amp; drop it here</p>
+          <input
+            ref={inputRef}
+            type="file"
+            accept={ACCEPT}
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files) handleFiles(e.target.files);
+              e.target.value = "";
+            }}
+          />
+        </button>
+
+        <label className="flex items-center gap-2 mt-4 text-sm text-gray-600 dark:text-gray-300 select-none">
+          <input
+            type="checkbox"
+            checked={isPublic}
+            onChange={(e) => setIsPublic(e.target.checked)}
+            className="w-4 h-4"
+          />
+          Make uploaded documents public (shareable by link)
+        </label>
+
+        {items.length > 0 && (
+          <ul className="mt-8 space-y-2">
+            {items.map((it) => (
+              <li
+                key={it.id}
+                className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 dark:border-gray-800 px-4 py-3 text-sm"
+              >
+                <span className="truncate">{it.name}</span>
+                {it.status === "uploading" && <span className="text-gray-400 shrink-0">Uploading…</span>}
+                {it.status === "done" && it.slug && (
+                  <Link to={`/d/${it.slug}`} className="text-indigo-500 hover:text-indigo-400 shrink-0">
+                    Open →
+                  </Link>
+                )}
+                {it.status === "error" && <span className="text-red-500 shrink-0">{it.error}</span>}
+              </li>
+            ))}
+          </ul>
+        )}
+      </main>
+    </div>
+  );
+}

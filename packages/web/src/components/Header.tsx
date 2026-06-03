@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../lib/auth.js";
 
 interface HeaderProps {
@@ -22,6 +23,15 @@ export function Header({ onToggleTOC, onToggleSearch, theme, onToggleTheme }: He
         &#9776; TOC
       </button>
       <div className="flex items-center gap-2">
+        {user && (
+          <Link
+            to="/upload"
+            className="px-2 py-1 rounded text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800 transition"
+            aria-label="Upload a document"
+          >
+            &#128228; Upload
+          </Link>
+        )}
         <button
           type="button"
           onClick={onToggleSearch}

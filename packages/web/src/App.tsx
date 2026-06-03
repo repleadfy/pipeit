@@ -6,6 +6,7 @@ import { DocPage } from "./pages/DocPage.js";
 import { InstallPage } from "./pages/InstallPage.js";
 import { LoginPage } from "./pages/LoginPage.js";
 import { NotFoundPage } from "./pages/NotFoundPage.js";
+import { UploadPage } from "./pages/UploadPage.js";
 
 export function App() {
   return (
@@ -15,6 +16,14 @@ export function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/install" element={<InstallPage />} />
           <Route path="/d/:slug" element={<DocPage />} />
+          <Route
+            path="/upload"
+            element={
+              <ProtectedRoute>
+                <UploadPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/mcp/consent" element={<ConsentPage />} />
           <Route
             path="/"
