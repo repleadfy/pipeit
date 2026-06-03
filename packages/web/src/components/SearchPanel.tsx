@@ -65,8 +65,50 @@ export function SearchPanel({ open, onClose }: { open: boolean; onClose: () => v
             className="w-full px-3 py-2 rounded-lg bg-raise border border-hair text-sm text-ink placeholder:text-muted focus:outline-none focus:border-accent"
           />
           <div className="flex gap-2">
-            <CycleFilter label="📖" options={READ_STATES} value={readState} onChange={setReadState} />
-            <CycleFilter label="🔒" options={VISIBILITY} value={visibility} onChange={setVisibility} />
+            <CycleFilter
+              label={
+                <svg
+                  width={13}
+                  height={13}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M12 6.5C10.5 5 8 4.5 4 4.5v13c4 0 6.5.5 8 2 1.5-1.5 4-2 8-2v-13c-4 0-6.5.5-8 2Z" />
+                  <path d="M12 6.5v13" />
+                </svg>
+              }
+              name="Read state"
+              options={READ_STATES}
+              value={readState}
+              onChange={setReadState}
+            />
+            <CycleFilter
+              label={
+                <svg
+                  width={13}
+                  height={13}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <rect x="5" y="11" width="14" height="9" rx="2" />
+                  <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                </svg>
+              }
+              name="Visibility"
+              options={VISIBILITY}
+              value={visibility}
+              onChange={setVisibility}
+            />
           </div>
         </div>
         <div className="flex-1 overflow-y-auto p-3">

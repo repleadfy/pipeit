@@ -1,11 +1,16 @@
+import type { ReactNode } from "react";
+
 interface CycleFilterProps {
-  label: string;
+  /** Visual prefix (icon or text). */
+  label: ReactNode;
+  /** Plain-text name used for the tooltip and accessible label. */
+  name: string;
   options: string[];
   value: string;
   onChange: (value: string) => void;
 }
 
-export function CycleFilter({ label, options, value, onChange }: CycleFilterProps) {
+export function CycleFilter({ label, name, options, value, onChange }: CycleFilterProps) {
   const idx = options.indexOf(value);
   const next = options[(idx + 1) % options.length];
   const active = value !== options[0];
@@ -14,7 +19,8 @@ export function CycleFilter({ label, options, value, onChange }: CycleFilterProp
     <button
       type="button"
       onClick={() => onChange(next)}
-      title={`${label}: ${value} (tap to cycle)`}
+      title={`${name}: ${value} (tap to cycle)`}
+      aria-label={`${name}: ${value}. Tap to cycle.`}
       className={`inline-flex items-center gap-1 min-h-9 px-2.5 rounded-lg text-xs font-medium transition ${
         active
           ? "bg-accent-soft text-accent border border-accent/40"
