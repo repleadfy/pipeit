@@ -23,9 +23,14 @@ export function DocPage() {
   const [tocOpen, setTocOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const toggleSearch = useCallback(() => setSearchOpen((v) => !v), []);
+  const closeOverlays = useCallback(() => {
+    setTocOpen(false);
+    setSearchOpen(false);
+  }, []);
   useKeyboard("k", true, toggleSearch);
+  useKeyboard("Escape", false, closeOverlays);
   useReadingPosition(slug);
-  const { theme, toggle: toggleTheme } = useTheme();
+  const { theme, toggle: toggleTheme, skin, setSkin } = useTheme();
 
   useEffect(() => {
     if (!slug) return;
@@ -37,19 +42,19 @@ export function DocPage() {
   if (error) {
     if (error === "no_docs")
       return (
-        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-          <div className="text-center space-y-4 max-w-md">
-            <h1 className="text-2xl font-bold">Welcome to pipeit</h1>
-            <p className="text-gray-400">
+        <div className="min-h-screen flex items-center justify-center bg-app text-ink px-6">
+          <div className="text-center space-y-5 max-w-md">
+            <h1 className="font-heading text-3xl font-bold">Welcome to pipeit</h1>
+            <p className="text-muted">
               You don't have any documents yet. Push your first markdown file to get started:
             </p>
-            <pre className="text-left bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-gray-300 overflow-x-auto">
+            <pre className="text-left bg-raise border border-hair rounded-card p-4 text-sm font-mono text-ink overflow-x-auto">
               npx pipeit push README.md
             </pre>
-            <p className="text-gray-500 text-sm">or</p>
+            <p className="text-muted text-sm">or</p>
             <Link
               to="/upload"
-              className="inline-block px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-accent hover:opacity-90 text-on-accent text-sm font-semibold transition"
             >
               &#128228; Upload a file
             </Link>
@@ -57,10 +62,10 @@ export function DocPage() {
         </div>
       );
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+      <div className="min-h-screen flex items-center justify-center bg-app text-ink px-6">
         <div className="text-center">
-          <p className="text-gray-400 mb-4">{error === "not found" ? "Document not found" : error}</p>
-          <Link to="/" className="text-indigo-400 hover:text-indigo-300 text-sm">
+          <p className="text-muted mb-4">{error === "not found" ? "Document not found" : error}</p>
+          <Link to="/" className="text-accent hover:opacity-80 text-sm font-medium">
             Back to home
           </Link>
         </div>
@@ -70,18 +75,21 @@ export function DocPage() {
 
   if (!doc)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-        <p className="text-gray-400">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-app text-ink">
+        <p className="text-muted">Loading...</p>
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-app text-ink">
       <Header
         onToggleTOC={() => setTocOpen(!tocOpen)}
         onToggleSearch={() => setSearchOpen(!searchOpen)}
         theme={theme}
         onToggleTheme={toggleTheme}
+        skin={skin}
+        setSkin={setSkin}
+        docTitle={doc.title}
       />
       <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} />
       <div className="mx-auto max-w-7xl px-4 py-8 lg:flex lg:gap-8 lg:items-start">
@@ -89,12 +97,12 @@ export function DocPage() {
         <main
           className={`w-full mx-auto ${doc.format === "pdf" || doc.format === "html" ? "lg:max-w-5xl" : "lg:max-w-3xl"}`}
         >
-          <h1 className="text-3xl font-bold mb-2">{doc.title}</h1>
-          <p className="text-sm text-gray-500 mb-8">
+          <h1 className="font-heading text-4xl font-bold leading-tight tracking-tight mb-2">{doc.title}</h1>
+          <p className="text-sm text-muted mb-10">
             v{doc.version} &middot; {new Date(doc.updated_at).toLocaleDateString()}
           </p>
           {doc.format === "pdf" ? (
-            <Suspense fallback={<p className="text-gray-400">Loading PDF viewer…</p>}>
+            <Suspense fallback={<p className="text-muted">Loading PDF viewer…</p>}>
               <PdfRenderer slug={doc.slug} />
             </Suspense>
           ) : doc.format === "html" ? (

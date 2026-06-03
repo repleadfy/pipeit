@@ -45,8 +45,8 @@ export function HtmlRenderer({ content }: { content: string }) {
         className="w-full border-0 bg-white"
         style={{ height }}
       />
-      <p className="mt-4 text-sm text-gray-500">
-        <a href={objectUrl} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300">
+      <p className="mt-4 text-sm text-muted">
+        <a href={objectUrl} target="_blank" rel="noreferrer" className="text-accent hover:opacity-80">
           Open original HTML ↗
         </a>
       </p>

@@ -43,23 +43,23 @@ export function ConsentPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-      <div className="w-full max-w-md space-y-6 p-8 rounded-xl border border-gray-200 dark:border-gray-800">
-        <h1 className="text-xl font-bold">Authorize access</h1>
-        {error && <p className="text-sm text-red-500">{error}</p>}
+    <div className="min-h-screen flex items-center justify-center bg-app text-ink px-6">
+      <div className="w-full max-w-md space-y-6 p-8 rounded-card border border-hair bg-surface">
+        <h1 className="font-heading text-xl font-bold">Authorize access</h1>
+        {error && <p className="text-sm text-bad">{error}</p>}
         {info && (
           <>
-            <p className="text-gray-700 dark:text-gray-300">
+            <p className="text-ink/90">
               <span className="font-medium">{info.client_name}</span> is requesting permission to upload markdown to
               your pipeit account.
             </p>
-            <p className="text-xs text-gray-500">Request issued {new Date(info.issued_at).toLocaleString()}</p>
+            <p className="text-xs text-muted">Request issued {new Date(info.issued_at).toLocaleString()}</p>
             <div className="flex gap-3 pt-2">
               <button
                 type="button"
                 disabled={submitting}
                 onClick={() => decide("allow")}
-                className="flex-1 py-2.5 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-500 disabled:opacity-50"
+                className="flex-1 py-2.5 rounded-lg bg-accent text-on-accent font-semibold hover:opacity-90 disabled:opacity-50"
               >
                 Allow
               </button>
@@ -67,7 +67,7 @@ export function ConsentPage() {
                 type="button"
                 disabled={submitting}
                 onClick={() => decide("deny")}
-                className="flex-1 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-800 font-medium hover:bg-gray-300 dark:hover:bg-gray-700 disabled:opacity-50"
+                className="flex-1 py-2.5 rounded-lg bg-raise border border-hair font-medium hover:text-ink disabled:opacity-50"
               >
                 Deny
               </button>

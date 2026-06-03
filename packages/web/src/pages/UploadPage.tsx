@@ -75,11 +75,11 @@ export function UploadPage() {
   );
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-      <header className="sticky top-0 z-40 flex items-center justify-between px-4 py-2 bg-white/80 dark:bg-gray-950/80 backdrop-blur border-b border-gray-200 dark:border-gray-800">
+    <div className="min-h-screen bg-app text-ink">
+      <header className="sticky top-0 z-40 flex items-center justify-between px-4 py-2 bg-app/80 backdrop-blur border-b border-hair">
         <Link
           to="/d/latest"
-          className="px-2 py-1 rounded text-sm text-gray-500 hover:text-gray-900 dark:hover:text-gray-100"
+          className="inline-flex items-center min-h-9 px-2.5 rounded-lg text-sm font-medium text-muted hover:text-ink hover:bg-raise transition"
         >
           &larr; Back
         </Link>
@@ -87,9 +87,9 @@ export function UploadPage() {
         <span className="w-12" />
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-2">Upload a document</h1>
-        <p className="text-sm text-gray-500 mb-6">{ACCEPT_HINT} — up to 25 MB.</p>
+      <main className="max-w-2xl mx-auto px-4 py-10">
+        <h1 className="font-heading text-3xl font-bold mb-2">Upload a document</h1>
+        <p className="text-sm text-muted mb-6">{ACCEPT_HINT} — up to 25 MB.</p>
 
         <button
           type="button"
@@ -101,14 +101,12 @@ export function UploadPage() {
           onDragLeave={() => setDragging(false)}
           onDrop={onDrop}
           className={`w-full rounded-2xl border-2 border-dashed px-6 py-16 text-center transition cursor-pointer ${
-            dragging
-              ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30"
-              : "border-gray-300 dark:border-gray-700 hover:border-indigo-400"
+            dragging ? "border-accent bg-accent-soft" : "border-hair hover:border-accent"
           }`}
         >
           <div className="text-4xl mb-3">&#128228;</div>
           <p className="text-base font-medium">Tap to choose a file</p>
-          <p className="text-sm text-gray-500 mt-1">or drag &amp; drop it here</p>
+          <p className="text-sm text-muted mt-1">or drag &amp; drop it here</p>
           <input
             ref={inputRef}
             type="file"
@@ -122,12 +120,12 @@ export function UploadPage() {
           />
         </button>
 
-        <label className="flex items-center gap-2 mt-4 text-sm text-gray-600 dark:text-gray-300 select-none">
+        <label className="flex items-center gap-3 mt-4 min-h-11 text-sm text-muted select-none cursor-pointer">
           <input
             type="checkbox"
             checked={isPublic}
             onChange={(e) => setIsPublic(e.target.checked)}
-            className="w-4 h-4"
+            className="w-5 h-5 accent-[var(--pi-accent)]"
           />
           Make uploaded documents public (shareable by link)
         </label>
@@ -137,16 +135,16 @@ export function UploadPage() {
             {items.map((it) => (
               <li
                 key={it.id}
-                className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 dark:border-gray-800 px-4 py-3 text-sm"
+                className="flex items-center justify-between gap-3 rounded-lg border border-hair px-4 py-3 text-sm"
               >
                 <span className="truncate">{it.name}</span>
-                {it.status === "uploading" && <span className="text-gray-400 shrink-0">Uploading…</span>}
+                {it.status === "uploading" && <span className="text-muted shrink-0">Uploading…</span>}
                 {it.status === "done" && it.slug && (
-                  <Link to={`/d/${it.slug}`} className="text-indigo-500 hover:text-indigo-400 shrink-0">
+                  <Link to={`/d/${it.slug}`} className="text-accent hover:opacity-80 shrink-0 font-medium">
                     Open →
                   </Link>
                 )}
-                {it.status === "error" && <span className="text-red-500 shrink-0">{it.error}</span>}
+                {it.status === "error" && <span className="text-bad shrink-0">{it.error}</span>}
               </li>
             ))}
           </ul>

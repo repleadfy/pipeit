@@ -24,14 +24,14 @@ export function TOCSidebar({ open, onClose }: { open: boolean; onClose: () => vo
 
   const items = (onItemClick?: () => void) => (
     <>
-      <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">Contents</h2>
+      <h2 className="text-[11px] font-semibold tracking-[0.12em] uppercase text-muted mb-3">On this page</h2>
       {headings.map((h) => (
         <a
           key={h.id}
           href={`#${h.id}`}
           onClick={onItemClick}
-          className="block py-1 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition"
-          style={{ paddingLeft: `${(h.level - 1) * 12}px` }}
+          className="block py-1.5 text-sm text-muted hover:text-ink border-l-2 border-hair hover:border-accent transition"
+          style={{ paddingLeft: `${12 + (h.level - 1) * 12}px` }}
         >
           {h.text}
         </a>
@@ -42,7 +42,7 @@ export function TOCSidebar({ open, onClose }: { open: boolean; onClose: () => vo
   return (
     <>
       {/* Desktop: persistent sidebar in the left gutter */}
-      <nav className="hidden lg:block lg:w-56 lg:shrink-0 lg:sticky lg:top-16 lg:self-start lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
+      <nav className="hidden lg:block lg:w-56 lg:shrink-0 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
         {items()}
       </nav>
 
@@ -55,7 +55,18 @@ export function TOCSidebar({ open, onClose }: { open: boolean; onClose: () => vo
             onClick={onClose}
             className="fixed inset-0 bg-black/50 z-40 cursor-default"
           />
-          <nav className="fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-50 overflow-y-auto p-4 pt-16">
+          <nav className="fixed left-0 top-0 bottom-0 w-72 max-w-[80vw] bg-surface border-r border-hair z-50 overflow-y-auto p-4 pt-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-semibold tracking-[0.12em] uppercase text-muted">Contents</span>
+              <button
+                type="button"
+                aria-label="Close table of contents"
+                onClick={onClose}
+                className="min-h-9 min-w-9 -mr-1 inline-flex items-center justify-center rounded-lg text-muted hover:text-ink hover:bg-raise transition"
+              >
+                &#x2715;
+              </button>
+            </div>
             {items(onClose)}
           </nav>
         </div>

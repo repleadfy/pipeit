@@ -10,7 +10,7 @@ export function CopyButton({ text }: { text: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
       }}
-      className="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-700 transition"
+      className="text-xs font-medium px-2.5 py-1 rounded-lg bg-surface border border-hair text-muted hover:text-ink transition"
       aria-label={copied ? "Copied" : "Copy"}
     >
       {copied ? "Copied" : "Copy"}

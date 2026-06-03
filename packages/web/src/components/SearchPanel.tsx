@@ -42,33 +42,38 @@ export function SearchPanel({ open, onClose }: { open: boolean; onClose: () => v
         type="button"
         aria-label="Close search panel"
         onClick={onClose}
-        className="hidden md:block fixed inset-0 bg-black/30 z-40 cursor-default"
+        className="fixed inset-0 bg-black/40 z-40 cursor-default"
       />
-      <div className="fixed top-0 right-0 bottom-0 w-full md:w-96 bg-gray-900 border-l border-gray-800 z-50 flex flex-col">
-        <div className="p-3 border-b border-gray-800 space-y-2">
+      <div className="fixed top-0 right-0 bottom-0 w-full sm:w-[26rem] max-w-full bg-surface border-l border-hair z-50 flex flex-col shadow-xl">
+        <div className="p-3 border-b border-hair space-y-2.5">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-gray-200">Your Docs</h2>
-            <button type="button" onClick={onClose} className="text-sm text-gray-500 hover:text-gray-300">
+            <h2 className="text-sm font-semibold text-ink">Your Docs</h2>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+              className="min-h-9 min-w-9 inline-flex items-center justify-center rounded-lg text-muted hover:text-ink hover:bg-raise transition"
+            >
               &#x2715;
             </button>
           </div>
+          <input
+            type="text"
+            placeholder="Search docs..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg bg-raise border border-hair text-sm text-ink placeholder:text-muted focus:outline-none focus:border-accent"
+          />
           <div className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Search docs..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="flex-1 px-3 py-1.5 rounded-lg bg-gray-800 border border-gray-700 text-sm text-gray-100 placeholder-gray-500"
-            />
-            <CycleFilter options={READ_STATES} value={readState} onChange={setReadState} />
-            <CycleFilter options={VISIBILITY} value={visibility} onChange={setVisibility} />
+            <CycleFilter label="📖" options={READ_STATES} value={readState} onChange={setReadState} />
+            <CycleFilter label="🔒" options={VISIBILITY} value={visibility} onChange={setVisibility} />
           </div>
         </div>
         <div className="flex-1 overflow-y-auto p-3">
           {docs.map((doc) => (
             <DocListItem key={doc.slug} doc={doc} />
           ))}
-          {docs.length === 0 && <p className="text-sm text-gray-500 text-center mt-8">No docs found</p>}
+          {docs.length === 0 && <p className="text-sm text-muted text-center mt-8">No docs found</p>}
         </div>
       </div>
     </>

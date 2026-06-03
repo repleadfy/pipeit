@@ -8,13 +8,14 @@ import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 
-mermaid.initialize({ startOnLoad: false, theme: "dark" });
-
 function MermaidBlock({ code }: { code: string }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!ref.current) return;
+    // Match the active color mode so diagrams aren't dark-on-light.
+    const dark = document.documentElement.classList.contains("dark");
+    mermaid.initialize({ startOnLoad: false, theme: dark ? "dark" : "neutral" });
     const id = `mermaid-${Math.random().toString(36).slice(2)}`;
     mermaid.render(id, code).then(({ svg }) => {
       if (ref.current) ref.current.innerHTML = svg;
@@ -26,7 +27,7 @@ function MermaidBlock({ code }: { code: string }) {
 
 export function MarkdownRenderer({ content }: { content: string }) {
   return (
-    <article className="prose dark:prose-invert prose-gray max-w-none">
+    <article className="prose max-w-none">
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeHighlight, rehypeKatex, rehypeSlug, rehypeAutolinkHeadings]}

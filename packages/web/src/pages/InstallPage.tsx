@@ -8,17 +8,15 @@ function Block({ label, code, recommended }: { label: string; code: string; reco
   return (
     <section className="space-y-2">
       <div className="flex items-center gap-2">
-        <h2 className="font-semibold text-sm uppercase tracking-wide text-gray-600 dark:text-gray-400">{label}</h2>
+        <h2 className="font-semibold text-sm uppercase tracking-wide text-muted">{label}</h2>
         {recommended && (
-          <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200">
-            recommended
-          </span>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-accent-soft text-accent">recommended</span>
         )}
         <div className="ml-auto">
           <CopyButton text={code} />
         </div>
       </div>
-      <pre className="rounded-lg bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-3 text-sm overflow-x-auto">
+      <pre className="rounded-card bg-raise border border-hair p-3 text-sm font-mono overflow-x-auto">
         <code>{code}</code>
       </pre>
     </section>
@@ -27,25 +25,25 @@ function Block({ label, code, recommended }: { label: string; code: string; reco
 
 export function InstallPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-app text-ink">
       <div className="max-w-2xl mx-auto px-6 py-16 space-y-8">
         <header className="space-y-2">
-          <h1 className="text-3xl font-bold">pipeit</h1>
-          <p className="text-gray-600 dark:text-gray-400">Share markdown from AI conversations. Read on any device.</p>
+          <h1 className="font-heading text-4xl font-bold tracking-tight">pipeit</h1>
+          <p className="text-muted">Share markdown from AI conversations. Read on any device.</p>
         </header>
 
         <Block label="Claude Code plugin" code={PLUGIN_COMMANDS} recommended />
         <Block label="npm" code="npx pipeit.live" />
         <Block label="Bun" code="bunx pipeit.live" />
 
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          After install: run <code className="text-gray-900 dark:text-gray-100">/pipeit</code> in Claude Code. Your
-          browser opens once to sign in.
+        <p className="text-sm text-muted">
+          After install: run <code className="font-mono text-ink">/pipeit</code> in Claude Code. Your browser opens once
+          to sign in.
         </p>
 
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted">
           Already installed?{" "}
-          <Link to="/login" className="text-indigo-500 hover:text-indigo-400">
+          <Link to="/login" className="text-accent hover:opacity-80 font-medium">
             Sign in →
           </Link>
         </p>

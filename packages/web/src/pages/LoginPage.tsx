@@ -14,27 +14,29 @@ export function LoginPage() {
   if (user) return <Navigate to={returnTo} replace />;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-app text-ink">
       <div className="w-full max-w-sm space-y-6 p-8">
-        <h1 className="text-2xl font-bold text-center">{isSignUp ? "Create an account" : "Sign in to pipeit"}</h1>
+        <h1 className="font-heading text-2xl font-bold text-center">
+          {isSignUp ? "Create an account" : "Sign in to pipeit"}
+        </h1>
         <div className="space-y-3">
           <a
             href={`/auth/google${returnTo !== "/" ? `?return_to=${encodeURIComponent(returnTo)}` : ""}`}
-            className="block w-full text-center py-2.5 px-4 rounded-lg bg-white text-gray-900 font-medium hover:bg-gray-100 transition"
+            className="block w-full text-center py-2.5 px-4 rounded-lg bg-surface border border-hair text-ink font-medium hover:bg-raise transition"
           >
             Continue with Google
           </a>
           <a
             href={`/auth/github${returnTo !== "/" ? `?return_to=${encodeURIComponent(returnTo)}` : ""}`}
-            className="block w-full text-center py-2.5 px-4 rounded-lg bg-gray-800 text-white font-medium hover:bg-gray-700 transition"
+            className="block w-full text-center py-2.5 px-4 rounded-lg bg-ink text-app font-medium hover:opacity-90 transition"
           >
             Continue with GitHub
           </a>
         </div>
-        <div className="flex items-center gap-3 text-gray-500 text-sm">
-          <div className="flex-1 h-px bg-gray-800" />
+        <div className="flex items-center gap-3 text-muted text-sm">
+          <div className="flex-1 h-px bg-hair" />
           <span>or</span>
-          <div className="flex-1 h-px bg-gray-800" />
+          <div className="flex-1 h-px bg-hair" />
         </div>
         <form
           key={isSignUp ? "signup" : "signin"}
@@ -67,7 +69,7 @@ export function LoginPage() {
               type="text"
               placeholder="Name"
               required
-              className="w-full px-3 py-2 rounded-lg bg-gray-900 border border-gray-800 text-gray-100 placeholder-gray-500"
+              className="w-full px-3 py-2 rounded-lg bg-raise border border-hair text-ink placeholder:text-muted focus:outline-none focus:border-accent"
             />
           )}
           <input
@@ -75,26 +77,24 @@ export function LoginPage() {
             type="email"
             placeholder="Email"
             required
-            className="w-full px-3 py-2 rounded-lg bg-gray-900 border border-gray-800 text-gray-100 placeholder-gray-500"
+            className="w-full px-3 py-2 rounded-lg bg-raise border border-hair text-ink placeholder:text-muted focus:outline-none focus:border-accent"
           />
           <input
             name="password"
             type="password"
             placeholder="Password"
             required
-            className="w-full px-3 py-2 rounded-lg bg-gray-900 border border-gray-800 text-gray-100 placeholder-gray-500"
+            className="w-full px-3 py-2 rounded-lg bg-raise border border-hair text-ink placeholder:text-muted focus:outline-none focus:border-accent"
           />
-          {error && (
-            <p className="text-red-400 text-sm bg-red-400/10 border border-red-400/30 rounded-lg px-3 py-2">{error}</p>
-          )}
+          {error && <p className="text-bad text-sm bg-bad/10 border border-bad/30 rounded-lg px-3 py-2">{error}</p>}
           <button
             type="submit"
-            className="w-full py-2.5 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-500 transition"
+            className="w-full py-2.5 rounded-lg bg-accent text-on-accent font-semibold hover:opacity-90 transition"
           >
             {isSignUp ? "Create account" : "Sign in"}
           </button>
         </form>
-        <p className="text-center text-sm text-gray-500">
+        <p className="text-center text-sm text-muted">
           {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
           <button
             type="button"
@@ -102,7 +102,7 @@ export function LoginPage() {
               setIsSignUp(!isSignUp);
               setError("");
             }}
-            className="text-indigo-400 hover:text-indigo-300"
+            className="text-accent hover:opacity-80 font-medium"
           >
             {isSignUp ? "Sign in" : "Sign up"}
           </button>

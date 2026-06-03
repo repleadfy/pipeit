@@ -12,26 +12,28 @@ function timeAgo(dateStr: string): string {
 
 export function DocListItem({ doc }: { doc: DocItem }) {
   const pct = doc.read_pct ?? 0;
-  const pctColor = pct >= 1 ? "text-green-400" : pct > 0 ? "text-amber-400" : "text-gray-600";
-  const barColor = pct >= 1 ? "bg-green-400" : pct > 0 ? "bg-amber-400" : "bg-gray-700";
+  const pctColor = pct >= 1 ? "text-ok" : pct > 0 ? "text-warn" : "text-muted";
+  const barColor = pct >= 1 ? "bg-ok" : pct > 0 ? "bg-warn" : "bg-hair";
 
   return (
     <Link
       to={`/d/${doc.slug}`}
-      className="block p-3 rounded-lg bg-gray-900/50 border border-gray-800 hover:border-gray-700 transition mb-2"
+      className="block p-3 rounded-lg bg-raise/60 border border-hair hover:border-accent/50 transition mb-2"
     >
-      <div className="font-medium text-sm text-gray-100 mb-1 truncate">{doc.title}</div>
+      <div className="font-medium text-sm text-ink mb-1 truncate">{doc.title}</div>
       <div className="flex items-center justify-between text-xs">
-        <span className="text-gray-500">
+        <span className="text-muted">
           v{doc.version} &middot; {timeAgo(doc.updated_at)}
         </span>
         <div className="flex items-center gap-2">
           <span className={pctColor}>{Math.round(pct * 100)}%</span>
-          <div className="w-6 h-1 bg-gray-800 rounded-full overflow-hidden">
+          <div className="w-6 h-1 bg-hair rounded-full overflow-hidden">
             <div className={`h-full rounded-full ${barColor}`} style={{ width: `${pct * 100}%` }} />
           </div>
           <span
-            className={`text-[10px] px-1.5 py-0.5 rounded ${doc.is_public ? "bg-green-900/50 text-green-400" : "bg-indigo-900/50 text-indigo-400"}`}
+            className={`text-[10px] px-1.5 py-0.5 rounded ${
+              doc.is_public ? "bg-ok/15 text-ok" : "bg-accent-soft text-accent"
+            }`}
           >
             {doc.is_public ? "pub" : "priv"}
           </span>

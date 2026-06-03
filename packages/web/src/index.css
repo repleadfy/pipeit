@@ -1,3 +1,183 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Semantic tokens → Tailwind utilities ──────────────────────────────
+   Each maps to a runtime CSS var (--pi-*) set per skin/mode below, so
+   bg-surface / text-ink / border-hair / text-accent re-skin automatically. */
+@theme {
+  --color-app: var(--pi-app);
+  --color-surface: var(--pi-surface);
+  --color-raise: var(--pi-raise);
+  --color-ink: var(--pi-ink);
+  --color-muted: var(--pi-muted);
+  --color-hair: var(--pi-hair);
+  --color-accent: var(--pi-accent);
+  --color-accent-soft: var(--pi-accent-soft);
+  --color-on-accent: var(--pi-on-accent);
+  --color-ok: var(--pi-ok);
+  --color-warn: var(--pi-warn);
+  --color-bad: var(--pi-bad);
+
+  --font-ui: var(--pi-font-ui);
+  --font-prose: var(--pi-font-prose);
+  --font-heading: var(--pi-font-heading);
+  --font-mono: var(--pi-font-mono);
+
+  --radius-card: 14px;
+}
+
+/* ── Skin palettes (× light / dark) ───────────────────────────────────── */
+
+/* Reading Room — warm editorial (DEFAULT) */
+:root,
+[data-skin="reading-room"] {
+  --pi-app: #faf8f3;
+  --pi-surface: #ffffff;
+  --pi-raise: #f3efe7;
+  --pi-ink: #1c1a17;
+  --pi-muted: #6b655c;
+  --pi-hair: #e7e2d8;
+  --pi-accent: #b4451f;
+  --pi-accent-soft: #f0d9cf;
+  --pi-on-accent: #ffffff;
+  --pi-ok: #3f7d4e;
+  --pi-warn: #b07d1a;
+  --pi-bad: #b3402f;
+  --pi-code-ink: #3a352e;
+  --pi-font-ui: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --pi-font-prose: "Literata", Georgia, serif;
+  --pi-font-heading: "Literata", Georgia, serif;
+  --pi-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+.dark,
+[data-skin="reading-room"].dark {
+  --pi-app: #131210;
+  --pi-surface: #1c1a17;
+  --pi-raise: #232019;
+  --pi-ink: #ece7dd;
+  --pi-muted: #968f82;
+  --pi-hair: #2a2722;
+  --pi-accent: #e8714a;
+  --pi-accent-soft: #3a2418;
+  --pi-on-accent: #1c1a17;
+  --pi-ok: #6cc080;
+  --pi-warn: #d9a441;
+  --pi-bad: #e8765f;
+  --pi-code-ink: #d8cfc0;
+}
+
+/* Slate — refined neutral */
+[data-skin="slate"] {
+  --pi-app: #fcfcfd;
+  --pi-surface: #ffffff;
+  --pi-raise: #f4f5f7;
+  --pi-ink: #16181d;
+  --pi-muted: #5a6069;
+  --pi-hair: #e6e8ec;
+  --pi-accent: #2563eb;
+  --pi-accent-soft: #dce7ff;
+  --pi-on-accent: #ffffff;
+  --pi-ok: #16a34a;
+  --pi-warn: #d97706;
+  --pi-bad: #dc2626;
+  --pi-code-ink: #2b2f36;
+  --pi-font-ui: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --pi-font-prose: "Source Serif 4", Georgia, serif;
+  --pi-font-heading: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --pi-font-mono: "Geist Mono", ui-monospace, monospace;
+}
+[data-skin="slate"].dark {
+  --pi-app: #0b0c0e;
+  --pi-surface: #15171a;
+  --pi-raise: #1c1f24;
+  --pi-ink: #e6e8ec;
+  --pi-muted: #8a909a;
+  --pi-hair: #23262b;
+  --pi-accent: #3b82f6;
+  --pi-accent-soft: #15243f;
+  --pi-on-accent: #ffffff;
+  --pi-ok: #4ade80;
+  --pi-warn: #fbbf24;
+  --pi-bad: #f87171;
+  --pi-code-ink: #c7ccd4;
+}
+
+/* Terminal — dev brutalist */
+[data-skin="terminal"] {
+  --pi-app: #f4f4f1;
+  --pi-surface: #ffffff;
+  --pi-raise: #ecece8;
+  --pi-ink: #111111;
+  --pi-muted: #666666;
+  --pi-hair: #d8d8d2;
+  --pi-accent: #00a152;
+  --pi-accent-soft: #d6f2e2;
+  --pi-on-accent: #000000;
+  --pi-ok: #00a152;
+  --pi-warn: #b8860b;
+  --pi-bad: #c0392b;
+  --pi-code-ink: #111111;
+  --pi-font-ui: "IBM Plex Mono", ui-monospace, monospace;
+  --pi-font-prose: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  --pi-font-heading: "IBM Plex Mono", ui-monospace, monospace;
+  --pi-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+[data-skin="terminal"].dark {
+  --pi-app: #0a0a0a;
+  --pi-surface: #111111;
+  --pi-raise: #161616;
+  --pi-ink: #ededed;
+  --pi-muted: #8a8a8a;
+  --pi-hair: #262626;
+  --pi-accent: #00e676;
+  --pi-accent-soft: #0c3a22;
+  --pi-on-accent: #000000;
+  --pi-ok: #00e676;
+  --pi-warn: #d9a441;
+  --pi-bad: #ff6b5e;
+  --pi-code-ink: #ededed;
+}
+
+@layer base {
+  html {
+    background: var(--pi-app);
+  }
+  body {
+    font-family: var(--pi-font-ui);
+    background: var(--pi-app);
+    color: var(--pi-ink);
+  }
+
+  /* Theme the Typography plugin via its own vars — skin + mode aware,
+     so dark:prose-invert is unnecessary. */
+  .prose {
+    --tw-prose-body: var(--pi-ink);
+    --tw-prose-headings: var(--pi-ink);
+    --tw-prose-links: var(--pi-accent);
+    --tw-prose-bold: var(--pi-ink);
+    --tw-prose-code: var(--pi-accent);
+    --tw-prose-quotes: var(--pi-muted);
+    --tw-prose-quote-borders: var(--pi-accent);
+    --tw-prose-hr: var(--pi-hair);
+    --tw-prose-th-borders: var(--pi-hair);
+    --tw-prose-td-borders: var(--pi-hair);
+    --tw-prose-pre-bg: var(--pi-raise);
+    --tw-prose-pre-code: var(--pi-code-ink);
+    --tw-prose-counters: var(--pi-muted);
+    --tw-prose-bullets: var(--pi-hair);
+    --tw-prose-captions: var(--pi-muted);
+    font-family: var(--pi-font-prose);
+  }
+  .prose :is(h1, h2, h3, h4) {
+    font-family: var(--pi-font-heading);
+  }
+  .prose :is(code, pre) {
+    font-family: var(--pi-font-mono);
+  }
+  /* drop the plugin's backtick quotes around inline code */
+  .prose :where(code):not(:where(pre *))::before,
+  .prose :where(code):not(:where(pre *))::after {
+    content: none;
+  }
+}

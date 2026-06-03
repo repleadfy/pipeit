@@ -47,8 +47,7 @@ export function PdfRenderer({ slug }: { slug: string }) {
           const canvas = document.createElement("canvas");
           canvas.width = viewport.width;
           canvas.height = viewport.height;
-          canvas.className =
-            "mx-auto mb-4 max-w-full h-auto rounded-lg shadow border border-gray-200 dark:border-gray-800";
+          canvas.className = "mx-auto mb-4 max-w-full h-auto rounded-lg shadow border border-hair";
           canvas.style.width = "100%";
           const ctx = canvas.getContext("2d");
           if (!ctx) continue;
@@ -71,9 +70,9 @@ export function PdfRenderer({ slug }: { slug: string }) {
 
   return (
     <div>
-      {status === "loading" && <p className="text-gray-400">Rendering PDF…</p>}
+      {status === "loading" && <p className="text-muted">Rendering PDF…</p>}
       {status === "error" && (
-        <p className="text-red-500">
+        <p className="text-bad">
           Couldn't render PDF ({error}).{" "}
           <a href={rawUrl} target="_blank" rel="noreferrer" className="underline">
             Open original ↗
@@ -81,8 +80,8 @@ export function PdfRenderer({ slug }: { slug: string }) {
         </p>
       )}
       <div ref={containerRef} />
-      <p className="mt-4 text-sm text-gray-500">
-        <a href={rawUrl} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300">
+      <p className="mt-4 text-sm text-muted">
+        <a href={rawUrl} target="_blank" rel="noreferrer" className="text-accent hover:opacity-80">
           Open original PDF ↗
         </a>
       </p>
