@@ -185,3 +185,32 @@
   --tw-prose-captions: var(--pi-muted);
   font-family: var(--pi-font-prose);
 }
+
+/* Keep wide content from overflowing the viewport on mobile. Unlayered for the
+   same reason as the prose vars above: must beat the plugin's later-layer rules.
+   react-markdown emits raw <table>/<code> with no wrapper, so the elements
+   themselves become the scroll/break boundary. */
+.prose :where(pre) {
+  overflow-x: auto;
+  max-width: 100%;
+}
+/* Table wrapper (see MarkdownRenderer). Only the table scrolls sideways; the
+   table itself keeps native display:table so width/columns render normally. */
+.prose .pi-table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+/* Break long unbreakable strings (URLs, long identifiers, inline code) so they
+   wrap instead of widening the line box past the viewport. break-word (not
+   anywhere) leaves intrinsic min-content sizing alone, so table columns are
+   unaffected. */
+.prose {
+  overflow-wrap: break-word;
+}
+/* Media safety net: nothing can exceed the content box and re-introduce page
+   overflow. (Tailwind Typography sets img max-width already; this also covers
+   svg/video/iframe.) */
+.prose :where(img, svg, video, iframe) {
+  max-width: 100%;
+  height: auto;
+}

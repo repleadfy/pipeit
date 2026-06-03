@@ -109,7 +109,7 @@ export function DocPage() {
       <div className="mx-auto max-w-7xl px-4 py-8 lg:flex lg:gap-8 lg:items-start">
         <TOCSidebar open={tocOpen} onClose={() => setTocOpen(false)} />
         <main
-          className={`w-full mx-auto ${doc.format === "pdf" || doc.format === "html" ? "lg:max-w-5xl" : "lg:max-w-3xl"}`}
+          className={`w-full min-w-0 mx-auto ${doc.format === "pdf" || doc.format === "html" ? "lg:max-w-5xl" : "lg:max-w-3xl"}`}
         >
           <h1 className="font-heading text-4xl font-bold leading-tight tracking-tight mb-2">{doc.title}</h1>
           <p className="text-sm text-muted mb-10">

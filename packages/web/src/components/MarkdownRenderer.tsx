@@ -41,6 +41,15 @@ export function MarkdownRenderer({ content }: { content: string }) {
               </code>
             );
           },
+          // Wrap tables so only the table scrolls horizontally — the page never
+          // does. Keeps native display:table (full-width, no cosmetic regression).
+          table({ children, ...props }) {
+            return (
+              <div className="pi-table-scroll">
+                <table {...props}>{children}</table>
+              </div>
+            );
+          },
         }}
       >
         {content}
