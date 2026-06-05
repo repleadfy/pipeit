@@ -5,7 +5,7 @@
 <h1 align="center">pipeit</h1>
 
 <p align="center">
-  <strong>Pipe markdown, code, and (soon) anything else out of your AI chats.<br/>
+  <strong>Pipe markdown, code, PDFs, HTML — anything out of your AI chats.<br/>
   One command, one pipeit URL.</strong>
 </p>
 
@@ -56,9 +56,13 @@ First run opens your browser once for sign-in. After that, Claude Code holds the
 
 ## Features
 
-- **Direct disk → URL.** The CLI reads your file from disk and POSTs it. Nothing passes through your LLM context, so you don't pay for tokens twice and uploads stay sub-second up to 1 MB.
+- **Direct disk → URL.** The CLI reads your file from disk and POSTs it. Nothing passes through your LLM context, so you don't pay for tokens twice and uploads stay sub-second for text docs.
+- **Multi-format.** Markdown, HTML, plain text, and PDF — format is auto-detected server-side, the client never declares it. Markdown renders rich; HTML renders sandboxed; PDF renders via pdf.js (portable to mobile/headless).
 - **Update-in-place.** Re-running `/pipeit ./file.md` updates the same URL with a new version — no clutter, no re-sharing.
 - **Renders the way an AI writes.** Headings, TOC, syntax highlight, KaTeX, Mermaid, dark/light, search (`⌘K`), keyboard nav.
+- **Full-text search.** Search across all your docs by title *and* body, ranked — find that runbook from three weeks ago.
+- **Drag-and-drop upload.** A browser `/upload` page takes md/txt/html/pdf (multi-file, mobile-friendly) when you're not in Claude Code.
+- **Themeable.** Three runtime-selectable skins — Reading Room (warm editorial), Slate (refined neutral), Terminal (dev brutalist) — each with light/dark.
 - **Reading-progress sync.** Pick up where you left off, on any device.
 - **Public/private toggle.** Flip after upload; the URL stays the same.
 - **OAuth (Google / GitHub / email)** with PKCE. No API keys, no credentials on disk outside Claude Code.
@@ -89,13 +93,13 @@ Your file content never enters the LLM context. The `/pipeit` skill shells out t
 
 ## Roadmap
 
-`pipeit.live` today renders Markdown (and treats other text as plain text). We're expanding the viewer:
+`pipeit.live` renders Markdown, HTML, plain text, and PDF today. We're still expanding the viewer:
 
-- [ ] **PDF** — upload and view, no copy-paste through tokens.
+- [x] **PDF** — upload and view, no copy-paste through tokens.
+- [x] **HTML** — sandboxed render, sane defaults.
+- [x] **Search across your docs** — find that runbook from three weeks ago.
 - [ ] **DOCX / XLSX** — common office formats, rendered in-browser.
-- [ ] **HTML** — sandboxed render, sane defaults.
 - [ ] **Images** — direct paste / upload, full-resolution viewing.
-- [ ] **Search across your docs** — find that runbook from three weeks ago.
 
 If a format you need isn't here, [open an issue](https://github.com/repleadfy/pipeit/issues) — the roadmap is driven by what people actually share.
 
@@ -103,7 +107,8 @@ If a format you need isn't here, [open an issue](https://github.com/repleadfy/pi
 
 | Limit | Value |
 |---|---|
-| Doc size | 1 MB |
+| Doc size (text: md / html / txt) | 1 MB |
+| Doc size (PDF) | 25 MB |
 | Uploads per hour | 60 / user |
 | API calls per minute | 300 / user |
 | Auth attempts | 10 / minute / IP |
