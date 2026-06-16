@@ -5,6 +5,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import * as http from "node:http";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const BASE = process.env.PIPEIT_URL ?? "https://pipeit.live";
 const TOKEN_PATH = join(homedir(), ".config", "pipeit", "token");
@@ -111,6 +112,23 @@ function isBinaryDoc(abs: string, bytes: Buffer): boolean {
   );
 }
 
+// Run an authenticated request, transparently re-authing once on a 401 (expired token).
+async function authedRequest(makeReq: (token: string) => Promise<Response>): Promise<Response> {
+  let token = await getToken();
+  let r = await makeReq(token);
+  if (r.status === 401) {
+    token = await getToken(true);
+    r = await makeReq(token);
+  }
+  return r;
+}
+
+/** Accept either a bare slug or a full pipeit URL (…/d/<slug>) and return the slug. */
+export function slugFromTarget(target: string): string {
+  const m = target.match(/\/d\/([^/?#]+)/);
+  return (m ? m[1] : target).trim();
+}
+
 async function upload(filePath: string, opts: { isPublic: boolean; forceNew: boolean }): Promise<string> {
   const abs = resolve(filePath);
   const bytes = readFileSync(abs);
@@ -137,50 +155,101 @@ async function upload(filePath: string, opts: { isPublic: boolean; forceNew: boo
           }),
         });
 
-  let token = await getToken();
-  let r = await post(token);
-  if (r.status === 401) {
-    token = await getToken(true);
-    r = await post(token);
-  }
+  const r = await authedRequest(post);
   if (!r.ok) throw new Error(`upload failed: ${r.status} ${await r.text()}`);
   const j = (await r.json()) as { url: string };
   return j.url;
 }
 
-function parseArgs(argv: string[]): {
+// Toggle a doc's visibility. The server enforces ownership — a 404 means the doc
+// doesn't exist OR isn't yours (it never reveals which).
+async function setVisibility(target: string, isPublic: boolean): Promise<string> {
+  const slug = slugFromTarget(target);
+  const r = await authedRequest((token) =>
+    fetch(`${BASE}/api/docs/${encodeURIComponent(slug)}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ is_public: isPublic }),
+    }),
+  );
+  if (r.status === 404) throw new Error(`doc "${slug}" not found or not yours`);
+  if (!r.ok) throw new Error(`failed: ${r.status} ${await r.text()}`);
+  return slug;
+}
+
+// Delete a doc you own. Same ownership rule: a non-owner gets a 404.
+async function deleteDoc(target: string): Promise<string> {
+  const slug = slugFromTarget(target);
+  const r = await authedRequest((token) =>
+    fetch(`${BASE}/api/docs/${encodeURIComponent(slug)}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+  );
+  if (r.status === 404) throw new Error(`doc "${slug}" not found or not yours`);
+  if (!r.ok) throw new Error(`failed: ${r.status} ${await r.text()}`);
+  return slug;
+}
+
+export type Command = "delete" | "public" | "private";
+const COMMANDS = new Set<Command>(["delete", "public", "private"]);
+
+export function parseArgs(argv: string[]): {
+  command?: Command;
+  target?: string;
   file?: string;
   isPublic: boolean;
   forceNew: boolean;
   logout: boolean;
   help: boolean;
 } {
-  const out = { file: undefined as string | undefined, isPublic: false, forceNew: false, logout: false, help: false };
+  const out = {
+    command: undefined as Command | undefined,
+    target: undefined as string | undefined,
+    file: undefined as string | undefined,
+    isPublic: false,
+    forceNew: false,
+    logout: false,
+    help: false,
+  };
+  const positionals: string[] = [];
   for (const a of argv) {
     if (a === "--public") out.isPublic = true;
     else if (a === "--new") out.forceNew = true;
     else if (a === "--logout") out.logout = true;
     else if (a === "-h" || a === "--help") out.help = true;
-    else if (!a.startsWith("--")) out.file = a;
+    else if (!a.startsWith("--")) positionals.push(a);
+  }
+  // First positional may be a subcommand (delete/public/private) acting on a
+  // slug/URL; otherwise it's a file path to upload (the default).
+  if (positionals.length > 0 && COMMANDS.has(positionals[0] as Command)) {
+    out.command = positionals[0] as Command;
+    out.target = positionals[1];
+  } else {
+    out.file = positionals[0];
   }
   return out;
 }
 
 function printHelp() {
   process.stderr.write(
-    `pipeit-upload — upload a markdown / text / HTML / PDF file to pipeit.live\n\n` +
+    `pipeit-upload — push docs to pipeit.live and manage them\n\n` +
       `Usage:\n` +
-      `  pipeit-upload [--public] [--new] <file>\n` +
-      `  pipeit-upload --logout\n\n` +
+      `  pipeit-upload [--public] [--new] <file>   upload a markdown / text / HTML / PDF file\n` +
+      `  pipeit-upload public  <slug|url>          make a doc publicly shareable\n` +
+      `  pipeit-upload private <slug|url>          make a doc private\n` +
+      `  pipeit-upload delete  <slug|url>          delete a doc you own\n` +
+      `  pipeit-upload --logout                    delete the cached token\n\n` +
       `Flags:\n` +
-      `  --public   make the doc publicly shareable\n` +
+      `  --public   upload as publicly shareable\n` +
       `  --new      force new link (don't update-in-place)\n` +
       `  --logout   delete the cached token\n\n` +
-      `First run opens a browser to authorize. Token cached at ~/.config/pipeit/token.\n`,
+      `You can only manage your own docs. First run opens a browser to authorize.\n` +
+      `Token cached at ~/.config/pipeit/token.\n`,
   );
 }
 
-async function main() {
+export async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) return printHelp();
   if (args.logout) {
@@ -188,6 +257,23 @@ async function main() {
     process.stderr.write("logged out\n");
     return;
   }
+
+  if (args.command) {
+    if (!args.target) {
+      printHelp();
+      process.exit(2);
+    }
+    if (args.command === "delete") {
+      const slug = await deleteDoc(args.target);
+      process.stdout.write(`deleted ${slug}\n`);
+    } else {
+      const isPublic = args.command === "public";
+      const slug = await setVisibility(args.target, isPublic);
+      process.stdout.write(`${slug} is now ${isPublic ? "public" : "private"}\n`);
+    }
+    return;
+  }
+
   if (!args.file) {
     printHelp();
     process.exit(2);
@@ -196,7 +282,10 @@ async function main() {
   process.stdout.write(`${url}\n`);
 }
 
-main().catch((err) => {
-  process.stderr.write(`error: ${err.message}\n`);
-  process.exit(1);
-});
+// Only run when invoked as the CLI binary — not when imported by tests.
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    process.stderr.write(`error: ${err.message}\n`);
+    process.exit(1);
+  });
+}
