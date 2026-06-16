@@ -269,6 +269,7 @@ docsRouter.get("/:slug", async (c) => {
       content: d.content,
       version: d.version,
       is_public: d.isPublic,
+      is_owner: c.get("user")?.sub === d.userId,
       created_at: d.createdAt.toISOString(),
       updated_at: d.updatedAt.toISOString(),
     });
@@ -293,6 +294,7 @@ docsRouter.get("/:slug", async (c) => {
     content: d.content,
     version: d.version,
     is_public: d.isPublic,
+    is_owner: c.get("user")?.sub === d.userId,
     created_at: d.createdAt.toISOString(),
     updated_at: d.updatedAt.toISOString(),
   });
@@ -363,7 +365,18 @@ docsRouter.delete("/:slug", async (c) => {
   const userId = c.get("user").sub;
   const slug = c.req.param("slug");
 
-  const _result = await db.delete(docs).where(and(eq(docs.slug, slug), eq(docs.userId, userId)));
+  // Fetch-then-check: only the owner may delete. Returns 404 (not 403) for a
+  // non-owner so we don't leak the existence of another user's doc.
+  const doc = await db
+    .select({ id: docs.id })
+    .from(docs)
+    .where(and(eq(docs.slug, slug), eq(docs.userId, userId)))
+    .limit(1);
+
+  if (doc.length === 0) return c.json({ error: "not found" }, 404);
+
+  // Cascades to doc_blobs and reading_positions via FK onDelete: cascade.
+  await db.delete(docs).where(eq(docs.id, doc[0].id));
 
   return c.json({ ok: true });
 });

@@ -34,6 +34,26 @@ export function SearchPanel({ open, onClose }: { open: boolean; onClose: () => v
       .catch(() => {});
   }, [open, query, readState, visibility]);
 
+  async function handleToggle(slug: string, next: boolean) {
+    // Optimistic: flip locally, revert on failure.
+    setDocs((prev) => prev.map((d) => (d.slug === slug ? { ...d, is_public: next } : d)));
+    try {
+      await api(`/api/docs/${slug}`, { method: "PATCH", body: JSON.stringify({ is_public: next }) });
+    } catch {
+      setDocs((prev) => prev.map((d) => (d.slug === slug ? { ...d, is_public: !next } : d)));
+    }
+  }
+
+  async function handleDelete(slug: string) {
+    const prev = docs;
+    setDocs((cur) => cur.filter((d) => d.slug !== slug));
+    try {
+      await api(`/api/docs/${slug}`, { method: "DELETE" });
+    } catch {
+      setDocs(prev); // restore on failure
+    }
+  }
+
   if (!open) return null;
 
   return (
@@ -44,8 +64,8 @@ export function SearchPanel({ open, onClose }: { open: boolean; onClose: () => v
         onClick={onClose}
         className="fixed inset-0 bg-black/40 z-40 cursor-default"
       />
-      <div className="fixed top-0 right-0 bottom-0 w-full sm:w-[26rem] max-w-full bg-surface border-l border-hair z-50 flex flex-col shadow-xl">
-        <div className="p-3 border-b border-hair space-y-2.5">
+      <div className="fixed top-0 right-0 bottom-0 w-full sm:w-[28rem] max-w-full bg-surface border-l border-hair z-50 flex flex-col shadow-xl">
+        <div className="px-4 pt-4 pb-3 border-b border-hair space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-ink">Your Docs</h2>
             <button
@@ -62,7 +82,7 @@ export function SearchPanel({ open, onClose }: { open: boolean; onClose: () => v
             placeholder="Search docs..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg bg-raise border border-hair text-sm text-ink placeholder:text-muted focus:outline-none focus:border-accent"
+            className="w-full px-3 py-2.5 rounded-lg bg-raise border border-hair text-sm text-ink placeholder:text-muted focus:outline-none focus:border-accent"
           />
           <div className="flex gap-2">
             <CycleFilter
@@ -111,9 +131,9 @@ export function SearchPanel({ open, onClose }: { open: boolean; onClose: () => v
             />
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto p-3">
+        <div className="flex-1 overflow-y-auto px-4 py-3">
           {docs.map((doc) => (
-            <DocListItem key={doc.slug} doc={doc} />
+            <DocListItem key={doc.slug} doc={doc} onToggle={handleToggle} onDelete={handleDelete} />
           ))}
           {docs.length === 0 && <p className="text-sm text-muted text-center mt-8">No docs found</p>}
         </div>
