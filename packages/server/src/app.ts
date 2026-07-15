@@ -14,6 +14,7 @@ import { authMiddleware } from "./auth/middleware.js";
 import { env } from "./env.js";
 import { apiRateLimit, authRateLimit } from "./middleware/rate-limit.js";
 import { docsRouter } from "./routes/docs.js";
+import { docMetaHandler, ogImageHandler } from "./routes/og.js";
 import { positionRouter } from "./routes/position.js";
 import { pushRouter } from "./routes/push.js";
 
@@ -78,8 +79,17 @@ app.get("/.well-known/oauth-authorization-server", (c) => {
   });
 });
 
+// Per-doc social card image. Registered outside the production guard so it also
+// works against `tsx watch` in dev (curl :3001/d/<slug>/og.png). The `.png` path
+// is matched here before the static handler below would try (and fail) to find it.
+app.get("/d/:slug/og.png", ogImageHandler);
+
 // Serve built web assets (production only)
 if (process.env.NODE_ENV === "production") {
+  // Rewrite the SPA shell's og/twitter/title tags per public doc, before the
+  // static handler serves index.html verbatim. Crawlers don't run JS, so this is
+  // the only way they see a per-doc card.
+  app.get("/d/:slug", docMetaHandler);
   app.use("/*", serveStatic({ root: "./public" }));
   // SPA fallback — serve index.html only for non-file paths (no extension)
   const spaFallback = serveStatic({ root: "./public", path: "index.html" });

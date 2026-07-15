@@ -6,6 +6,12 @@ All notable changes to pipeit are documented here. Format follows [Keep a Change
 
 ### Added
 
+- **Dynamic Open Graph images.** Every `/d/:slug` link now unfurls with a per-document
+  social card (title, format badge, version · date) rendered server-side via satori +
+  resvg, plus per-doc `og:`/`twitter:` meta injected into the SPA shell for crawlers.
+  Private and unknown docs return an identical generic card and untouched meta — no
+  title or existence leak. Fixes the previously-404ing site-wide `og.png` and the PWA
+  `icon-192.png` / `icon-512.png`.
 - `README.md` rewritten for open-source launch (hero, comparison table, roadmap, limits).
 - `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, GitHub issue / PR templates.
 - `LICENSE` file (MIT) added at repo root.
