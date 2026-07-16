@@ -104,6 +104,7 @@ export function DocPage() {
         skin={skin}
         setSkin={setSkin}
         docTitle={doc.title}
+        exportDoc={{ slug: doc.slug, title: doc.title, format: doc.format, content: doc.content }}
       />
       <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} />
       <div className="mx-auto max-w-7xl px-4 py-8 lg:flex lg:gap-8 lg:items-start">
