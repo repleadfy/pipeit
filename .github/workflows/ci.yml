@@ -15,7 +15,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: ['20', '22']
+        # pdfjs-dist@6 requires Node >=22.13 || >=24, so Node 20 can't even install.
+        node: ['22', '24']
+    services:
+      # The server and mcp test suites hit Postgres at this DSN
+      # (postgres://test:test@localhost:5432/test — see their package.json test scripts).
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgres://test:test@localhost:5432/test
     steps:
       - uses: actions/checkout@v4
 
@@ -34,6 +53,9 @@ jobs:
 
       - name: Typecheck
         run: yarn check:types
+
+      - name: Migrate test database
+        run: yarn drizzle-kit migrate
 
       - name: Test
         run: yarn test
