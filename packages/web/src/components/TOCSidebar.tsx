@@ -42,7 +42,7 @@ export function TOCSidebar({ open, onClose }: { open: boolean; onClose: () => vo
   return (
     <>
       {/* Desktop: persistent sidebar in the left gutter */}
-      <nav className="hidden lg:block lg:w-56 lg:shrink-0 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+      <nav className="hidden lg:block lg:w-56 lg:shrink-0 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto print:hidden">
         {items()}
       </nav>
 

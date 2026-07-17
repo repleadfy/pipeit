@@ -214,3 +214,37 @@
   max-width: 100%;
   height: auto;
 }
+
+/* ── Print (also the "Save as PDF" path) ──────────────────────────────────
+   Force a light, high-contrast palette no matter the on-screen skin/theme —
+   otherwise a reader in dark mode prints light text on (browser-stripped) dark
+   and gets a near-blank page. Overriding the --pi-* tokens re-skins bg/text and
+   the Typography plugin (its --tw-prose-* read these) in one place. Chrome
+   (header, sidebar, progress, export menu) is hidden via `print:hidden`. */
+@media print {
+  :root {
+    --pi-app: #ffffff !important;
+    --pi-surface: #ffffff !important;
+    --pi-raise: #f4f4f2 !important;
+    --pi-ink: #111111 !important;
+    --pi-muted: #555555 !important;
+    --pi-hair: #d8d8d2 !important;
+    --pi-accent: #1a4fb4 !important;
+    --pi-accent-soft: #e6edfb !important;
+    --pi-code-ink: #111111 !important;
+  }
+  /* Content takes the full page — drop the centered column + gutters. */
+  main {
+    max-width: none !important;
+  }
+  .prose :where(a) {
+    text-decoration: underline;
+  }
+  /* Avoid orphaned headings/code at page breaks. */
+  .prose :where(h1, h2, h3, h4) {
+    break-after: avoid;
+  }
+  .prose :where(pre, blockquote, table, img) {
+    break-inside: avoid;
+  }
+}

@@ -6,6 +6,10 @@ All notable changes to pipeit are documented here. Format follows [Keep a Change
 
 ### Added
 
+- **Take the doc with you.** An export menu on the doc viewer to copy the source,
+  download it as a file (`.md`/`.txt`/`.html`, or the original PDF), or print — which
+  doubles as "save as PDF". Print styling forces a light, readable palette regardless
+  of the reader's theme and hides the app chrome (header, TOC, progress bar).
 - **Dynamic Open Graph images.** Every `/d/:slug` link now unfurls with a per-document
   social card (title, format badge, version · date) rendered server-side via satori +
   resvg, plus per-doc `og:`/`twitter:` meta injected into the SPA shell for crawlers.

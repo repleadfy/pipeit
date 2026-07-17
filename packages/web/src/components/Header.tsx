@@ -1,7 +1,9 @@
+import type { DocFormat } from "@pipeit/shared";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Skin } from "../hooks/useTheme.js";
 import { useAuth } from "../lib/auth.js";
+import { DocActions } from "./DocActions.js";
 import { ThemePicker } from "./ThemePicker.js";
 
 const iconProps = {
@@ -41,9 +43,19 @@ interface HeaderProps {
   skin: Skin;
   setSkin: (s: Skin) => void;
   docTitle?: string;
+  exportDoc?: { slug: string; title: string; format: DocFormat; content: string };
 }
 
-export function Header({ onToggleTOC, onToggleSearch, theme, onToggleTheme, skin, setSkin, docTitle }: HeaderProps) {
+export function Header({
+  onToggleTOC,
+  onToggleSearch,
+  theme,
+  onToggleTheme,
+  skin,
+  setSkin,
+  docTitle,
+  exportDoc,
+}: HeaderProps) {
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -66,7 +78,7 @@ export function Header({ onToggleTOC, onToggleSearch, theme, onToggleTheme, skin
     "inline-flex items-center justify-center gap-1.5 min-h-9 px-2.5 rounded-lg text-sm font-medium text-muted hover:text-ink hover:bg-raise transition";
 
   return (
-    <header className="sticky top-0 z-40 flex items-center gap-3 px-4 py-2 bg-app/80 backdrop-blur border-b border-hair">
+    <header className="sticky top-0 z-40 flex items-center gap-3 px-4 py-2 bg-app/80 backdrop-blur border-b border-hair print:hidden">
       <button type="button" onClick={onToggleTOC} className={`lg:hidden ${ghost}`} aria-label="Table of contents">
         &#9776;
       </button>
@@ -81,6 +93,7 @@ export function Header({ onToggleTOC, onToggleSearch, theme, onToggleTheme, skin
       )}
       <div className="flex-1" />
       <div className="flex items-center gap-1">
+        {exportDoc && <DocActions {...exportDoc} />}
         {user && (
           <Link to="/upload" className={`hidden sm:inline-flex ${ghost}`} aria-label="Upload a document">
             <UploadIcon />
