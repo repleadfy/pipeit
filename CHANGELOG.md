@@ -9,7 +9,10 @@ All notable changes to pipeit are documented here. Format follows [Keep a Change
 - **Take the doc with you.** An export menu on the doc viewer to copy the source,
   download it as a file (`.md`/`.txt`/`.html`, or the original PDF), or print — which
   doubles as "save as PDF". Print styling forces a light, readable palette regardless
-  of the reader's theme and hides the app chrome (header, TOC, progress bar).
+  of the reader's theme and hides the app chrome (header, TOC, progress bar). For
+  embedded (HTML) docs, the viewer wrappers collapse in print so a doc taller than one
+  page no longer prints a blank leading page, and the "Open original HTML" link and the
+  duplicate app title are omitted from the printout.
 - **Dynamic Open Graph images.** Every `/d/:slug` link now unfurls with a per-document
   social card (title, format badge, version · date) rendered server-side via satori +
   resvg, plus per-doc `og:`/`twitter:` meta injected into the SPA shell for crawlers.
