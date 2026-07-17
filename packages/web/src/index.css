@@ -247,4 +247,5 @@
   .prose :where(pre, blockquote, table, img) {
     break-inside: avoid;
   }
+
 }

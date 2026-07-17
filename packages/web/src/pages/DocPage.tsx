@@ -94,8 +94,15 @@ export function DocPage() {
       </div>
     );
 
+  const isEmbed = doc.format === "pdf" || doc.format === "html";
+
   return (
-    <div className="min-h-screen bg-app text-ink">
+    // print:[display:contents] on the viewer wrapper chain (this div → the
+    // centered container → <main>) collapses their boxes when printing. Chrome
+    // otherwise inserts a blank leading page before a doc taller than one page
+    // that's rendered in an <iframe> (HTML docs); flattening the wrappers lets
+    // it paginate the frame from page one.
+    <div className="min-h-screen bg-app text-ink print:[display:contents]">
       <Header
         onToggleTOC={() => setTocOpen(!tocOpen)}
         onToggleSearch={() => setSearchOpen(!searchOpen)}
@@ -107,13 +114,19 @@ export function DocPage() {
         exportDoc={{ slug: doc.slug, title: doc.title, format: doc.format, content: doc.content }}
       />
       <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} />
-      <div className="mx-auto max-w-7xl px-4 py-8 lg:flex lg:gap-8 lg:items-start">
+      <div className="mx-auto max-w-7xl px-4 py-8 lg:flex lg:gap-8 lg:items-start print:[display:contents]">
         <TOCSidebar open={tocOpen} onClose={() => setTocOpen(false)} />
         <main
-          className={`w-full min-w-0 mx-auto ${doc.format === "pdf" || doc.format === "html" ? "lg:max-w-5xl" : "lg:max-w-3xl"}`}
+          className={`w-full min-w-0 mx-auto print:[display:contents] ${isEmbed ? "lg:max-w-5xl" : "lg:max-w-3xl"}`}
         >
-          <h1 className="font-heading text-4xl font-bold leading-tight tracking-tight mb-2">{doc.title}</h1>
-          <p className="text-sm text-muted mb-10">
+          {/* Embedded docs (PDF/HTML) carry their own heading inside the frame, so
+              the app title block is hidden in print to avoid a duplicate title. */}
+          <h1
+            className={`font-heading text-4xl font-bold leading-tight tracking-tight mb-2 ${isEmbed ? "print:hidden" : ""}`}
+          >
+            {doc.title}
+          </h1>
+          <p className={`text-sm text-muted mb-10 ${isEmbed ? "print:hidden" : ""}`}>
             v{doc.version} &middot; {new Date(doc.updated_at).toLocaleDateString()}
           </p>
           {doc.format === "pdf" ? (
