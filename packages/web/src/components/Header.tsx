@@ -4,36 +4,8 @@ import { Link } from "react-router-dom";
 import type { Skin } from "../hooks/useTheme.js";
 import { useAuth } from "../lib/auth.js";
 import { DocActions } from "./DocActions.js";
+import { LogoMark, MenuIcon, SearchIcon, UploadIcon } from "./icons.js";
 import { ThemePicker } from "./ThemePicker.js";
-
-const iconProps = {
-  width: 16,
-  height: 16,
-  viewBox: "0 0 24 24",
-  fill: "none",
-  stroke: "currentColor",
-  strokeWidth: 1.5,
-  strokeLinecap: "round" as const,
-  strokeLinejoin: "round" as const,
-};
-
-function UploadIcon() {
-  return (
-    <svg {...iconProps} aria-hidden="true">
-      <path d="M12 15V4M12 4 8 8M12 4l4 4" />
-      <path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg {...iconProps} aria-hidden="true">
-      <circle cx="11" cy="11" r="7" />
-      <path d="m20 20-3.5-3.5" />
-    </svg>
-  );
-}
 
 interface HeaderProps {
   onToggleTOC: () => void;
@@ -75,14 +47,19 @@ export function Header({
   }, [menuOpen]);
 
   const ghost =
-    "inline-flex items-center justify-center gap-1.5 min-h-9 px-2.5 rounded-lg text-sm font-medium text-muted hover:text-ink hover:bg-raise transition";
+    "inline-flex items-center justify-center gap-1.5 min-h-9 px-2.5 rounded-lg text-sm font-medium text-muted hover:text-ink hover:bg-raise active:scale-[0.97] transition duration-200";
 
   return (
     <header className="sticky top-0 z-40 flex items-center gap-3 px-4 py-2 bg-app/80 backdrop-blur border-b border-hair print:hidden">
       <button type="button" onClick={onToggleTOC} className={`lg:hidden ${ghost}`} aria-label="Table of contents">
-        &#9776;
+        <MenuIcon />
       </button>
-      <Link to="/d/latest" className="font-heading font-bold tracking-tight text-ink shrink-0" aria-label="pipeit home">
+      <Link
+        to="/d/latest"
+        className="inline-flex items-center gap-1.5 shrink-0 font-heading font-bold tracking-tight text-ink rounded-md"
+        aria-label="pipeit home"
+      >
+        <LogoMark size={16} className="translate-y-px" />
         pipeit
       </Link>
       {docTitle && (
@@ -102,7 +79,7 @@ export function Header({
         )}
         <button type="button" onClick={onToggleSearch} className={ghost} aria-label="Search your docs">
           <SearchIcon />
-          <kbd className="hidden sm:inline text-[11px] text-muted bg-surface px-1.5 py-0.5 rounded border border-hair">
+          <kbd className="hidden sm:inline text-[11px] font-mono text-muted bg-surface px-1.5 py-0.5 rounded-md border border-hair">
             &#x2318;K
           </kbd>
         </button>
@@ -112,7 +89,7 @@ export function Header({
               type="button"
               aria-label="Account menu"
               onClick={() => setMenuOpen(!menuOpen)}
-              className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-xs font-bold text-on-accent overflow-hidden"
+              className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-xs font-bold text-on-accent overflow-hidden ring-2 ring-transparent hover:ring-accent/30 active:scale-95 transition duration-200"
             >
               {user.avatar_url ? (
                 <img src={user.avatar_url} alt="" className="w-8 h-8 rounded-full" />
@@ -121,14 +98,14 @@ export function Header({
               )}
             </button>
             {menuOpen && (
-              <div className="absolute right-0 mt-2 w-60 bg-surface border border-hair rounded-xl shadow-xl py-1 z-50">
+              <div className="pi-pop absolute right-0 mt-2 w-60 bg-surface border border-hair rounded-xl shadow-xl shadow-black/5 dark:shadow-black/30 py-1 z-50">
                 <div className="px-3 py-2 text-sm text-muted border-b border-hair truncate">{user.email}</div>
                 <ThemePicker skin={skin} setSkin={setSkin} theme={theme} onToggleTheme={onToggleTheme} />
-                <div className="border-t border-hair pt-1">
+                <div className="border-t border-hair pt-1 px-1 pb-1">
                   <button
                     type="button"
                     onClick={logout}
-                    className="w-full text-left px-3 py-2 text-sm text-muted hover:bg-raise hover:text-ink transition rounded-lg"
+                    className="w-full text-left px-2 py-2 text-sm text-muted hover:bg-raise hover:text-ink transition duration-200 rounded-lg"
                   >
                     Sign out
                   </button>

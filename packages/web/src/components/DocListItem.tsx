@@ -1,6 +1,7 @@
 import type { DocListItem as DocItem } from "@pipeit/shared";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { CloseIcon, TrashIcon } from "./icons.js";
 
 function timeAgo(dateStr: string): string {
   const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
@@ -83,7 +84,7 @@ export function DocListItem({
                 aria-label="Cancel delete"
                 className="inline-flex items-center justify-center p-1 rounded-md text-muted hover:text-ink transition"
               >
-                &#x2715;
+                <CloseIcon size={13} />
               </button>
             </span>
           ) : (
@@ -97,19 +98,7 @@ export function DocListItem({
               title="Delete"
               className="inline-flex items-center justify-center p-1 -mr-1 rounded-md text-muted opacity-60 hover:opacity-100 hover:text-bad transition"
             >
-              <svg
-                width={15}
-                height={15}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-              </svg>
+              <TrashIcon size={15} />
             </button>
           )}
         </div>

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { CycleIcon } from "./icons.js";
 
 interface CycleFilterProps {
   /** Visual prefix (icon or text). */
@@ -21,14 +22,15 @@ export function CycleFilter({ label, name, options, value, onChange }: CycleFilt
       onClick={() => onChange(next)}
       title={`${name}: ${value} (tap to cycle)`}
       aria-label={`${name}: ${value}. Tap to cycle.`}
-      className={`inline-flex items-center gap-1 min-h-9 px-2.5 rounded-lg text-xs font-medium transition ${
+      className={`inline-flex items-center gap-1.5 min-h-9 px-2.5 rounded-lg text-xs font-medium active:scale-[0.97] transition duration-200 ${
         active
           ? "bg-accent-soft text-accent border border-accent/40"
           : "bg-raise text-muted border border-hair hover:text-ink"
       }`}
     >
       <span className="opacity-70">{label}</span>
-      {value} &#x21bb;
+      {value}
+      <CycleIcon size={11} className="opacity-60" />
     </button>
   );
 }

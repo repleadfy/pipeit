@@ -38,7 +38,7 @@ describe("unauthed routing", () => {
       </MemoryRouter>,
     );
     await waitFor(() => {
-      expect(screen.getByText(/Share markdown from AI conversations/)).toBeInTheDocument();
+      expect(screen.getByText(/Pipe docs out of your AI chats/i)).toBeInTheDocument();
     });
   });
 });

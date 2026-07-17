@@ -142,11 +142,66 @@
 @layer base {
   html {
     background: var(--pi-app);
+    scrollbar-width: thin;
+    scrollbar-color: var(--pi-hair) transparent;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
   body {
     font-family: var(--pi-font-ui);
     background: var(--pi-app);
     color: var(--pi-ink);
+  }
+
+  ::selection {
+    background: var(--pi-accent-soft);
+    color: var(--pi-ink);
+  }
+
+  /* Keyboard focus is always visible, mouse focus never rings. */
+  :focus-visible {
+    outline: 2px solid var(--pi-accent);
+    outline-offset: 2px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  /* Clickable affordance: Tailwind v4's Preflight no longer sets cursor:pointer
+     on buttons, so restore it for buttons, button-role elements, and summaries.
+     Disabled controls fall back to the not-allowed cursor. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  label:has(> input[type="checkbox"]),
+  summary {
+    cursor: pointer;
+  }
+  button:disabled,
+  [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  /* Autofill: Chrome paints its own light background + dark text over the
+     field, ignoring the theme. The box-shadow hack repaints the field in the
+     surface token and --pi-ink keeps the text readable in both modes. The hack
+     leaves white at rounded corners because an inset shadow ignores an input's
+     border-radius; login fields work around that by keeping the <input> square
+     and rounding a wrapper with overflow:hidden (see LoginPage), so this stays
+     a plain rectangle fill. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--pi-ink);
+    caret-color: var(--pi-ink);
+    -webkit-box-shadow: 0 0 0 1000px var(--pi-raise) inset;
+    box-shadow: 0 0 0 1000px var(--pi-raise) inset;
   }
 
   .prose :is(h1, h2, h3, h4) {
@@ -159,6 +214,92 @@
   .prose :where(code):not(:where(pre *))::before,
   .prose :where(code):not(:where(pre *))::after {
     content: none;
+  }
+}
+
+/* ── Motion primitives ─────────────────────────────────────────────────────
+   Entry animations for overlays/menus. All gated on prefers-reduced-motion:
+   with motion off, elements simply appear (opacity/transform untouched). */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pi-rise {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+  @keyframes pi-pop {
+    from {
+      opacity: 0;
+      transform: translateY(-4px) scale(0.98);
+    }
+  }
+  @keyframes pi-slide-right {
+    from {
+      transform: translateX(24px);
+      opacity: 0.4;
+    }
+  }
+  @keyframes pi-slide-left {
+    from {
+      transform: translateX(-24px);
+      opacity: 0.4;
+    }
+  }
+  @keyframes pi-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  .pi-rise {
+    animation: pi-rise 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .pi-pop {
+    animation: pi-pop 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .pi-slide-right {
+    animation: pi-slide-right 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .pi-slide-left {
+    animation: pi-slide-left 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .pi-fade {
+    animation: pi-fade 0.18s ease-out;
+  }
+}
+
+/* Pipe-flow mark — three bars that pulse like text moving through a pipe.
+   Decorative echo of the brand mark, used only on the install hero. */
+.pi-flow-bar {
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pi-flow {
+    0%,
+    100% {
+      transform: scaleY(0.5);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+  .pi-flow-bar {
+    animation: pi-flow 1.5s ease-in-out infinite;
+  }
+}
+
+/* Skeleton placeholder blocks — shape-matched loading states. */
+.pi-skeleton {
+  background: var(--pi-raise);
+  border-radius: 8px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pi-skeleton {
+    animation: pi-skeleton-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pi-skeleton-pulse {
+    50% {
+      opacity: 0.55;
+    }
   }
 }
 
