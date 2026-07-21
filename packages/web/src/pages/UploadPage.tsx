@@ -79,7 +79,7 @@ export function UploadPage() {
     <div className="min-h-screen bg-app text-ink">
       <header className="sticky top-0 z-40 flex items-center justify-between px-4 py-2 bg-app/80 backdrop-blur border-b border-hair">
         <Link
-          to="/d/latest"
+          to="/"
           className="inline-flex items-center gap-1.5 min-h-9 px-2.5 rounded-lg text-sm font-medium text-muted hover:text-ink hover:bg-raise active:scale-[0.97] transition duration-200"
         >
           <ArrowLeftIcon size={14} />

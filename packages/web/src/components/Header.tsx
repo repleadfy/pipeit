@@ -8,8 +8,10 @@ import { LogoMark, MenuIcon, SearchIcon, UploadIcon } from "./icons.js";
 import { ThemePicker } from "./ThemePicker.js";
 
 interface HeaderProps {
-  onToggleTOC: () => void;
-  onToggleSearch: () => void;
+  /** Opens the mobile TOC drawer. Omit on surfaces without a table of contents (e.g. the home). */
+  onToggleTOC?: () => void;
+  /** Opens the doc search panel. Omit where the page owns its own search (e.g. the home). */
+  onToggleSearch?: () => void;
   theme: "light" | "dark";
   onToggleTheme: () => void;
   skin: Skin;
@@ -51,11 +53,13 @@ export function Header({
 
   return (
     <header className="sticky top-0 z-40 flex items-center gap-3 px-4 py-2 bg-app/80 backdrop-blur border-b border-hair print:hidden">
-      <button type="button" onClick={onToggleTOC} className={`lg:hidden ${ghost}`} aria-label="Table of contents">
-        <MenuIcon />
-      </button>
+      {onToggleTOC && (
+        <button type="button" onClick={onToggleTOC} className={`lg:hidden ${ghost}`} aria-label="Table of contents">
+          <MenuIcon />
+        </button>
+      )}
       <Link
-        to="/d/latest"
+        to="/"
         className="inline-flex items-center gap-1.5 shrink-0 font-heading font-bold tracking-tight text-ink rounded-md"
         aria-label="pipeit home"
       >
@@ -77,12 +81,14 @@ export function Header({
             Upload
           </Link>
         )}
-        <button type="button" onClick={onToggleSearch} className={ghost} aria-label="Search your docs">
-          <SearchIcon />
-          <kbd className="hidden sm:inline text-[11px] font-mono text-muted bg-surface px-1.5 py-0.5 rounded-md border border-hair">
-            &#x2318;K
-          </kbd>
-        </button>
+        {onToggleSearch && (
+          <button type="button" onClick={onToggleSearch} className={ghost} aria-label="Search your docs">
+            <SearchIcon />
+            <kbd className="hidden sm:inline text-[11px] font-mono text-muted bg-surface px-1.5 py-0.5 rounded-md border border-hair">
+              &#x2318;K
+            </kbd>
+          </button>
+        )}
         {user && (
           <div className="relative" ref={menuRef}>
             <button

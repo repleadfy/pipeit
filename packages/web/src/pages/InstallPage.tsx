@@ -10,8 +10,8 @@ const TABS = [
     recommended: true,
     lines: ["/plugin marketplace add repleadfy/pipeit", "/plugin install pipeit@repleadfy"],
   },
-  { id: "npm", label: "npm", lines: ["npx pipeit.live"] },
-  { id: "bun", label: "Bun", lines: ["bunx pipeit.live"] },
+  { id: "npm", label: "npm", recommended: false, lines: ["npx pipeit.live"] },
+  { id: "bun", label: "Bun", recommended: false, lines: ["bunx pipeit.live"] },
 ] as const;
 
 const STEPS = [

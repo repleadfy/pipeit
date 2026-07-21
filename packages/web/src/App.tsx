@@ -3,6 +3,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute.js";
 import { AuthProvider } from "./lib/auth.js";
 import { ConsentPage } from "./pages/ConsentPage.js";
 import { DocPage } from "./pages/DocPage.js";
+import { HomePage } from "./pages/HomePage.js";
 import { InstallPage } from "./pages/InstallPage.js";
 import { LoginPage } from "./pages/LoginPage.js";
 import { NotFoundPage } from "./pages/NotFoundPage.js";
@@ -29,7 +30,7 @@ export function App() {
             path="/"
             element={
               <ProtectedRoute fallback={<Navigate to="/install" replace />}>
-                <Navigate to="/d/latest" replace />
+                <HomePage />
               </ProtectedRoute>
             }
           />

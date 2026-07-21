@@ -147,9 +147,11 @@ export function SearchPanel({ open, onClose }: { open: boolean; onClose: () => v
             </>
           ) : (
             <>
-              {docs.map((doc) => (
-                <DocListItem key={doc.slug} doc={doc} onToggle={handleToggle} onDelete={handleDelete} />
-              ))}
+              <div className="space-y-2">
+                {docs.map((doc) => (
+                  <DocListItem key={doc.slug} doc={doc} onToggle={handleToggle} onDelete={handleDelete} />
+                ))}
+              </div>
               {docs.length === 0 && (
                 <div className="text-center mt-12 space-y-2">
                   <SearchIcon size={22} className="mx-auto text-muted opacity-50" />

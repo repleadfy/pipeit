@@ -1,16 +1,9 @@
 import type { DocListItem as DocItem } from "@pipeit/shared";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { timeAgo } from "../lib/time.js";
+import { FormatBadge } from "./FormatBadge.js";
 import { CloseIcon, TrashIcon } from "./icons.js";
-
-function timeAgo(dateStr: string): string {
-  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
-  if (seconds < 60) return "now";
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`;
-  if (seconds < 604800) return `${Math.floor(seconds / 86400)}d`;
-  return `${Math.floor(seconds / 604800)}w`;
-}
 
 export function DocListItem({
   doc,
@@ -35,12 +28,12 @@ export function DocListItem({
   return (
     <Link
       to={`/d/${doc.slug}`}
-      className="group block px-3.5 py-3 rounded-xl bg-raise/60 border border-hair hover:border-accent/50 hover:bg-raise transition mb-2"
+      className="group block px-3.5 py-3 rounded-xl bg-raise/60 border border-hair hover:border-accent/50 hover:bg-raise transition"
     >
       <div className="font-medium text-[15px] leading-snug text-ink mb-2 truncate">{doc.title}</div>
       <div className="flex items-center justify-between gap-3 text-xs">
         <span className="flex items-center gap-1.5 text-muted whitespace-nowrap">
-          v{doc.version}
+          <FormatBadge format={doc.format} />v{doc.version}
           <span className="text-hair">&middot;</span>
           {timeAgo(doc.updated_at)}
         </span>
