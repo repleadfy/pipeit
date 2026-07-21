@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { AlertIcon, ArrowLeftIcon, CheckIcon, FileUpIcon, SpinnerIcon } from "../components/icons.js";
 
 const ACCEPT = ".md,.markdown,.txt,.text,.html,.htm,.pdf";
 const ACCEPT_HINT = "Markdown, text, HTML, or PDF";
@@ -78,18 +79,19 @@ export function UploadPage() {
     <div className="min-h-screen bg-app text-ink">
       <header className="sticky top-0 z-40 flex items-center justify-between px-4 py-2 bg-app/80 backdrop-blur border-b border-hair">
         <Link
-          to="/d/latest"
-          className="inline-flex items-center min-h-9 px-2.5 rounded-lg text-sm font-medium text-muted hover:text-ink hover:bg-raise transition"
+          to="/"
+          className="inline-flex items-center gap-1.5 min-h-9 px-2.5 rounded-lg text-sm font-medium text-muted hover:text-ink hover:bg-raise active:scale-[0.97] transition duration-200"
         >
-          &larr; Back
+          <ArrowLeftIcon size={14} />
+          Back
         </Link>
         <span className="text-sm font-semibold">Upload</span>
         <span className="w-12" />
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-10">
-        <h1 className="font-heading text-3xl font-bold mb-2">Upload a document</h1>
-        <p className="text-sm text-muted mb-6">{ACCEPT_HINT} — up to 25 MB.</p>
+      <main className="pi-rise max-w-2xl mx-auto px-4 py-10">
+        <h1 className="font-heading text-3xl font-bold tracking-tight mb-2">Upload a document</h1>
+        <p className="text-sm text-muted mb-6">{ACCEPT_HINT} (up to 25 MB).</p>
 
         <button
           type="button"
@@ -100,11 +102,14 @@ export function UploadPage() {
           }}
           onDragLeave={() => setDragging(false)}
           onDrop={onDrop}
-          className={`w-full rounded-2xl border-2 border-dashed px-6 py-16 text-center transition cursor-pointer ${
-            dragging ? "border-accent bg-accent-soft" : "border-hair hover:border-accent"
+          className={`group w-full rounded-card border-2 border-dashed px-6 py-16 text-center transition duration-200 cursor-pointer ${
+            dragging ? "border-accent bg-accent-soft" : "border-hair hover:border-accent/60 hover:bg-raise/50"
           }`}
         >
-          <div className="text-4xl mb-3">&#128228;</div>
+          <FileUpIcon
+            size={36}
+            className={`mx-auto mb-4 transition duration-200 ${dragging ? "text-accent" : "text-muted group-hover:text-accent"}`}
+          />
           <p className="text-base font-medium">Tap to choose a file</p>
           <p className="text-sm text-muted mt-1">or drag &amp; drop it here</p>
           <input
@@ -135,16 +140,30 @@ export function UploadPage() {
             {items.map((it) => (
               <li
                 key={it.id}
-                className="flex items-center justify-between gap-3 rounded-lg border border-hair px-4 py-3 text-sm"
+                className="pi-rise flex items-center justify-between gap-3 rounded-xl border border-hair bg-surface px-4 py-3 text-sm"
               >
-                <span className="truncate">{it.name}</span>
-                {it.status === "uploading" && <span className="text-muted shrink-0">Uploading…</span>}
+                <span className="truncate font-medium">{it.name}</span>
+                {it.status === "uploading" && (
+                  <span className="inline-flex items-center gap-2 text-muted shrink-0">
+                    <SpinnerIcon size={13} />
+                    Uploading
+                  </span>
+                )}
                 {it.status === "done" && it.slug && (
-                  <Link to={`/d/${it.slug}`} className="text-accent hover:opacity-80 shrink-0 font-medium">
-                    Open →
+                  <Link
+                    to={`/d/${it.slug}`}
+                    className="inline-flex items-center gap-1.5 text-accent hover:opacity-80 shrink-0 font-medium transition"
+                  >
+                    <CheckIcon size={13} className="text-ok" />
+                    Open
                   </Link>
                 )}
-                {it.status === "error" && <span className="text-bad shrink-0">{it.error}</span>}
+                {it.status === "error" && (
+                  <span className="inline-flex items-center gap-1.5 text-bad shrink-0">
+                    <AlertIcon size={13} />
+                    {it.error}
+                  </span>
+                )}
               </li>
             ))}
           </ul>

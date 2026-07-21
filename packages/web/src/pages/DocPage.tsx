@@ -3,6 +3,7 @@ import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Header } from "../components/Header.js";
 import { HtmlRenderer } from "../components/HtmlRenderer.js";
+import { LogoMark, UploadIcon } from "../components/icons.js";
 import { MarkdownRenderer } from "../components/MarkdownRenderer.js";
 import { ReadingProgress } from "../components/ReadingProgress.js";
 import { SearchPanel } from "../components/SearchPanel.js";
@@ -15,6 +16,42 @@ import { api } from "../lib/api.js";
 
 // pdf.js is heavy (~1MB worker) — only load it when actually viewing a PDF.
 const PdfRenderer = lazy(() => import("../components/PdfRenderer.js").then((m) => ({ default: m.PdfRenderer })));
+
+/** ~220 wpm; only meaningful for text formats. */
+function readingMinutes(content: string): number {
+  return Math.max(1, Math.round(content.split(/\s+/).length / 220));
+}
+
+function DocSkeleton() {
+  return (
+    <div
+      className="mx-auto max-w-7xl px-4 py-8 lg:flex lg:gap-8 lg:items-start"
+      role="status"
+      aria-busy="true"
+      aria-label="Loading"
+    >
+      <div className="hidden lg:block lg:w-56 lg:shrink-0 space-y-3 pt-1">
+        <div className="pi-skeleton h-3 w-24" />
+        <div className="pi-skeleton h-3 w-40" />
+        <div className="pi-skeleton h-3 w-32" />
+        <div className="pi-skeleton h-3 w-36" />
+      </div>
+      <div className="w-full min-w-0 mx-auto lg:max-w-3xl">
+        <div className="pi-skeleton h-10 w-3/4 mb-3" />
+        <div className="pi-skeleton h-4 w-40 mb-10" />
+        <div className="space-y-3">
+          <div className="pi-skeleton h-4 w-full" />
+          <div className="pi-skeleton h-4 w-[92%]" />
+          <div className="pi-skeleton h-4 w-[97%]" />
+          <div className="pi-skeleton h-4 w-2/3" />
+          <div className="pi-skeleton h-40 w-full mt-6" />
+          <div className="pi-skeleton h-4 w-full mt-6" />
+          <div className="pi-skeleton h-4 w-[88%]" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function DocPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -43,33 +80,19 @@ export function DocPage() {
     if (error === "no_docs")
       return (
         <div className="min-h-screen flex items-center justify-center bg-app text-ink px-6">
-          <div className="text-center space-y-5 max-w-md">
+          <div className="pi-rise text-center space-y-5 max-w-md">
+            <LogoMark size={32} className="mx-auto text-ink" />
             <h1 className="font-heading text-3xl font-bold">Welcome to pipeit</h1>
-            <p className="text-muted">
-              You don't have any documents yet. Push your first markdown file to get started:
-            </p>
+            <p className="text-muted">You don't have any documents yet. Pipe your first one from Claude Code:</p>
             <pre className="text-left bg-raise border border-hair rounded-card p-4 text-sm font-mono text-ink overflow-x-auto">
-              npx pipeit push README.md
+              /pipeit ./README.md
             </pre>
             <p className="text-muted text-sm">or</p>
             <Link
               to="/upload"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-accent hover:opacity-90 text-on-accent text-sm font-semibold transition"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-accent hover:opacity-90 active:scale-[0.98] text-on-accent text-sm font-semibold transition duration-200"
             >
-              <svg
-                width={16}
-                height={16}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M12 15V4M12 4 8 8M12 4l4 4" />
-                <path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />
-              </svg>
+              <UploadIcon />
               Upload a file
             </Link>
           </div>
@@ -77,9 +100,15 @@ export function DocPage() {
       );
     return (
       <div className="min-h-screen flex items-center justify-center bg-app text-ink px-6">
-        <div className="text-center">
-          <p className="text-muted mb-4">{error === "not found" ? "Document not found" : error}</p>
-          <Link to="/" className="text-accent hover:opacity-80 text-sm font-medium">
+        <div className="pi-rise text-center space-y-4 max-w-sm">
+          <LogoMark size={28} className="mx-auto text-muted opacity-60" />
+          <p className="font-heading text-xl font-bold">
+            {error === "not found" ? "Document not found" : "Something went wrong"}
+          </p>
+          <p className="text-sm text-muted">
+            {error === "not found" ? "This document may have been deleted, or the link is private." : error}
+          </p>
+          <Link to="/" className="inline-block text-accent hover:opacity-80 text-sm font-medium transition">
             Back to home
           </Link>
         </div>
@@ -89,12 +118,13 @@ export function DocPage() {
 
   if (!doc)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-app text-ink">
-        <p className="text-muted">Loading...</p>
+      <div className="min-h-screen bg-app text-ink">
+        <DocSkeleton />
       </div>
     );
 
   const isEmbed = doc.format === "pdf" || doc.format === "html";
+  const isText = doc.format === "markdown" || doc.format === "txt";
 
   return (
     // print:[display:contents] on the viewer wrapper chain (this div → the
@@ -117,17 +147,23 @@ export function DocPage() {
       <div className="mx-auto max-w-7xl px-4 py-8 lg:flex lg:gap-8 lg:items-start print:[display:contents]">
         <TOCSidebar open={tocOpen} onClose={() => setTocOpen(false)} />
         <main
-          className={`w-full min-w-0 mx-auto print:[display:contents] ${isEmbed ? "lg:max-w-5xl" : "lg:max-w-3xl"}`}
+          className={`pi-rise w-full min-w-0 mx-auto print:[display:contents] ${isEmbed ? "lg:max-w-5xl" : "lg:max-w-3xl"}`}
         >
           {/* Embedded docs (PDF/HTML) carry their own heading inside the frame, so
               the app title block is hidden in print to avoid a duplicate title. */}
           <h1
-            className={`font-heading text-4xl font-bold leading-tight tracking-tight mb-2 ${isEmbed ? "print:hidden" : ""}`}
+            className={`font-heading text-4xl font-bold leading-tight tracking-tight text-balance mb-2 ${isEmbed ? "print:hidden" : ""}`}
           >
             {doc.title}
           </h1>
           <p className={`text-sm text-muted mb-10 ${isEmbed ? "print:hidden" : ""}`}>
-            v{doc.version} &middot; {new Date(doc.updated_at).toLocaleDateString()}
+            v{doc.version} &middot;{" "}
+            {new Date(doc.updated_at).toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+            {isText && ` · ${readingMinutes(doc.content)} min read`}
           </p>
           {doc.format === "pdf" ? (
             <Suspense fallback={<p className="text-muted">Loading PDF viewer…</p>}>

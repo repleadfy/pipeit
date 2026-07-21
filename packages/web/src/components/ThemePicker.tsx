@@ -1,4 +1,5 @@
 import { SKIN_LABELS, SKINS, type Skin } from "../hooks/useTheme.js";
+import { CheckIcon, MoonIcon, SunIcon } from "./icons.js";
 
 // Light-mode accent + surface per skin, for the swatch preview dots.
 const SWATCH: Record<Skin, { accent: string; surface: string; hair: string }> = {
@@ -22,10 +23,11 @@ export function ThemePicker({ skin, setSkin, theme, onToggleTheme }: Props) {
         <button
           type="button"
           onClick={onToggleTheme}
-          className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-muted hover:bg-raise hover:text-ink transition"
+          className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-muted hover:bg-raise hover:text-ink active:scale-95 transition duration-200"
           aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
         >
-          {theme === "dark" ? "☾ Dark" : "☀ Light"}
+          {theme === "dark" ? <MoonIcon size={13} /> : <SunIcon size={13} />}
+          {theme === "dark" ? "Dark" : "Light"}
         </button>
       </div>
       {SKINS.map((s) => {
@@ -36,7 +38,7 @@ export function ThemePicker({ skin, setSkin, theme, onToggleTheme }: Props) {
             type="button"
             key={s}
             onClick={() => setSkin(s)}
-            className={`flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left text-sm transition ${
+            className={`flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left text-sm transition duration-200 ${
               active ? "bg-accent-soft text-ink" : "text-muted hover:bg-raise hover:text-ink"
             }`}
           >
@@ -47,7 +49,7 @@ export function ThemePicker({ skin, setSkin, theme, onToggleTheme }: Props) {
               <span className="h-3 w-3 rounded-full" style={{ background: sw.accent }} />
             </span>
             <span className="flex-1 font-medium">{SKIN_LABELS[s]}</span>
-            {active && <span className="text-accent">✓</span>}
+            {active && <CheckIcon size={14} className="text-accent" />}
           </button>
         );
       })}

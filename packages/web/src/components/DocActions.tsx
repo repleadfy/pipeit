@@ -1,5 +1,6 @@
 import type { DocFormat } from "@pipeit/shared";
 import { useEffect, useRef, useState } from "react";
+import { DownloadIcon } from "./icons.js";
 
 const EXT: Record<DocFormat, string> = { markdown: "md", txt: "txt", html: "html", pdf: "pdf" };
 const MIME: Partial<Record<DocFormat, string>> = {
@@ -14,27 +15,9 @@ const COPY_LABEL: Partial<Record<DocFormat, string>> = {
 };
 
 const ghost =
-  "inline-flex items-center justify-center min-h-9 px-2.5 rounded-lg text-sm font-medium text-muted hover:text-ink hover:bg-raise transition";
-const item = "w-full text-left px-3 py-2 text-sm text-muted hover:bg-raise hover:text-ink transition rounded-lg";
-
-function DownloadIcon() {
-  return (
-    <svg
-      width={16}
-      height={16}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M12 4v10M8 12l4 4 4-4" />
-      <path d="M4 18v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1" />
-    </svg>
-  );
-}
+  "inline-flex items-center justify-center min-h-9 px-2.5 rounded-lg text-sm font-medium text-muted hover:text-ink hover:bg-raise active:scale-[0.97] transition duration-200";
+const item =
+  "w-full text-left px-2 py-2 text-sm text-muted hover:bg-raise hover:text-ink transition duration-200 rounded-lg";
 
 // Filesystem-safe name from the doc title (keep letters/numbers/space/._-), else slug.
 function filename(title: string, slug: string, format: DocFormat): string {
@@ -113,10 +96,10 @@ export function DocActions({ slug, title, format, content }: Props) {
         <DownloadIcon />
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-52 bg-surface border border-hair rounded-xl shadow-xl py-1 z-50">
+        <div className="pi-pop absolute right-0 mt-2 w-52 bg-surface border border-hair rounded-xl shadow-xl shadow-black/5 dark:shadow-black/30 py-1 px-1 z-50">
           {canCopy && (
             <button type="button" className={item} onClick={copy}>
-              {copied ? "Copied ✓" : COPY_LABEL[format]}
+              {copied ? "Copied" : COPY_LABEL[format]}
             </button>
           )}
           <button type="button" className={item} onClick={download}>
